@@ -101,7 +101,7 @@ public class Tuple2 implements Vec, KVEntry {
   @Override
   public boolean equals(Object obj) {
     //TODO: if wrapper? (meta)
-    if ((obj instanceof Vec)) {
+    if ((obj instanceof VecLike)) {
       VecLike other = (VecLike) obj;
       return getCountAsInteger() == other.getCountAsInteger() && t0.equals(other.nth(0)) && t1.equals(other.nth(1));
     }

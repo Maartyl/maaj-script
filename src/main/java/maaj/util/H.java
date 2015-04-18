@@ -13,6 +13,7 @@ import maaj.coll.LazySeq;
 import maaj.coll.Tuple0;
 import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
+import maaj.coll.Tuple3;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.KVEntry;
 import maaj.coll.traits.Sequable;
@@ -129,17 +130,22 @@ public class H {
     return new Tuple2(key, value);
   }
 
-  public static Vec tuple(Term t0, Term t1) {
-    return new Tuple2(t0, t1);
+  public static Vec tuple() {
+    return Tuple0.EMPTY_VEC;
   }
 
   public static Vec tuple(Term t0) {
     return new Tuple1(t0);
   }
 
-  public static Vec tuple() {
-    return Tuple0.EMPTY_VEC;
+  public static Vec tuple(Term t0, Term t1) {
+    return new Tuple2(t0, t1);
   }
+
+  public static Vec tuple(Term t0, Term t1, Term t2) {
+    return new Tuple3(t0, t1, t2);
+  }
+
   /**
    * eagerly constructs list (Sexp) from given args array
    * <p>
