@@ -21,12 +21,10 @@ public class SeqH {
 
   //--ctors
   public static Sexp sexp(Term t, Seq s) {
-    //TODO: this sexp requires legth of tail : change?
     return new Sexp(t, s);
   }
 
   public static Cons cons(Term t, Seq s) {
-    //TODO: this sexp requires legth of tail : change?
     return new Cons(t, s);
   }
 
@@ -55,12 +53,13 @@ public class SeqH {
    * @return [f 1, f 2, f 3]
    */
   public static Seq mapSexp(Seq coll, Invocable mapper) {
+    if (coll.isNil()) return H.END;
     return sexp(mapper.invoke(coll.first()), mapSexp(coll.rest(), mapper));
   }
 
   //--lazy variants
   /**
-   * eager, recursive
+   * lazy
    * <p>
    * @param seqs [[1,2],[],[1],[[2,5],4,8]]
    * @return [1,2,1,[2,5],4,8]
@@ -68,19 +67,19 @@ public class SeqH {
   public static Seq concatLazy(Seq seqs) {
     if (seqs.isNil()) return H.END;
     if (seqs.rest().isNil()) return (Seq) seqs.first();
-    return concatSexp((Seq) seqs.first(), seqs.rest());
+    return concatLazy((Seq) seqs.first(), seqs.rest());
   }
 
   /**
-   * eager, recursive
+   * lazy
    */
   private static Seq concatLazy(Seq firsts, Seq rests) {
-    if (firsts.isNil()) return concatSexp(rests);
-    return H.lazy(firsts.first(), () -> concatSexp(firsts.rest(), rests));
+    if (firsts.isNil()) return concatLazy(rests);
+    return H.lazy(firsts.first(), () -> concatLazy(firsts.rest(), rests));
   }
 
   /**
-   * eager, recursive
+   * lazy
    * <p>
    * @param coll   [1, 2, 3]
    * @param mapper f
