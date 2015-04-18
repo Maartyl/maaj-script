@@ -1,0 +1,78 @@
+
+package maaj.term;
+
+import maaj.coll.Sexp;
+import maaj.coll.traits.SeqLike;
+import maaj.lang.Context;
+import maaj.util.H;
+import maaj.exceptions.InvalidOperationException;
+import maaj.util.SeqH;
+
+/**
+ * Represents singleLinked list - base for S-expressions
+ * <p>
+ * Default ~Monadic and seq operations implementations are lazy
+ * - Sexp overrides them to be eager if list is short
+ *
+ * @author maartyl
+ */
+public interface Seq extends Monad, SeqLike {
+
+  @Override //explicit because: diamon inheritance (same name on purpose)
+  default boolean isNil() {
+    return false;
+  }
+
+  @Override
+  public default Seq retM(Term contents) {
+    return Sexp.retM1(contents);
+  }
+
+  @Override
+  public default Seq bindM(Invocable fn2Monad) {
+    return SeqH.concatLazy(this.fmap(fn2Monad));
+  }
+
+  @Override
+  public default Seq fmap(Invocable mapper) {
+    return SeqH.mapLazy(this, mapper);
+  }
+
+  @Override
+  public default Term eval(Context c) {
+    //Core sexp application:
+    //rest will be evaluated in apply (or not) based on 'function type' (Fn, macro...)
+    return first().eval(c).apply(c, rest());
+  }
+
+  @Override
+  public default Term evalMacros(Context c) {
+    return first().evalMacros(c).applyMacros(c, rest());
+  }
+
+  @Override
+  public default Term apply(Context cxt, Seq args) {
+    throw new InvalidOperationException("Seq cannot be used as a function."); //TODO: implement
+  }
+
+  @Override
+  public default Seq seq() {
+    return this;
+  }
+
+  /**
+   * eagerly evaluated
+   */
+  @Override
+  default Seq foreach(Invocable mapper) {
+    for (Seq cur = this; !cur.isNil(); cur = cur.rest())
+      mapper.invoke(cur.first());
+    return this;
+  }
+
+  //--- static
+  public static Seq retM1(Term content) {
+    return Sexp.retM1(content);
+  }
+
+}

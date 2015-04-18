@@ -1,0 +1,126 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package maaj.term;
+
+import java.util.Objects;
+import maaj.exceptions.InvalidOperationException;
+import maaj.lang.Context;
+
+/**
+ * wrapped longs
+ * <p>
+ * @author maartyl
+ */
+public final class Char implements Num {
+  private final char value;
+
+  private Char(char value) {
+    this.value = value;
+  }
+
+  @Override
+  public Term apply(Context cxt, Seq args) {
+    throw new UnsupportedOperationException("Won't be ever supported."); //TODO: implement
+  }
+
+  @Override
+  public Char inc() {
+    return Char.of((char) (value + 1));
+  }
+
+  @Override
+  public Char inc(Num diff) {
+    //todo: 'plus' variant that will add mathematically: Int + Dbl => Dbl
+    return Char.of((char) (value + diff.asLong()));
+  }
+
+  @Override
+  public Char neg() {
+    throw new InvalidOperationException("Char cennot be negated.");
+  }
+
+  @Override
+  public Char dec() {
+    return Char.of((char) (value - 1));
+  }
+
+  @Override
+  public Char dec(Num diff) {
+    return Char.of((char) (value - diff.asLong()));
+  }
+
+  @Override
+  public long asLong() {
+    return value;
+  }
+
+  @Override
+  public double asDouble() {
+    return value;
+  }
+
+  public char asCharacter() {
+    return value;
+  }
+
+  @Override
+  public boolean eq(Num other) {
+    if (other.getClass() == Char.class) 
+      return value == ((Char) other).value;
+    
+    return value == other.asDouble();
+  }
+
+  @Override
+  public boolean lt(Num other) {
+    if (other.getClass() == Char.class) {
+      return value < ((Char) other).value;
+    }
+    return value < other.asDouble();
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
+
+  @Override
+  public Object getContent() {
+    return value;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(value);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final Char other = (Char) obj;
+    if (this.value != other.value) return false;
+    return true;
+  }
+
+
+
+
+  //---- STATIC (ASCII + ... 128-255)
+  private static final Char[] cache = new Char[256];
+
+  public static Char of(char val) {
+    if (val < 256) {
+      if (cache[val] == null) {
+        //no sync needed: worst case: it will be created twice
+        cache[val] = new Char(val);
+      }
+      return cache[val];
+    }
+    return new Char(val);
+  }
+
+}
