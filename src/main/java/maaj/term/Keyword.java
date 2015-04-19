@@ -41,20 +41,24 @@ public class Keyword extends Symbol {
     return composeShow();
   }
 
-
   //-- STATIC
   public static Keyword of(String str) {
     if (str.charAt(0) == ':') str = str.substring(1);
     int slash = findNsEnd(str);
     if (slash < 0) return simple(str);
-    return qualified(str.substring(0, slash), str.substring(slash + 1));
+    return qualifiedNonNull(str.substring(0, slash), str.substring(slash + 1));
   }
 
   public static Keyword simple(String name) {
     return new Keyword(name);
   }
 
-  public static Keyword qualified(String ns, String name) {
+  private static Keyword qualifiedNonNull(String ns, String name) {
     return new KeywordNs(ns, name);
+  }
+
+  public static Keyword qualified(String ns, String name) {
+    if (ns == null) return simple(name);
+    return qualifiedNonNull(ns, name);
   }
 }

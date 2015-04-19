@@ -25,7 +25,6 @@ public class KeywordNs extends Keyword {
     return ns;
   }
 
-
   @Override
   protected String composeShow() {
     return ':' + ns + '/' + name;
