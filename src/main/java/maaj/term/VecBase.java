@@ -37,14 +37,14 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
     int count = getCountAsInteger();
     VecT v = VecH.emptyTransient();
     for (int i = 0; i < count; i++)
-      v.doConj(mapper.invoke(nth(i)));
+      v.doConj(nth(i).transform(mapper));
     return fromTransient(v);
   }
 
   @Override
   default public VB bindM(Invocable fn2Monad) {
     VecT v = VecH.emptyTransient();
-    foreach((Invocable1) x -> (Term) ((Functor<?>) fn2Monad.invoke(x)).foreach((Invocable1) v::doConj));
+    foreach((Invocable1) x -> (Term) ((Functor<?>) x.transform(fn2Monad)).foreach((Invocable1) v::doConj));
     return fromTransient(v);
   }
 
@@ -82,7 +82,7 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
   default public VecBase<VB> foreach(Invocable mapper) {
     int count = getCountAsInteger();
     for (int i = 0; i < count; i++) {
-      mapper.invoke(nth(i));
+      nth(i).transform(mapper);
     }
     return this;
   }
