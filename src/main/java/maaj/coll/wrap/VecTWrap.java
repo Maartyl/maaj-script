@@ -39,12 +39,14 @@ public final class VecTWrap implements VecT {
   @Override
   @SuppressWarnings("unchecked")
   public VecT doConj(Term t) {
-    return wrap((ITransientVector<Term>) vector.conj(t));
+    vector.conj(t);
+    return this;
   }
 
   @Override
   public VecT doAssocN(int pos, Term value) {
-    return wrap(vector.assocN(pos, value));
+    vector.assocN(pos, value);
+    return this;
   }
 
   @Override
