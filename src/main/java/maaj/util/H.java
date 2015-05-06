@@ -146,6 +146,10 @@ public class H {
     return new Tuple3(t0, t1, t2);
   }
 
+  public static Vec vec(Seq s) {
+    return VecH.fromSeq(s);
+  }
+
   /**
    * eagerly constructs list (Sexp) from given args array
    * <p>
@@ -300,7 +304,7 @@ public class H {
    * "throw H.sneakyThrow(ex)" to fix Java exception handling bug
    * <p>
    * <p>
- I love this bug-fix. If anyone were to be against it, I would like to remind them, that they have said themselves that
+   * I love this bug-fix. If anyone were to be against it, I would like to remind them, that they have said themselves that
    * explicit throwing wrap all exceptions in all method declarations was a bad design decision in the first place.
    * <p>
    * @param t

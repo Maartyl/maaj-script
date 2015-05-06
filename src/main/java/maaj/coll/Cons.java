@@ -55,6 +55,16 @@ public class Cons implements Seq {
     throw new UnsupportedOperationException("Cons cannot be used as function."); //TODO: implement
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    throw new UnsupportedOperationException("TODO"); //DODO: equals
+  }
+
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("TODO"); //DODO: hash
+  }
+
   //--- STATIC
   public static Seq retM1(Term t) {
     return new Sexp(1, t, H.END);
