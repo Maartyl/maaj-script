@@ -8,6 +8,7 @@ package maaj;
 import com.github.krukow.clj_lang.IMapEntry;
 import com.github.krukow.clj_lang.IPersistentCollection;
 import com.github.krukow.clj_lang.IPersistentMap;
+import com.github.krukow.clj_lang.IPersistentStack;
 import com.github.krukow.clj_lang.IPersistentVector;
 import com.github.krukow.clj_lang.ISeq;
 import java.io.Writer;
@@ -47,6 +48,8 @@ public class TestMain {
     Int a = Int.of(3);
     System.out.println(a.neg());
 
+    Vec v = H.tuple(a);
+
     SeqH.mapLazy(H.list(Int.of(1), Int.of(2), Int.of(3), Int.of(4)), (Invocable1) x -> {
       return ((Num) x).inc();
     }).foreach((Invocable1) x -> {
@@ -67,7 +70,7 @@ public class TestMain {
       });
     } catch (RuntimeException e) {
     }
-    
+    System.out.println();
   }
 
   static void test(IPersistentMap<String, Term> m) {
@@ -77,6 +80,69 @@ public class TestMain {
 
   static void test(IPersistentVector<Term> v) {
 
+  }
+
+  static class TestVec implements IPersistentVector<Term> {
+
+    @Override
+    public int length() {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public IPersistentVector<Term> assocN(int i, Term val) {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public IPersistentVector<Term> cons(Term o) {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public Term peek() {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public IPersistentStack<Term> pop() {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public int count() {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public IPersistentCollection<Term> empty() {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public boolean equiv(Object o) {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public ISeq<Term> seq() {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public ISeq<Term> rseq() {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public Term nth(int i) {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
+
+    @Override
+    public Term nth(int i, Term notFound) {
+      throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    }
   }
 
   static class TestMap implements IPersistentMap<Term, Term> {

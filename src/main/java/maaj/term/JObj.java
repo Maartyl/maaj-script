@@ -6,7 +6,9 @@
 package maaj.term;
 
 /**
- *
+ * Used to represent wrappers of native JVM objects.
+ * Used in: Str, JWrap
+ * <p>
  * @author maartyl
  */
 public interface JObj extends Term {

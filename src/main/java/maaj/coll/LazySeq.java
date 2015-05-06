@@ -76,6 +76,7 @@ public final class LazySeq implements Seq {
  
   @Override
   public Term transform(Invocable transformer) {
+    //TODO: reconsider: necessary? - it wouold evaluate first elem...
     return seq().transform(transformer);
   }
 

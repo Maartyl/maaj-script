@@ -16,7 +16,7 @@ import maaj.util.SeqH;
  */
 public class Str implements JObj, Collection {
 
-  private String value;
+  private final String value;
 
   public Str(String value) {
     this.value = value;
