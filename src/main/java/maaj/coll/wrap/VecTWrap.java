@@ -5,11 +5,8 @@
  */
 package maaj.coll.wrap;
 
-import com.github.krukow.clj_lang.APersistentVector;
-import com.github.krukow.clj_lang.IEditableCollection;
 import com.github.krukow.clj_lang.IPersistentVector;
 import com.github.krukow.clj_lang.ITransientVector;
-import com.github.krukow.clj_lang.LazilyPersistentVector;
 import maaj.term.Int;
 import maaj.term.Term;
 import maaj.term.Vec;
@@ -25,7 +22,7 @@ public final class VecTWrap implements VecT {
 
   private final ITransientVector<Term> vector;
 
-  public VecTWrap(ITransientVector<Term> vector) {
+  private VecTWrap(ITransientVector<Term> vector) {
     this.vector = vector;
   }
 
@@ -59,6 +56,16 @@ public final class VecTWrap implements VecT {
   @SuppressWarnings("unchecked")
   public Vec asPersistent() {
     return VecPWrap.of((IPersistentVector<Term>) vector.persistent());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    throw new UnsupportedOperationException("TODO"); //DODO: equals
+  }
+
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("TODO"); //DODO: hash
   }
 
   private static VecTWrap wrap(ITransientVector<Term> pvector) {

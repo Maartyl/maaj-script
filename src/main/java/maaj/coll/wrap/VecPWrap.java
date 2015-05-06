@@ -8,7 +8,6 @@ package maaj.coll.wrap;
 import com.github.krukow.clj_lang.IEditableCollection;
 import com.github.krukow.clj_lang.IPersistentVector;
 import com.github.krukow.clj_lang.ITransientVector;
-import com.github.krukow.clj_lang.LazilyPersistentVector;
 import maaj.term.Int;
 import maaj.term.Term;
 import maaj.term.Vec;
@@ -24,7 +23,7 @@ public final class VecPWrap implements Vec {
 
   private final IPersistentVector<Term> vector;
 
-  public VecPWrap(IPersistentVector<Term> vector) {
+  private VecPWrap(IPersistentVector<Term> vector) {
     this.vector = vector;
   }
 
@@ -56,7 +55,18 @@ public final class VecPWrap implements Vec {
   @Override
   @SuppressWarnings({"unchecked", "unchecked"})
   public VecT asTransient() {
+    //TODO: handle vectors that are not IEditable
     return VecTWrap.of((ITransientVector<Term>) ((IEditableCollection) vector).asTransient());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    throw new UnsupportedOperationException("TODO"); //DODO: equals
+  }
+
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("TODO"); //DODO: hash
   }
 
   private static VecPWrap wrap(IPersistentVector<Term> pvector) {
@@ -64,6 +74,7 @@ public final class VecPWrap implements Vec {
   }
 
   @SuppressWarnings("unchecked") //precondition: pvector != null
+
   public static VecPWrap of(IPersistentVector<Term> pvector) {
     //null checked in H.wrap: properly returns Nil on null
     return wrap(pvector);
@@ -76,4 +87,5 @@ public final class VecPWrap implements Vec {
       return VecH.emptyPersistent();
     return new VecPWrap(pvector);
   }
+
 }

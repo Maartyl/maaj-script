@@ -7,9 +7,11 @@ package maaj.term;
 
 import com.github.krukow.clj_lang.ArityException;
 import java.io.IOException;
+import maaj.coll.traits.Functor;
 import maaj.coll.traits.VecLikeBase;
 import maaj.lang.Context;
 import maaj.util.H;
+import maaj.util.VecH;
 
 /**
  *
@@ -18,22 +20,37 @@ import maaj.util.H;
  */
 public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, VecLikeBase<VB> {
 
+  /**
+   * Knows how to become itself from transient version.
+   * Essentailly private.
+   * <p>
+   * @param v
+   * @return
+   */
+  VB fromTransient(VecT v);
+
+  VB fromPersistent(Vec v);
+
   @Override
+  @SuppressWarnings("unchecked")
   default public VB fmap(Invocable mapper) {
-    //TODO: after transient
-    throw new UnsupportedOperationException("not yet");
+    int count = getCountAsInteger();
+    VecT v = VecH.emptyTransient();
+    for (int i = 0; i < count; i++)
+      v.doConj(mapper.invoke(nth(i)));
+    return fromTransient(v);
   }
 
   @Override
   default public VB bindM(Invocable fn2Monad) {
-    //TODO: after transient
-    throw new UnsupportedOperationException("not yet");
+    VecT v = VecH.emptyTransient();
+    foreach((Invocable1) x -> (Term) ((Functor<?>) fn2Monad.invoke(x)).foreach((Invocable1) v::doConj));
+    return fromTransient(v);
   }
 
   @Override
   default public VB retM(Term contents) {
-    //TODO: after Tuple1
-    throw new UnsupportedOperationException("not yet");
+    return fromPersistent(H.tuple(contents));
   }
 
   @Override

@@ -12,6 +12,7 @@ import com.github.krukow.clj_lang.PersistentVector;
 import maaj.coll.Tuple0;
 import maaj.coll.traits.VecLike;
 import maaj.coll.wrap.VecTWrap;
+import maaj.term.Invocable2;
 import maaj.term.Seq;
 import maaj.term.Term;
 import maaj.term.Vec;
@@ -32,6 +33,10 @@ public class VecH {
 
   public static Seq asSeq(VecT v) {
     return asSeq(v.asPersistent());
+  }
+
+  public static Vec fromSeq(Seq s) {
+    return ((VecT) s.reduce(emptyTransient(), (Invocable2) (v, x) -> ((VecT) v).doConj(x))).asPersistent();
   }
 
   public static int computeHash(Vec v) {

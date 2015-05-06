@@ -16,6 +16,16 @@ import maaj.util.VecH;
 public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, Vec> {
 
   @Override
+  public default VecT fromTransient(VecT v) {
+    return v;
+  }
+
+  @Override
+  public default VecT fromPersistent(Vec v) {
+    return v.asTransient();
+  }
+
+  @Override
   public default VecT asTransient() {
     return this;
   }
