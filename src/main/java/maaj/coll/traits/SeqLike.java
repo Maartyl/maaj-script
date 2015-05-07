@@ -5,6 +5,7 @@
  */
 package maaj.coll.traits;
 
+import java.util.Iterator;
 import maaj.term.Invocable;
 import maaj.term.Seq;
 import maaj.term.Term;
@@ -13,7 +14,7 @@ import maaj.term.Term;
  *
  * @author maartyl
  */
-public interface SeqLike extends Numerable, Sequable, Reducible {
+public interface SeqLike extends Numerable, Sequable, Reducible, Iterable<Term> {
   //--contract:
 
   Term first();
@@ -45,4 +46,24 @@ public interface SeqLike extends Numerable, Sequable, Reducible {
       acc = reducer.invoke(acc, cur.first());
     return acc;
   }
+
+  @Override
+  public default Iterator<Term> iterator() {
+    return new Iterator<Term>() {
+      private SeqLike self = SeqLike.this;
+
+      @Override
+      public boolean hasNext() {
+        return !self.isNil();
+      }
+
+      @Override
+      public Term next() {
+        Term v = self.first();
+        self = self.rest();
+        return v;
+      }
+    };
+  }
+
 }
