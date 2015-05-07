@@ -93,11 +93,6 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
     switch (count) {
     case 0: w.append("[]");
       break;
-//    case 1:
-//      w.append('[');
-//      nth(0).serialize(w);
-//      w.append(']');
-//      break;
     default:
       w.append('[');
       nth(0).serialize(w);
