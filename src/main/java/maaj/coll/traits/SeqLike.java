@@ -14,7 +14,7 @@ import maaj.term.Term;
  *
  * @author maartyl
  */
-public interface SeqLike extends Numerable, Sequable, Reducible, Iterable<Term> {
+public interface SeqLike extends Numerable, Seqable, Reducible, Iterable<Term> {
   //--contract:
 
   Term first();

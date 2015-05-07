@@ -12,7 +12,7 @@ import maaj.term.Seq;
  *
  * @author maartyl
  */
-public interface Sequable {
+public interface Seqable {
 
   /**
    * linear representation of collection

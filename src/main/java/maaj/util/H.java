@@ -16,7 +16,7 @@ import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.KVEntry;
-import maaj.coll.traits.Sequable;
+import maaj.coll.traits.Seqable;
 import maaj.coll.wrap.VecPWrap;
 import maaj.coll.wrap.VecTWrap;
 import maaj.term.*;
@@ -247,8 +247,8 @@ public class H {
   public static Seq seqFrom(Term t) {
     if (t instanceof Seq)
       return (Seq) t;
-    if (t instanceof Sequable)
-      return ((Sequable) t).seq();
+    if (t instanceof Seqable)
+      return ((Seqable) t).seq();
 
     throw new IllegalArgumentException("Cannot create Seq from: " + t.getClass().getName());
   }

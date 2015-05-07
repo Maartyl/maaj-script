@@ -7,7 +7,7 @@ package maaj.term;
 
 import maaj.coll.traits.Growable;
 import maaj.coll.traits.Reducible;
-import maaj.coll.traits.Sequable;
+import maaj.coll.traits.Seqable;
 
 /**
  * Collection of Terms.
@@ -15,7 +15,7 @@ import maaj.coll.traits.Sequable;
  * @author maartyl
  * @param <C> self : final type of collection
  */
-public interface Collection<C extends Collection<C>> extends CollectionBase<C>, Growable<C>, Sequable, Reducible {
+public interface Collection<C extends Collection<C>> extends CollectionBase<C>, Growable<C>, Seqable, Reducible {
 
   @Override
   public default Term reduce(Term start, Invocable reducer) {

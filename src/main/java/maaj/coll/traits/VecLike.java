@@ -17,7 +17,7 @@ import maaj.term.Term;
  */
 //public interface VecLike<VLSelf extends VecLike<VLSelf, VLTransient>, VLTransient extends VecTLike<? extends VLSelf, ? extends VLTransient>>
 public interface VecLike<VLSelf extends VecLike<VLSelf, VLTransient>, VLTransient>
-        extends VecLikeBase<VLSelf>, Growable<VLSelf>, AssocUpdate<VLSelf>, Persistent<VLSelf, VLTransient>, Sequable, Reducible {
+        extends VecLikeBase<VLSelf>, Growable<VLSelf>, AssocUpdate<VLSelf>, Persistent<VLSelf, VLTransient>, Seqable, Reducible {
 
   VLSelf assocN(int pos, Term value);
 
