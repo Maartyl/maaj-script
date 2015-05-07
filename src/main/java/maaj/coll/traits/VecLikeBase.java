@@ -14,7 +14,7 @@ import maaj.term.Term;
  * @author maartyl
  * @param <VL> self
  */
-public interface VecLikeBase<VL extends VecLikeBase<VL>> extends Indexed, AssocGet {
+public interface VecLikeBase<VL extends VecLikeBase<VL>> extends Indexed, AssocGet, Peekable {
 
   @Override
   public default Term valAt(Term key) {
@@ -42,5 +42,13 @@ public interface VecLikeBase<VL extends VecLikeBase<VL>> extends Indexed, AssocG
     //KVEntry must become Term anyway, to be useable - Nil is probably best
     return H.buildAssocEntry(key, val);
   }
+
+  @Override
+  public default Term peek() {
+    int count = getCountAsInteger();
+    if (count == 0) return H.NIL;
+    return nth(count - 1);
+  }
+
 
 }
