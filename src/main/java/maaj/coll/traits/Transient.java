@@ -23,7 +23,7 @@ package maaj.coll.traits;
 //  public PColl asPersistent();
 //
 //}
-public interface Transient<PColl, TColl> extends TraPer<PColl, TColl> {
+public interface Transient<PColl, TColl extends Transient<PColl, TColl>> extends TraPer<PColl, TColl> {
 
   @Override
   public TColl asTransient();

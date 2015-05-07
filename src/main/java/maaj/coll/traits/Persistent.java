@@ -23,7 +23,7 @@ package maaj.coll.traits;
 //  public PColl asPersistent();
 //
 //}
-public interface Persistent<PColl, TColl>
+public interface Persistent<PColl extends Persistent<PColl, TColl>, TColl>
         extends TraPer<PColl, TColl> {
 
   @Override
