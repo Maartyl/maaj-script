@@ -30,21 +30,6 @@ public interface Vec extends Collection<Vec>, VecBase<Vec>, VecLike<Vec, VecT> {
   }
 
   @Override
-  public default Vec retM(Term contents) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
-  }
-
-  @Override
-  public default Vec bindM(Invocable fn2Monad) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
-  }
-
-  @Override
-  public default Vec fmap(Invocable mapper) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
-  }
-
-  @Override
   default public Seq seq() {
     return VecH.asSeq(this);
   }

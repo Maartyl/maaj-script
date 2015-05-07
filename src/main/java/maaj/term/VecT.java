@@ -31,19 +31,8 @@ public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, V
 
   @Override
   default public VecT fmap(Invocable mapper) {
-    //TODO: after transient
+    //TODO: maybe make it mutate vect?
     throw new UnsupportedOperationException("not yet");
   }
 
-  @Override
-  default public VecT bindM(Invocable fn2Monad) {
-    //TODO: after transient
-    throw new UnsupportedOperationException("not yet");
-  }
-
-  @Override
-  default public VecT retM(Term contents) {
-    //TODO: after Tuple1
-    throw new UnsupportedOperationException("not yet");
-  }
 }
