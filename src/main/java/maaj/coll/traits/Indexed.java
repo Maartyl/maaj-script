@@ -5,6 +5,7 @@
  */
 package maaj.coll.traits;
 
+import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
 import maaj.term.Term;
@@ -22,7 +23,9 @@ public interface Indexed extends Counted {
   }
 
   default Term nth(int i) {
-    return nth(i, H.NIL);
+    if (i < 0 || i >= getCountAsInteger())
+      throw new IndexOutOfBoundsExceptionInfo(getCountAsInteger(), i);
+    return nth(i, H.NIL); //dflt shouldn't be ever returned
   }
 
   default Term nth(Int i) {

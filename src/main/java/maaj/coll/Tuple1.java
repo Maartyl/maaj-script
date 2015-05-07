@@ -42,7 +42,7 @@ public class Tuple1 implements Vec {
     switch (i) {
     case 0: return t0;
     default:
-      throw new IndexOutOfBoundsExceptionInfo(getCountAsInteger(), i);
+      return dflt;
     }
   }
 

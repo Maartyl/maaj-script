@@ -48,7 +48,7 @@ public class Tuple2 implements Vec, KVEntry {
     case 0: return t0;
     case 1: return t1;
     default:
-      throw new IndexOutOfBoundsExceptionInfo(getCountAsInteger(), i);
+      return dflt;
     }
   }
 

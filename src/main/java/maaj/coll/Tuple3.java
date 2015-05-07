@@ -49,7 +49,7 @@ public class Tuple3 implements Vec {
     case 1: return t1;
     case 2: return t2;
     default:
-      throw new IndexOutOfBoundsExceptionInfo(getCountAsInteger(), i);
+      return dflt;
     }
   }
 
