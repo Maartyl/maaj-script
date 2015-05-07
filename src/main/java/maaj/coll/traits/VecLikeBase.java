@@ -33,17 +33,6 @@ public interface VecLikeBase<VL extends VecLikeBase<VL>> extends Indexed, AssocG
   }
 
   @Override
-  public default KVPair entryAt(Term key) {
-    Term val = valAt(key, H.notFoundNil);
-    //TODO: think through (Nil / Ex / (Key, Nil) / ??)
-//    if (val == H.notFoundNil)
-//      return H.NIL;
-    //This is wrong: shows notFoundNil - that probably shouldn't be happening...
-    //KVEntry must become Term anyway, to be useable - Nil is probably best
-    return H.buildAssocEntry(key, val);
-  }
-
-  @Override
   public default Term peek() {
     int count = getCountAsInteger();
     if (count == 0) return H.NIL;

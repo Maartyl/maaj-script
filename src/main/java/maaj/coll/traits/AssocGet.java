@@ -18,5 +18,13 @@ public interface AssocGet extends Lookup {
     return valAt(key, H.notFoundNil) != H.notFoundNil;
   }
 
-  KVPair entryAt(Term key);
+  public default KVPair entryAt(Term key) {
+    Term val = valAt(key, H.notFoundNil);
+    //TODO: think through (Nil / Ex / (Key, Nil) / ??)
+//    if (val == H.notFoundNil)
+//      return H.NIL;
+    //This is wrong: shows notFoundNil - that probably shouldn't be happening...
+    //KVEntry must become Term anyway, to be useable - Nil is probably best
+    return H.buildAssocEntry(key, val);
+  }
 }
