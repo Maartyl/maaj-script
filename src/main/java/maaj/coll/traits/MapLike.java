@@ -12,8 +12,9 @@ import maaj.util.MapH;
  *
  * @author maartyl
  * @param <M> self
+ * @param <MT> transient version of self
  */
-public interface MapLike<M extends MapLike<M>> extends Growable<M>, AssocUpdate<M>, Seqable, Reducible {
+public interface MapLike<M extends MapLike<M, MT>, MT> extends Growable<M>, AssocUpdate<M>, Persistent<M, MT>, Seqable, Reducible {
   @Override
   public default M conj(Term term) {
     return MapH.coerceConj(term, this::assoc);
