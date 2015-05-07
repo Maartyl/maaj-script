@@ -5,6 +5,7 @@
  */
 package maaj.coll.traits;
 
+import maaj.term.KVPair;
 import maaj.term.Term;
 import maaj.util.H;
 
@@ -17,5 +18,5 @@ public interface AssocGet extends Lookup {
     return valAt(key, H.notFoundNil) != H.notFoundNil;
   }
 
-  KVEntry entryAt(Term key);
+  KVPair entryAt(Term key);
 }

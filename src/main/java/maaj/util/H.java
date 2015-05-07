@@ -126,7 +126,7 @@ public class H {
     return t.getContent();
   }
 
-  public static KVEntry buildAssocEntry(Term key, Term value) {
+  public static KVPair buildAssocEntry(Term key, Term value) {
     return new Tuple2(key, value);
   }
 

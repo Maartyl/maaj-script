@@ -5,6 +5,7 @@
  */
 package maaj.coll.traits;
 
+import maaj.term.KVPair;
 import maaj.util.H;
 import maaj.term.Term;
 
@@ -32,7 +33,7 @@ public interface VecLikeBase<VL extends VecLikeBase<VL>> extends Indexed, Sequab
   }
 
   @Override
-  public default KVEntry entryAt(Term key) {
+  public default KVPair entryAt(Term key) {
     Term val = valAt(key, H.notFoundNil);
     //TODO: think through (Nil / Ex / (Key, Nil) / ??)
 //    if (val == H.notFoundNil)
