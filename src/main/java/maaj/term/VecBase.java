@@ -57,7 +57,7 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
   default public Term apply(Context cxt, Seq args) {
     if (H.isSingle(args))
       return valAt(args.first().eval(cxt));
-    throw new ArityException(args.boundLength(20), "Vector can only be applied to 1 Int argument.");
+    throw new ArityException(args.boundLength(20), "Vector - can only be applied to 1 Int argument.");
   }
 
   @Override
