@@ -5,13 +5,13 @@
  */
 package maaj.coll;
 
-import maaj.coll.traits.AssocGet;
 import maaj.coll.traits.KVEntry;
 import maaj.coll.traits.VecLike;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
 import maaj.term.Invocable;
+import maaj.term.KVPair;
 import maaj.term.Seq;
 import maaj.term.Term;
 import maaj.term.Vec;
@@ -22,7 +22,7 @@ import maaj.util.VecH;
  *
  * @author maartyl
  */
-public class Tuple2 implements Vec, KVEntry {
+public class Tuple2 implements Vec, KVPair {
   private final Term t0;
   private final Term t1;
 
