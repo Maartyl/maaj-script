@@ -13,4 +13,9 @@ import maaj.coll.traits.MapLike;
  */
 public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
 
+  @Override
+  public default Map asPersistent() {
+    return this;
+  }
+
 }

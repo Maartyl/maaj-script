@@ -5,12 +5,17 @@
  */
 package maaj.term;
 
-import maaj.coll.traits.MapLike;
+import maaj.coll.traits.MapTLike;
 
 /**
  *
  * @author maartyl
  */
-public interface MapT extends CollectionT<MapT>, MapBase<MapT>, MapLike<Map, MapT> {
+public interface MapT extends CollectionT<MapT>, MapBase<MapT>, MapTLike<MapT, Map> {
+
+  @Override
+  public default MapT asTransient() {
+    return this;
+  }
 
 }
