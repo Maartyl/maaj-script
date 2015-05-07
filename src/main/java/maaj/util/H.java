@@ -283,6 +283,14 @@ public class H {
     throw new IllegalArgumentException("Requires Char, got: " + t.getClass().getName());
   }
 
+  public static int inc(int i) {
+    return i + 1;
+  }
+
+  public static Num inc(Num i) {
+    return i.inc();
+  }
+
   /**
    * Allows to perform arbitrary statement in second argument for side effects in any place, thanks to returning first.
    * - Thanks to Java evaluation: ignore is always run after computing ret

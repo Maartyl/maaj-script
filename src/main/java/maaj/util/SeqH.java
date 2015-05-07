@@ -5,6 +5,7 @@
  */
 package maaj.util;
 
+import java.util.Iterator;
 import maaj.coll.Cons;
 import maaj.coll.Sexp;
 import maaj.term.*;
@@ -94,6 +95,20 @@ public class SeqH {
     return H.lazy(mapper.invoke(coll.first()), () -> mapLazyInner(coll.rest(), mapper));
   }
 
+  private static Seq iterator2seq(Iterator<Term> it) {
+    if (!it.hasNext()) return H.END;
+    return H.lazy(it.next(), () -> iterator2seq(it));
+  }
+
+  /**
+   * .iterator() is not called until first element is needed
+   * @param it
+   * @return seq of all results from calling .next() on iterator
+   */
+  public static Seq iterable2seq(Iterable<Term> it) {
+    return H.lazy(() -> iterator2seq(it.iterator()));
+  }
+
   //Generic Indexed lazy seq {
   /**
    * creates lazy seq from indexed something represented by functions that access it
@@ -104,7 +119,7 @@ public class SeqH {
    * @return lazy seq of values from getter
    */
   public static Seq incremental2lazySeq(PerIndexRetriever<Term> getter, PerIndexTestEnd testEnd) {
-    return incremental2lazySeq(0, getter, i -> i + 1, testEnd);
+    return incremental2lazySeq(0, getter, H::inc, testEnd);
   }
 
   /**
