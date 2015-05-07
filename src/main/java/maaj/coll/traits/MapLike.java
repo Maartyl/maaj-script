@@ -12,7 +12,7 @@ import maaj.util.MapH;
  *
  * @author maartyl
  * @param <M> self
- * @param <MT> transient version of self
+ * @param <MT> transient variant of self
  */
 public interface MapLike<M extends MapLike<M, MT>, MT> extends
         Growable<M>, AssocUpdate<M>, Dissoc<M>, Persistent<M, MT>, Seqable, Reducible {
