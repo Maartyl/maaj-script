@@ -9,7 +9,6 @@ import java.util.Iterator;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
-import maaj.term.Seq;
 import maaj.term.Term;
 
 /**
