@@ -97,18 +97,6 @@ public class SeqH {
     return H.lazy(mapper.invoke(coll.first()), () -> mapLazyInner(coll.rest(), mapper));
   }
 
-//  private static Seq iterator2seq(Iterator<Term> it) {
-//    if (!it.hasNext()) return H.END;
-//    return H.lazy(it.next(), () -> iterator2seq(it));
-//  }
-//
-//  /**
-//   * @param it
-//   * @return seq of all results from calling .next() on iterator
-//   */
-//  public static Seq iterable2seq(Iterable<Term> it) {
-//    return H.lazy(() -> iterator2seq(it.iterator()));
-//  }
   /**
    * @param iterable
    * @return seq of all results from calling .next() on iterator
@@ -127,9 +115,6 @@ public class SeqH {
       }
     });
   }
-
-
-
 
   /**
    * This variant wraps all elements for seq that need it.
