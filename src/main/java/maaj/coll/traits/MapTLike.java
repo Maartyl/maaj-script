@@ -13,7 +13,7 @@ import maaj.util.MapH;
  * @author maartyl
  * @param <M> self
  */
-public interface MapTLike<M extends MapTLike<M, MP>, MP> extends GrowableT<M>, AssocUpdateT<M>, Transient<MP, M> {
+public interface MapTLike<M extends MapTLike<M, MP>, MP> extends GrowableT<M>, AssocUpdateT<M>, DissocT<M>, Transient<MP, M> {
 
   @Override
   public default M doConj(Term term) {
