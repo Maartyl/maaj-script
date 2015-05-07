@@ -59,6 +59,11 @@ public class Tuple0 implements Vec {
   }
 
   @Override
+  public Vec pop() {
+    throw new IllegalStateException("Can't pop empty vector.");
+  }
+
+  @Override
   public Seq seq() {
     return H.list();
   }

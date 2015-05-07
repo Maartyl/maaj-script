@@ -62,6 +62,11 @@ public class Tuple1 implements Vec {
   }
 
   @Override
+  public Vec pop() {
+    return H.tuple();
+  }
+
+  @Override
   public Seq seq() {
     return H.list(t0);
   }
