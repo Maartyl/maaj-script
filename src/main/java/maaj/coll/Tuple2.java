@@ -5,6 +5,7 @@
  */
 package maaj.coll;
 
+import maaj.coll.traits.AssocGet;
 import maaj.coll.traits.KVEntry;
 import maaj.coll.traits.VecLike;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
@@ -47,20 +48,9 @@ public class Tuple2 implements Vec, KVEntry {
     case 0: return t0;
     case 1: return t1;
     default:
-      return dflt;
-    }
-  }
-
-  @Override
-  public Term nth(int i) {
-    switch (i) {
-    case 0: return t0;
-    case 1: return t1;
-    default:
       throw new IndexOutOfBoundsExceptionInfo(getCountAsInteger(), i);
     }
   }
-
 
   @Override
   public Int getCount() {
