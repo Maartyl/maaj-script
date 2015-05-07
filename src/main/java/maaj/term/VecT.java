@@ -7,7 +7,6 @@ package maaj.term;
 
 
 import maaj.coll.traits.VecTLike;
-import maaj.util.VecH;
 
 /**
  *
