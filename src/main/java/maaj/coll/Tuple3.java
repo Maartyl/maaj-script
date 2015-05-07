@@ -65,7 +65,12 @@ public class Tuple3 implements Vec {
 
   @Override
   public Vec conj(Term t) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    VecT v = VecH.emptyTransient();
+    v.doConj(t0);
+    v.doConj(t1);
+    v.doConj(t2);
+    v.doConj(t);
+    return v.asPersistent();
   }
 
   @Override
