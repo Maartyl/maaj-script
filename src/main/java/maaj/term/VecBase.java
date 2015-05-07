@@ -61,16 +61,6 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
   }
 
   @Override
-  default public Term evalMacros(Context c) {
-    return fmap((Invocable1) x -> x.evalMacros(c));
-  }
-
-  @Override
-  default public Term eval(Context c) {
-    return fmap((Invocable1) x -> x.eval(c));
-  }
-
-  @Override
   default public VecBase<VB> foreach(Invocable mapper) {
     int count = getCountAsInteger();
     for (int i = 0; i < count; i++) {

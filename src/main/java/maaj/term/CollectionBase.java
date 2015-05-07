@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.coll.traits.Counted;
+import maaj.lang.Context;
 
 /**
  * Base for persistent Collections of Terms.
@@ -14,5 +15,15 @@ import maaj.coll.traits.Counted;
  * @param <C> self : final type of collection
  */
 public interface CollectionBase<C extends CollectionBase<C>> extends Monad<C>, Counted {
+
+  @Override
+  public default Term eval(Context c) {
+    return fmap((Invocable1) e -> e.eval(c));
+  }
+
+  @Override
+  public default Term evalMacros(Context c) {
+    return fmap((Invocable1) e -> e.evalMacros(c));
+  }
 
 }
