@@ -5,16 +5,18 @@
  */
 package maaj.coll.traits;
 
+import java.util.Iterator;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
+import maaj.term.Seq;
 import maaj.term.Term;
 
 /**
  *
  * @author maartyl
  */
-public interface Indexed extends Counted {
+public interface Indexed extends Counted, Iterable<Term> {
 
   Term nth(int i, Term dflt);
 
@@ -31,4 +33,22 @@ public interface Indexed extends Counted {
   default Term nth(Int i) {
     return nth(i.asInteger());
   }
+
+  @Override
+  public default Iterator<Term> iterator() {
+    return new Iterator<Term>() {
+      private int i = 0;
+
+      @Override
+      public boolean hasNext() {
+        return i < getCountAsInteger();
+      }
+
+      @Override
+      public Term next() {
+        return nth(i++);
+      }
+    };
+  }
+
 }
