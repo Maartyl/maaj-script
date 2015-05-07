@@ -73,8 +73,7 @@ public final class VecPWrap implements Vec {
     return new VecPWrap(pvector);
   }
 
-  @SuppressWarnings("unchecked") //precondition: pvector != null
-
+  @SuppressWarnings("unchecked")
   public static VecPWrap of(IPersistentVector<Term> pvector) {
     //null checked in H.wrap: properly returns Nil on null
     return wrap(pvector);
