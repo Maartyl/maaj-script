@@ -8,7 +8,9 @@ package maaj.util;
 import java.util.Iterator;
 import maaj.coll.Cons;
 import maaj.coll.Sexp;
+import maaj.lang.Context;
 import maaj.term.*;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 /**
  * Seq helpers - operations on seqs
@@ -95,19 +97,61 @@ public class SeqH {
     return H.lazy(mapper.invoke(coll.first()), () -> mapLazyInner(coll.rest(), mapper));
   }
 
-  private static Seq iterator2seq(Iterator<Term> it) {
-    if (!it.hasNext()) return H.END;
-    return H.lazy(it.next(), () -> iterator2seq(it));
-  }
-
+//  private static Seq iterator2seq(Iterator<Term> it) {
+//    if (!it.hasNext()) return H.END;
+//    return H.lazy(it.next(), () -> iterator2seq(it));
+//  }
+//
+//  /**
+//   * @param it
+//   * @return seq of all results from calling .next() on iterator
+//   */
+//  public static Seq iterable2seq(Iterable<Term> it) {
+//    return H.lazy(() -> iterator2seq(it.iterator()));
+//  }
   /**
-   * .iterator() is not called until first element is needed
-   * @param it
+   * @param iterable
    * @return seq of all results from calling .next() on iterator
    */
-  public static Seq iterable2seq(Iterable<Term> it) {
-    return H.lazy(() -> iterator2seq(it.iterator()));
+  public static Seq iterable2seq(Iterable<Term> iterable) {
+    return H.lazy(new Invocable0() {
+      private final Iterator<Term> it = iterable.iterator();
+
+      /**
+       * There is no point creating new lambda instance for each iteration: they share the same iterator.
+       */
+      @Override
+      public Term invoke() {
+        if (!it.hasNext()) return H.END;
+        return H.lazy(it.next(), this);
+      }
+    });
   }
+
+
+
+
+  /**
+   * This variant wraps all elements for seq that need it.
+   * <p>
+   * @param iterable
+   * @return seq of wrapped results from calling .next() on iterator
+   */
+  public static Seq iterableWrap2seq(Iterable<?> iterable) {
+    return H.lazy(new Invocable0() {
+      private final Iterator<?> it = iterable.iterator();
+
+      /**
+       * There is no point creating new lambda instance for each iteration: they share the same iterator.
+       */
+      @Override
+      public Term invoke() {
+        if (!it.hasNext()) return H.END;
+        return H.lazy(H.wrap(it.next()), this);
+      }
+    });
+  }
+
 
   //Generic Indexed lazy seq {
   /**
