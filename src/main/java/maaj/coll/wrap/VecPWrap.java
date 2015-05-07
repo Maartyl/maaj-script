@@ -53,6 +53,12 @@ public final class VecPWrap implements Vec {
   }
 
   @Override
+  public Term nth(int i) {
+    //TODO: throw OutOfBoundsINFO instead
+    return H.wrap(vector.nth(i));
+  }
+
+  @Override
   @SuppressWarnings({"unchecked", "unchecked"})
   public VecT asTransient() {
     //TODO: handle vectors that are not IEditable

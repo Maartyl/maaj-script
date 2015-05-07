@@ -55,6 +55,12 @@ public final class VecTWrap implements VecT {
   }
 
   @Override
+  public Term nth(int i) {
+    //TODO: throw OutOfBoundsINFO instead
+    return H.wrap(vector.nth(i));
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public Vec asPersistent() {
     return VecPWrap.of((IPersistentVector<Term>) vector.persistent());

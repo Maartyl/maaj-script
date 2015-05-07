@@ -42,6 +42,15 @@ public class Tuple1 implements Vec {
     switch (i) {
     case 0: return t0;
     default:
+      return dflt;
+    }
+  }
+
+  @Override
+  public Term nth(int i) {
+    switch (i) {
+    case 0: return t0;
+    default:
       throw new IndexOutOfBoundsExceptionInfo(getCountAsInteger(), i);
     }
   }
