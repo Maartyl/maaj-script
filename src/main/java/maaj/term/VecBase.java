@@ -71,14 +71,6 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
   }
 
   @Override
-  default public Term reduce(Term acc, Invocable reducer) {
-    int count = getCountAsInteger();
-    for (int i = 0; i < count; i++)
-      acc = reducer.invoke(acc, nth(i));
-    return acc;
-  }
-
-  @Override
   default public VecBase<VB> foreach(Invocable mapper) {
     int count = getCountAsInteger();
     for (int i = 0; i < count; i++) {

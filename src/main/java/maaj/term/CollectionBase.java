@@ -6,8 +6,6 @@
 package maaj.term;
 
 import maaj.coll.traits.Counted;
-import maaj.coll.traits.Reducible;
-import maaj.coll.traits.Sequable;
 
 /**
  * Base for persistent Collections of Terms.
@@ -15,11 +13,6 @@ import maaj.coll.traits.Sequable;
  * @author maartyl
  * @param <C> self : final type of collection
  */
-public interface CollectionBase<C extends CollectionBase<C>> extends Monad<C>, Counted, Sequable, Reducible {
-
-  @Override
-  public default Term reduce(Term start, Invocable reducer) {
-    return seq().reduce(reducer);
-  }
+public interface CollectionBase<C extends CollectionBase<C>> extends Monad<C>, Counted {
 
 }

@@ -47,9 +47,4 @@ public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, V
     //TODO: after Tuple1
     throw new UnsupportedOperationException("not yet");
   }
-
-  @Override
-  default public Seq seq() {
-    return VecH.asSeq(this.asPersistent());
-  }
 }

@@ -49,4 +49,13 @@ public interface Vec extends Collection<Vec>, VecBase<Vec>, VecLike<Vec, VecT> {
     return VecH.asSeq(this);
   }
 
+  @Override
+  default public Term reduce(Term acc, Invocable reducer) {
+    int count = getCountAsInteger();
+    for (int i = 0; i < count; i++)
+      acc = reducer.invoke(acc, nth(i));
+    return acc;
+  }
+
+
 }

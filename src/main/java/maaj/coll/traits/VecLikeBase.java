@@ -14,7 +14,7 @@ import maaj.term.Term;
  * @author maartyl
  * @param <VL> self
  */
-public interface VecLikeBase<VL extends VecLikeBase<VL>> extends Indexed, Sequable, AssocGet, Reducible {
+public interface VecLikeBase<VL extends VecLikeBase<VL>> extends Indexed, AssocGet {
 
   @Override
   public default Term valAt(Term key) {
