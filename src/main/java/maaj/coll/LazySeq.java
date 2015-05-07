@@ -34,12 +34,6 @@ public final class LazySeq implements Seq {
     this.fn = seqBuilder;
   }
 
-  //this .ctor makes little sense, but why not...
-  public LazySeq(Seq underlyingSeq) {
-    this.fn = null;
-    this.s = underlyingSeq;
-  }
-
   @Override
   public Term first() {
     return seq().first();
