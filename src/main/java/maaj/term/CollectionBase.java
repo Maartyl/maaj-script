@@ -10,7 +10,7 @@ import maaj.coll.traits.Reducible;
 import maaj.coll.traits.Sequable;
 
 /**
- * Base of Collection of Terms that does not provide modifying.
+ * Base for persistent Collections of Terms.
  * <p>
  * @author maartyl
  * @param <C> self : final type of collection
