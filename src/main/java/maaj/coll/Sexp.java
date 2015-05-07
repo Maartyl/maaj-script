@@ -88,6 +88,17 @@ public class Sexp extends Cons implements Collection {
     return super.reduce(start, reducer);
   }
 
+  @Override //required: diamond inheritance (unrelated defaults)
+  public Term eval(Context c) {
+    return super.eval(c);
+  }
+
+  @Override //required: diamond inheritance (unrelated defaults)
+  public Term evalMacros(Context c) {
+    return super.evalMacros(c);
+  }
+
+
 
   //--- STATIC
   public static Sexp retM1(Term t) {
