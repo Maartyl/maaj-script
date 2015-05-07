@@ -48,6 +48,11 @@ public final class VecPWrap implements Vec {
   }
 
   @Override
+  public Vec pop() {
+    return wrap((IPersistentVector<Term>) vector.pop());
+  }
+
+  @Override
   public Term nth(int i, Term dflt) {
     return H.wrap(vector.nth(i, dflt));
   }

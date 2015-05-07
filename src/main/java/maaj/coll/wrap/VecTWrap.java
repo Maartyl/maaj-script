@@ -51,6 +51,12 @@ public final class VecTWrap implements VecT {
   }
 
   @Override
+  public VecT doPop() {
+    vector = vector.pop();
+    return this;
+  }
+
+  @Override
   public Term nth(int i, Term dflt) {
     return H.wrap(vector.nth(i, dflt));
   }

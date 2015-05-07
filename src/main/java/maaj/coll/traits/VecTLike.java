@@ -12,24 +12,22 @@ import maaj.term.Term;
 /**
  *
  * @author maartyl
- * @param <VLSelf>
- * @param <VLPersistent>
+ * @param <V>
+ * @param <VP>
  */
 //public interface VecTLike<VLSelf extends VecTLike<VLSelf, VLPersistent>, VLPersistent extends VecLike<? extends VLPersistent, ? extends VLSelf>>
-public interface VecTLike<VLSelf extends VecTLike<VLSelf, VLPersistent>, VLPersistent>
-        extends VecLikeBase<VLSelf>, GrowableT<VLSelf>, AssocUpdateT<VLSelf>, Transient<VLPersistent, VLSelf> {
+public interface VecTLike<V extends VecTLike<V, VP>, VP>
+        extends VecLikeBase<V>, GrowableT<V>, AssocUpdateT<V>, Transient<VP, V>, StackTLike<V> {
 
+  V doAssocN(int pos, Term value);
 
-  VLSelf doAssocN(int pos, Term value);
-
-  default VLSelf doAssocN(Int pos, Term value) {
+  default V doAssocN(Int pos, Term value) {
     return doAssocN((pos).asInteger(), value);
   }
 
   @Override
-  public default VLSelf doAssoc(Term key, Term value) {
+  public default V doAssoc(Term key, Term value) {
     return doAssocN(H.requireInt(key), value);
   }
-
 
 }
