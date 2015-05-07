@@ -20,7 +20,7 @@ import maaj.util.VecH;
  */
 public final class VecTWrap implements VecT {
 
-  private final ITransientVector<Term> vector;
+  private ITransientVector<Term> vector;
 
   private VecTWrap(ITransientVector<Term> vector) {
     this.vector = vector;
@@ -39,13 +39,14 @@ public final class VecTWrap implements VecT {
   @Override
   @SuppressWarnings("unchecked")
   public VecT doConj(Term t) {
-    vector.conj(t);
+    //transient vector always returns itself, but... (map doesn't / impl. could potentailly change...)
+    vector = (ITransientVector<Term>) vector.conj(t);
     return this;
   }
 
   @Override
   public VecT doAssocN(int pos, Term value) {
-    vector.assocN(pos, value);
+    vector = vector.assocN(pos, value);
     return this;
   }
 
