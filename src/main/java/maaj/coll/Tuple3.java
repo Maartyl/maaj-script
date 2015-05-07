@@ -65,12 +65,7 @@ public class Tuple3 implements Vec {
 
   @Override
   public Vec conj(Term t) {
-    VecT v = VecH.emptyTransient();
-    v.doConj(t0);
-    v.doConj(t1);
-    v.doConj(t2);
-    v.doConj(t);
-    return v.asPersistent();
+    return VecH.emptyTransient().doConj(t0).doConj(t1).doConj(t2).doConj(t).asPersistent();
   }
 
   @Override

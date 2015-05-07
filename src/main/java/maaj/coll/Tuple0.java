@@ -55,7 +55,7 @@ public class Tuple0 implements Vec {
 
   @Override
   public Vec conj(Term t) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return H.tuple(t);
   }
 
   @Override

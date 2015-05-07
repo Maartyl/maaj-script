@@ -64,7 +64,7 @@ public class Tuple2 implements Vec, KVEntry {
 
   @Override
   public Vec conj(Term t) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return H.tuple(t0, t1, t);
   }
 
   @Override
