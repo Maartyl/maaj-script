@@ -153,6 +153,14 @@ public class H {
     return VecH.fromSeq(s);
   }
 
+  public static Symbol symbol(String symbol) {
+    return Symbol.of(symbol);
+  }
+
+  public static Symbol symbol(String ns, String name) {
+    return Symbol.qualified(ns, name);
+  }
+
   /**
    * eagerly constructs list (Sexp) from given args array
    * <p>
