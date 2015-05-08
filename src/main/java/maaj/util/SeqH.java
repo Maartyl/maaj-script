@@ -101,9 +101,9 @@ public class SeqH {
    * @param iterable
    * @return seq of all results from calling .next() on iterator
    */
-  public static Seq iterable2seq(Iterable<Term> iterable) {
+  public static Seq iterable2seq(Iterable<? extends Term> iterable) {
     return H.lazy(new Invocable0() {
-      private final Iterator<Term> it = iterable.iterator();
+      private final Iterator<? extends Term> it = iterable.iterator();
 
       /**
        * There is no point creating new lambda instance for each iteration: they share the same iterator.
