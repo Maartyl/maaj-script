@@ -5,7 +5,6 @@
  */
 package maaj.coll.traits;
 
-import maaj.term.KVPair;
 import maaj.util.H;
 import maaj.term.Term;
 
