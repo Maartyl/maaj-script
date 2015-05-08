@@ -9,6 +9,8 @@ import com.github.krukow.clj_lang.IPersistentVector;
 import com.github.krukow.clj_lang.ITransientVector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.Map.Entry;
+
 import maaj.coll.LazySeq;
 import maaj.coll.Tuple0;
 import maaj.coll.Tuple1;
@@ -125,6 +127,10 @@ public class H {
 
   public static KVPair buildAssocEntry(Term key, Term value) {
     return new Tuple2(key, value);
+  }
+
+  public static KVPair buildAssocEntry(Entry<Term, Term> e) {
+    return new Tuple2(e.getKey(), e.getValue());
   }
 
   public static Vec tuple() {
