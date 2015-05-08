@@ -5,6 +5,7 @@
  */
 package maaj.coll.wrap;
 
+import com.github.krukow.clj_lang.IEditableCollection;
 import com.github.krukow.clj_lang.IPersistentVector;
 import com.github.krukow.clj_lang.ITransientVector;
 import maaj.term.Int;
@@ -69,31 +70,26 @@ public final class VecTWrap implements VecT {
 
   @Override
   public String toString() {
-    return "#<transient vec>";
+    return "#<transient vec; size: " + getCountAsInteger() + ">";
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    return this == obj;
-  }
-
-  @Override
-  public int hashCode() {
-    return -1;
-  }
-
-  private static VecTWrap wrap(ITransientVector<Term> pvector) {
-    return new VecTWrap(pvector);
-  }
+//  @Override
+//  public boolean equals(Object obj) {
+//    return this == obj;
+//  }
+//
+//  @Override
+//  public int hashCode() {
+//    return -1;
+//  }
 
   @SuppressWarnings("unchecked") //precondition: pvector != null
-  public static VecTWrap of(ITransientVector<Term> pvector) {
-    //null checked in H.wrap: properly returns Nil on null
-    return wrap(pvector);
+  static VecTWrap of(IPersistentVector<Term> pvector) {
+    return new VecTWrap((ITransientVector<Term>) ((IEditableCollection) pvector).asTransient());
   }
 
   @SuppressWarnings({"unchecked", "unchecked"})
-  public static VecT ofNil(ITransientVector<Term> pvector) {
+  public static VecT ofNil(IPersistentVector<Term> pvector) {
     //variant that can handle null
     if (pvector == null)//TODO: null-> empty vector - any other option?
       return VecH.emptyTransient();

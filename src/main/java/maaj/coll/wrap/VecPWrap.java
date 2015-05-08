@@ -5,9 +5,8 @@
  */
 package maaj.coll.wrap;
 
-import com.github.krukow.clj_lang.IEditableCollection;
 import com.github.krukow.clj_lang.IPersistentVector;
-import com.github.krukow.clj_lang.ITransientVector;
+import maaj.coll.traits.VecLike;
 import maaj.term.Int;
 import maaj.term.Term;
 import maaj.term.Vec;
@@ -60,18 +59,32 @@ public final class VecPWrap implements Vec {
   @Override
   @SuppressWarnings({"unchecked", "unchecked"})
   public VecT asTransient() {
-    //TODO: handle vectors that are not IEditable
-    return VecTWrap.of((ITransientVector<Term>) ((IEditableCollection) vector).asTransient());
+    return VecTWrap.of(vector);
   }
 
   @Override
   public boolean equals(Object obj) {
-    throw new UnsupportedOperationException("TODO"); //DODO: equals
+    if (obj == null)
+      return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).getContent();
+    if (obj instanceof VecPWrap)
+      return vector.equiv(((VecPWrap) obj).vector);
+    if (obj instanceof VecLike) {
+      VecLike<?, ?> v = (VecLike) obj;
+      int count = getCountAsInteger();
+      for (int i = 0; i < count; ++i)
+        if (!nth(i).equals(v.nth(i)))
+          return false;
+      return true;
+    }
+    return false;
   }
 
   @Override
   public int hashCode() {
-    throw new UnsupportedOperationException("TODO"); //DODO: hash
+    //CORRECTNESS: !! - I have to make sure, tuples use the same algorithm...
+    return vector.hashCode();
   }
 
   private static VecPWrap wrap(IPersistentVector<Term> pvector) {
@@ -79,15 +92,14 @@ public final class VecPWrap implements Vec {
   }
 
   @SuppressWarnings("unchecked")
-  public static VecPWrap of(IPersistentVector<Term> pvector) {
-    //null checked in H.wrap: properly returns Nil on null
+  static VecPWrap of(IPersistentVector<Term> pvector) {
     return wrap(pvector);
   }
 
   @SuppressWarnings("unchecked")
   public static Vec ofNil(IPersistentVector<Term> pvector) {
     //variant that can handle null
-    if (pvector == null)//null-> empty vector - any other option?
+    if (pvector == null)//null-> empty - any other option?
       return VecH.emptyPersistent();
     return new VecPWrap(pvector);
   }
