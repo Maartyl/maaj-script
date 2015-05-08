@@ -6,6 +6,9 @@
 package maaj.util;
 
 import maaj.coll.Tuple0;
+import maaj.coll.Tuple1;
+import maaj.coll.Tuple2;
+import maaj.coll.Tuple3;
 import maaj.coll.traits.VecLike;
 import maaj.term.Invocable2;
 import maaj.term.Seq;
@@ -30,8 +33,18 @@ public class VecH {
   }
 
   public static int computeHash(Vec v) {
-    //TODO: compose hash for tuples: has to work same as clj vecs
+    //TODO: compose hash for tuples: has to work the same as clj vecs
     throw new UnsupportedOperationException("not yet");
+  }
+
+  public static Vec preferTuple(Vec v) {
+    switch (v.getCountAsInteger()) {
+    case 0: return H.tuple();
+    case 1: return v instanceof Tuple1 ? v : H.tuple(v.nth(0));
+    case 2: return v instanceof Tuple2 ? v : H.tuple(v.nth(0), v.nth(1));
+    case 3: return v instanceof Tuple3 ? v : H.tuple(v.nth(0), v.nth(1), v.nth(2));
+    default: return v;
+    }
   }
 
   public static Vec emptyPersistent() {
