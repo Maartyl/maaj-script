@@ -12,6 +12,7 @@ import maaj.util.H;
 /**
  *
  * @author maartyl
+ * @param <M> self
  */
 public interface MapLikeBase<M extends MapLikeBase<M>> extends AssocGet, Counted, Iterable<KVPair> {
   @Override
