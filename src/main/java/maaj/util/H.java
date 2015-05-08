@@ -88,10 +88,7 @@ public class H {
     return wrapNonNull(o, Str::of);
   }
   public static Term wrap(IPersistentVector<Term> o) {
-    return wrapNonNull(o, VecPWrap::of);
-  }
-  public static Term wrap(ITransientVector<Term> o) {
-    return wrapNonNull(o, VecTWrap::of);
+    return VecPWrap.ofNil(o);
   }
 
   public static Term wrap(Object o) {
