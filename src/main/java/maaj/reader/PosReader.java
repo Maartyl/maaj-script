@@ -117,4 +117,18 @@ public class PosReader {
     }
   }
 
+  /**
+   * Returns the next character. Possibly \r. (unlike .readNextChar())
+   */
+  public int peek() {
+    try {
+      int c = rdr.read();
+      rdr.unread(c);
+      return c;
+    } catch (Exception e) {
+      throw H.sneakyThrow(e); //just rethrow
+    }
+
+  }
+
 }
