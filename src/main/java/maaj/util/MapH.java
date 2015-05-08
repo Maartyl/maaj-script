@@ -5,9 +5,13 @@
  */
 package maaj.util;
 
+import com.github.krukow.clj_lang.PersistentArrayMap;
 import java.util.function.BiFunction;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.KVEntry;
+import maaj.coll.wrap.MapPWrap;
+import maaj.term.Map;
+import maaj.term.MapT;
 import maaj.term.Term;
 
 /**
@@ -18,6 +22,9 @@ public class MapH {
 
   private MapH() {
   }
+  @SuppressWarnings("unchecked")
+  private static final Map EMPTY = MapPWrap.of(PersistentArrayMap.EMPTY);
+
 
   public static <M> M coerceConj(Term o, BiFunction<Term, Term, M> assoc) {
     //TODO: possibly add second assoc for only KVEnrty; shouldn't be ever needed...
@@ -30,6 +37,14 @@ public class MapH {
     if (t instanceof KVEntry)
       return assoc.apply(((KVEntry) t).getKey(), ((KVEntry) t).getValue());
     throw new IllegalArgumentException("doConj: Cannot coerce " + "arg" + "(" + t.getClass().getName() + ") into key-value pair.");
+  }
+
+  public static Map emptyPersistent() {
+    return EMPTY;
+  }
+
+  public static MapT emptyTransient() {
+    return emptyPersistent().asTransient();
   }
 
 }
