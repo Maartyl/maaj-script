@@ -68,13 +68,18 @@ public final class VecTWrap implements VecT {
   }
 
   @Override
+  public String toString() {
+    return "#<transient vec>";
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    throw new UnsupportedOperationException("TODO"); //DODO: equals
+    return this == obj;
   }
 
   @Override
   public int hashCode() {
-    throw new UnsupportedOperationException("TODO"); //DODO: hash
+    return -1;
   }
 
   private static VecTWrap wrap(ITransientVector<Term> pvector) {
