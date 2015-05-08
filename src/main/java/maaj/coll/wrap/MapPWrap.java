@@ -25,7 +25,7 @@ import maaj.util.SeqH;
  *
  * @author maartyl
  */
-public class MapPWrap implements Map {
+public final class MapPWrap implements Map {
 
   private final IPersistentMap<Term, Term> map;
 

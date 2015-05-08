@@ -21,7 +21,7 @@ import maaj.util.MapH;
  *
  * @author maartyl
  */
-public class MapTWrap implements MapT {
+public final class MapTWrap implements MapT {
 
   private ITransientMap<Term, Term> map;
 
