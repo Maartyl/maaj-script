@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.exceptions.InvalidOperationException;
 
 /**
@@ -53,8 +55,29 @@ public interface NilSeq extends Seq {
     return this;
   }
 
+  @Override
+  public default void show(Writer w) throws IOException {
+    w.append("()");
+  }
+
+
 
   public static final NilSeq END = new NilSeq() {
+
+    @Override
+    public String toString() {
+      return "()";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj instanceof Term ? ((Term) obj).isNil() : false;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
 
   };
 }

@@ -65,6 +65,12 @@ public class Cons implements Seq {
     throw new UnsupportedOperationException("TODO"); //DODO: hash
   }
 
+  @Override
+  public String toString() {
+    return print();
+  }
+
+
   //--- STATIC
   public static Seq retM1(Term t) {
     return new Sexp(1, t, H.END);

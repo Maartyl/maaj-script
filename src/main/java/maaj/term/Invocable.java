@@ -6,6 +6,8 @@
 package maaj.term;
 
 import com.github.krukow.clj_lang.ArityException;
+import java.io.IOException;
+import java.io.Writer;
 import maaj.lang.Context;
 import maaj.util.H;
 
@@ -66,4 +68,10 @@ public interface Invocable extends Ground, Runnable {
     int argLen = args.boundLength(30);
     return throwArity(argLen == Integer.MAX_VALUE ? -1 : argLen);
   }
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    w.append("#<invocable>");
+  }
+
 }

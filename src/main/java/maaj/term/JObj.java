@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+
 /**
  * Used to represent wrappers of native JVM objects.
  * Used in: Str, JWrap
@@ -17,7 +19,7 @@ public interface JObj extends Term {
   Object getContent();
 
   @Override
-  default void serialize(java.io.Writer w) {
+  default void serialize(java.io.Writer w) throws IOException {
     throw new UnsupportedOperationException("JObj: cannot serialize wrapped Java object");
   }
 

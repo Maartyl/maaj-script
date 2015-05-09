@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Objects;
 import maaj.lang.Context;
 import maaj.util.H;
@@ -106,8 +108,14 @@ public class Str implements JObj, Collection {
   }
 
   @Override
-  public Str show() {
-    return this;
+  public void show(Writer w) throws IOException {
+    w.append("\"" + value + "\"");
+  }
+
+  @Override
+  public void serialize(Writer w) throws IOException {
+    //todo: escape
+    w.append("\"" + value + "\"");
   }
 
   public String asString() {

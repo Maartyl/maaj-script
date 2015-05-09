@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.lang.Context;
 
 /**
@@ -43,6 +45,12 @@ public interface Nil extends Ground {
   default Object getContent() {
     return null;
   }
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    w.append("nil");
+  }
+
 
 
   /**

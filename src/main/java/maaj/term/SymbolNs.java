@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Objects;
 
 /**
@@ -28,7 +30,10 @@ public class SymbolNs extends Symbol {
   public Str getNamespace() {
     return Str.of(ns);
   }
-
+  @Override
+  public void show(Writer w) throws IOException {
+    w.append(ns + '/' + name);
+  }
   @Override
   public int hashCode() {
     int hash = 7;

@@ -6,6 +6,7 @@
 package maaj.term;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Objects;
 import maaj.lang.Context;
 
@@ -59,8 +60,8 @@ public class Symbol implements Term {
   }
 
   @Override
-  public Str show() {
-    return Term.super.show();
+  public void show(Writer w) throws IOException {
+    w.append(name);
   }
 
   @Override

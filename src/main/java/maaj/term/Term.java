@@ -151,9 +151,8 @@ public interface Term {
    * @param w write into
    * @throws java.io.IOException
    */
-  default void show(Writer w) throws IOException {
-    w.append(toString());
-  }
+  /*default*/ void show(Writer w) throws IOException;/*{ w.append(toString()); }*/
+
 
   /**
    * The same as show() but returns normal String.

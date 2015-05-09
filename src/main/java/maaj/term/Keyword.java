@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.lang.Context;
 
 /**
@@ -32,9 +34,10 @@ public class Keyword extends Symbol {
   }
 
   @Override
-  public Str show() {
-    return Str.of(composeShow());
+  public void show(Writer w) throws IOException {
+    w.append(composeShow());
   }
+
 
   @Override
   public String toString() {
