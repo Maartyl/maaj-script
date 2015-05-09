@@ -28,7 +28,7 @@ public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
       if (first) {
         first = false;
       } else {
-        w.append(" ");
+        w.append(", ");
       }
       t.getKey().show(w);
       w.append(" ");

@@ -74,7 +74,7 @@ public class TestMain {
     }
     System.out.println("------");
 
-    StringReader sr = new StringReader("1[  2 4  ]3 ; \"hello\" \n (hello? :from (this (recursive)test!))  ");
+    StringReader sr = new StringReader("1[  2 4  ]3  \"hel\\u1234l\\to\" \n (hello? :from (this (recursive)test!))  {1 2, 3 4}");
     for (Term t : MaajReader.read(sr, null)) {
       System.out.println(t.print());
     }
