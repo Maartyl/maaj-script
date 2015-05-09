@@ -5,14 +5,32 @@
  */
 package maaj.reader;
 
+import maaj.term.Symbol;
+
 /**
  *
  * @author maartyl
  */
 public class ReaderContext {
 
+  private final Symbol namespace;
+  private final String fileName;
+
+  public ReaderContext(Symbol namespace, String file) {
+    this.namespace = namespace;
+    this.fileName = file;
+  }
+
+  public Symbol getNamespace() {
+    return namespace;
+  }
+
+  public String getFileName() {
+    return fileName;
+  }
+
   public String getCurrentNamespaceName() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return namespace.getNm();
   }
 
 }
