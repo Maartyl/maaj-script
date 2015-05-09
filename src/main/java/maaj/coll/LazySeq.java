@@ -11,6 +11,7 @@ import maaj.lang.MetaData;
 import maaj.util.SeqH;
 import maaj.term.Int;
 import maaj.term.Invocable;
+import maaj.term.Map;
 import maaj.term.Seq;
 import maaj.term.Str;
 import maaj.term.Term;
@@ -95,7 +96,7 @@ public final class LazySeq implements Seq {
   }
 
   @Override
-  public MetaData getMeta() {
+  public Map getMeta() {
     //possibly EMPTY instead? or at least when not evaluated?
     return seq().getMeta();
   }

@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import maaj.lang.Context;
 import maaj.util.H;
 import maaj.lang.MetaData;
+import maaj.util.MapH;
 import maaj.util.SeqH;
 
 /**
@@ -36,13 +37,11 @@ public interface Term {
 
   Term evalMacros(Context c);
 
-  default MetaData getMeta() {
-    //TODO: change signature to just Map
-    //TODO: add withMeta
-    return MetaData.EMPTY;
+  default Map getMeta() {
+    return MapH.emptyPersistent();
   }
 
-  default Term withMeta(MetaData meta) {
+  default Term withMeta(Map meta) {
     throw new UnsupportedOperationException("with meta: not implementet meta, yet");
   }
 

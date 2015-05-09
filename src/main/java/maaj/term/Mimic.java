@@ -89,7 +89,7 @@ public interface Mimic extends Term {
   }
 
   @Override
-  public default MetaData getMeta() {
+  public default Map getMeta() {
     return unwrap().getMeta();
   }
 
@@ -99,7 +99,7 @@ public interface Mimic extends Term {
   }
 
   @Override
-  public default Term withMeta(MetaData meta) {
+  public default Term withMeta(maaj.term.Map meta) {
     return unwrap().withMeta(meta);
   }
 
