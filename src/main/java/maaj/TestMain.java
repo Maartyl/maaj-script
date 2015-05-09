@@ -5,16 +5,7 @@
  */
 package maaj;
 
-import com.github.krukow.clj_lang.IMapEntry;
-import com.github.krukow.clj_lang.IPersistentCollection;
-import com.github.krukow.clj_lang.IPersistentMap;
-import com.github.krukow.clj_lang.IPersistentStack;
-import com.github.krukow.clj_lang.IPersistentVector;
-import com.github.krukow.clj_lang.ISeq;
 import java.io.StringReader;
-import java.io.Writer;
-import java.util.Iterator;
-import java.util.Map;
 import maaj.coll.traits.Persistent;
 import maaj.coll.traits.TraPer;
 import maaj.coll.traits.Transient;
@@ -23,7 +14,6 @@ import maaj.reader.MaajReader;
 import maaj.util.H;
 import maaj.util.SeqH;
 import maaj.term.Int;
-import maaj.term.Str;
 import maaj.term.Term;
 import maaj.term.*;
 import maaj.util.Generators;
