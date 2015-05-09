@@ -123,6 +123,15 @@ public interface Term {
   }
 
   /**
+   * Returns this, unless this term is only a wrapper.
+   * <p>
+   * @return Actually represented term by this term.
+   */
+  default Term unwrap() {
+    return this;
+  }
+
+  /**
    * Creates textual representation of term, that is human readable.
    * This string is not necessarily readable by computer.
    * Uses print() in default
