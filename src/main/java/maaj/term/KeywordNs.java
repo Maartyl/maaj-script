@@ -42,11 +42,6 @@ public class KeywordNs extends Keyword {
   }
 
   @Override
-  public Term evalMacros(Context c) {
-    return this;
-  }
-
-  @Override
   public int hashCode() {
     int hash = 3;
     hash = 89 * hash + Objects.hashCode(this.ns);

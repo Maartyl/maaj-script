@@ -31,7 +31,7 @@ public class Keyword extends Symbol {
 
   @Override
   public Term evalMacros(Context c) {
-    return qualified(c.getCurrentNamespaceName(), name);
+    return this;
   }
 
   @Override
