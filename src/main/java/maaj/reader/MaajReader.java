@@ -114,8 +114,8 @@ public class MaajReader {
     case '[': return fail("not implemented yet: array? something...");
     case '{': return fail("not implemented yet: set");
     case '"': return fail("not implemented yet: regexp");
-    case '_': return fail("not implemented yet: ignore next");
-    case '#': return fail("hash inside hash ? what does that do?");
+    case '_': return readIgnoreOne();
+    case '#': return fail("reserved: hash inside hash");
     //case '-': return readMinus(); - always interpret as symbol
     case ';': return readComment(this::readHash);
     case '/': return fail("not implemented yet: core functions");
@@ -139,6 +139,10 @@ public class MaajReader {
   }
 
   private Term readHashSymbol(Symbol s) {
+    if (s.isQualified()) {
+      //core functions with namespaces
+      return H.symbol('#' + s.getNs(), s.getNm());
+    }
     int c = nextSkipWhitespace();
     switch (c) {
     case '(': return fail("not implemented yet: ???");
@@ -167,6 +171,11 @@ public class MaajReader {
       return fail("not implemented yet: ???");
 
     return fail("readHashSymbol: " + (char) cur() + " /:" + cur());
+  }
+
+  private Term readIgnoreOne() {
+    read0SkipWhitespace();
+    return read0SkipWhitespace();
   }
 
   private Term readSlash() {
@@ -284,8 +293,10 @@ public class MaajReader {
   }
 
   private Term readMinus() {
-    if (isNumericStart(peek()))
+    if (isNumericStart(peek())) {
+      next();
       return readNum().neg();
+    }
     return readSymbol();
   }
 
