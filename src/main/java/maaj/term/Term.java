@@ -42,6 +42,10 @@ public interface Term {
     return MetaData.EMPTY;
   }
 
+  default Term withMeta(MetaData meta) {
+    throw new UnsupportedOperationException("with meta: not implementet meta, yet");
+  }
+
   /**
    * application of function on arguments:
    * (fn a b c) -> fn.apply(a,b,c)
