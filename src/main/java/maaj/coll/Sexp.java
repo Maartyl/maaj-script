@@ -49,7 +49,7 @@ public class Sexp extends Cons implements Collection {
 
   @Override
   public Seq bindM(Invocable fn2Monad) {
-    if (size.asLong() < 50)
+    if (size.asLong() < 25)
       return SeqH.concatSexp(this.fmap(fn2Monad));
     
     return super.bindM(fn2Monad);
@@ -57,7 +57,7 @@ public class Sexp extends Cons implements Collection {
 
   @Override
   public Seq fmap(Invocable mapper) {
-    if (size.asLong() < 100) //these numbers are just guessed: could be too much, too little... (more likely too much)
+    if (size.asLong() < 50) //these numbers are just guessed: could be too much, too little... (more likely too much)
       return SeqH.mapSexp(this, mapper);
 
     return super.fmap(mapper);
