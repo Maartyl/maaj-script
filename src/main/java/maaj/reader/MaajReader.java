@@ -123,7 +123,7 @@ public class MaajReader {
     case '/': return fail("not implemented yet: core functions");
     case '^': return fail("not implemented yet: I can pick anything...");
     case '~': return fail("not implemented yet: I can pick anything...");
-    case '\\': return fail("not implemented yet: I can pick anything...");
+    case '\\': return fail("not implemented yet: I can pick anything... (var)");
     case '`': return fail("not implemented yet: I can pick anything...");
     case '\'': return fail("not implemented yet: I can pick anything...");
     case '@': return fail("not implemented yet: I can pick anything...");
