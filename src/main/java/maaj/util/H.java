@@ -126,6 +126,18 @@ public class H {
     return t.getContent();
   }
 
+  public static Map map(Term key, Term val) {
+    return MapH.emptyPersistent().assoc(key, val);
+  }
+
+  public static Map map(Term key0, Term val0, Term key1, Term val1) {
+    return map(key0, val0).assoc(key1, val1);
+  }
+
+  public static Map map(Term key0, Term val0, Term key1, Term val1, Term key2, Term val2) {
+    return map(key0, val0).assoc(key1, val1).assoc(key2, val2);
+  }
+
   public static KVPair buildAssocEntry(Term key, Term value) {
     return new Tuple2(key, value);
   }
