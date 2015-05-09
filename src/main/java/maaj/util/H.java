@@ -6,7 +6,6 @@
 package maaj.util;
 
 import com.github.krukow.clj_lang.IPersistentVector;
-import com.github.krukow.clj_lang.ITransientVector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.Map.Entry;
@@ -17,10 +16,8 @@ import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
 import maaj.coll.traits.Indexed;
-import maaj.coll.traits.KVEntry;
 import maaj.coll.traits.Seqable;
 import maaj.coll.wrap.VecPWrap;
-import maaj.coll.wrap.VecTWrap;
 import maaj.term.*;
 
 /**
@@ -43,6 +40,10 @@ public class H {
    */
   public static final Nil notFoundNil = new Nil() {
   };
+  /**
+   * for use only in .uniqueInt()
+   */
+  private static final AtomicInteger UNIQUE = new AtomicInteger(0);
 
   private static <TIn> Term wrapNonNull(TIn val, Function<TIn, Term> transformNonNull) {
     if (val == null)
@@ -301,6 +302,11 @@ public class H {
   public static Num inc(Num i) {
     return i.inc();
   }
+
+  public static int uniqueInt() {
+    return UNIQUE.getAndIncrement();
+  }
+
 
   /**
    * Allows to perform arbitrary statement in second argument for side effects in any place, thanks to returning first.
