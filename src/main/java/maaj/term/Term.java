@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import maaj.lang.Context;
 import maaj.util.H;
-import maaj.lang.MetaData;
 import maaj.util.MapH;
 import maaj.util.SeqH;
 

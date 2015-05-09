@@ -7,7 +7,6 @@ package maaj.coll;
 
 import java.io.IOException;
 import maaj.util.H;
-import maaj.lang.MetaData;
 import maaj.util.SeqH;
 import maaj.term.Int;
 import maaj.term.Invocable;
