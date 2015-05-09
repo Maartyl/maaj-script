@@ -49,7 +49,7 @@ public class H {
    */
   private static final AtomicInteger UNIQUE = new AtomicInteger(0);
 
-  private static final ReaderContext staticReaderContext = new ReaderContext();
+  private static final ReaderContext staticReaderContext = new ReaderContext(symbol("maaj.static"), "<?>");
 
   private static <TIn> Term wrapNonNull(TIn val, Function<TIn, Term> transformNonNull) {
     if (val == null)
