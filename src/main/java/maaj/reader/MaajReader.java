@@ -9,6 +9,7 @@ import java.io.Reader;
 import maaj.exceptions.ReaderException;
 import maaj.term.Dbl;
 import maaj.term.Int;
+import maaj.term.Invocable0;
 import maaj.term.Map;
 import maaj.term.MapT;
 import maaj.term.Num;
@@ -84,7 +85,8 @@ public class MaajReader {
     case '{': return readMap();
     case '"': return readStr();
     case '#': return readHash();
-    case ';': return readComment();
+    case '-': return readMinus();
+    case ';': return readComment(this::read0SkipWhitespace);
     case '/': return readSlash();
     case '^': return readMeta();
     case '~': return readUnquote();
@@ -97,11 +99,10 @@ public class MaajReader {
     case '}': return fail("unmatched: }");
     }
     if (c < 0) return fail("unexpected EOF");
-    if (isNumericStart(c))
+    if (isNumericStart(c)) 
       return readNum();
-    if (isSymbolicStart(c))
+    if (isSymbolicStart(c)) 
       return readSymbol();
-
 
     return fail("read0: " + (char) c + " /:" + c);
   }
@@ -115,7 +116,8 @@ public class MaajReader {
     case '"': return fail("not implemented yet: regexp");
     case '_': return fail("not implemented yet: ignore next");
     case '#': return fail("hash inside hash ? what does that do?");
-    case ';': return readComment(); //this should continue with reading hash... !!!
+    //case '-': return readMinus(); - always interpret as symbol
+    case ';': return readComment(this::readHash);
     case '/': return fail("not implemented yet: core functions");
     case '^': return fail("not implemented yet: I can pick anything...");
     case '~': return fail("not implemented yet: I can pick anything...");
@@ -131,14 +133,48 @@ public class MaajReader {
     if (isNumericStart(c))
       return fail("not implemented yet: hash number ... ?");
     if (isSymbolicStart(c))
-      return fail("not implemented yet: should be something dynamic...");
+      return readHashSymbol(readSymbol());
 
     return fail("readHash: " + (char) cur() + " /:" + cur());
   }
 
+  private Term readHashSymbol(Symbol s) {
+    int c = nextSkipWhitespace();
+    switch (c) {
+    case '(': return fail("not implemented yet: ???");
+    case '[': return fail("not implemented yet: ???");
+    case '{': return fail("not implemented yet: ???");
+    case '"': return fail("not implemented yet: ???");
+    case '_': return fail("not implemented yet: ???");
+    case '#': return fail("maybe, this should work normally?");
+    // case '-': return readMinus(); // for now, interpret as symbol...
+    case ';': return readComment(() -> readHashSymbol(s));
+    case '/': return fail("not implemented yet: core functions with namespace");
+    case '^': return fail("not implemented yet: work normally? ... applying to rest: not syntax based...");
+    case '~': return fail("not implemented yet: ???");
+    case '\\': return fail("not implemented yet: ???");
+    case '`': return fail("not implemented yet: ???");
+    case '\'': return fail("not implemented yet: ???");
+    case '@': return fail("not implemented yet: ???");
+    case ')': return fail("unmatched: )");
+    case ']': return fail("unmatched: ]");
+    case '}': return fail("unmatched: }");
+    }
+    if (c < 0) return fail("unexpected EOF");
+    if (isNumericStart(c))
+      return fail("not implemented yet: ???");
+    if (isSymbolicStart(c))
+      return fail("not implemented yet: ???");
+
+    return fail("readHashSymbol: " + (char) cur() + " /:" + cur());
+  }
+
   private Term readSlash() {
+    if (!isSymbolic(peek()))
+      return H.symbol("/");
     //symbols cannot start with /, unless / - DECIDE what to do with this
-    return fail("readSlash: " + (char) cur() + " /:" + cur());
+    //clojure: just returns, never extending... unless 3... ?
+    return fail("symbol cannot start with '/'");
   }
 
   private Term readMeta() {
@@ -209,13 +245,14 @@ public class MaajReader {
   }
 
   private Num readNum() {
+    //precodition: isNumericStart(cur())
     boolean metDot = false;
     StringBuilder sb = new StringBuilder();
-    while (isNumeric(next())) {
-      if (cur() == '.')
+    do {
+      if (cur() == '.') //is never called when cur() is .
         metDot = true;
       sb.append((char) cur());
-    }
+    } while (isNumeric(next()));
     unread(); //last read char is not part of number
     if (metDot) 
       return Dbl.of(Double.parseDouble(sb.toString()));
@@ -223,9 +260,11 @@ public class MaajReader {
       return Int.of(Long.parseLong(sb.toString()));
   }
 
-  private Term readSymbol() {
+  private Symbol readSymbol() {
+    //precodition: isSymbolicStart(cur())
     StringBuilder sb = new StringBuilder();
-    while (isSymbolic(next())) sb.append((char) cur());
+    do sb.append((char) cur());
+    while (isSymbolic(next()));
     unread(); //last read char is not part of symbol
     return H.symbol(sb.toString());
   }
@@ -238,10 +277,16 @@ public class MaajReader {
     return H.list(unquote, read0SkipWhitespace());
   }
 
-  private Term readComment() {
+  private Term readComment(Invocable0 continuation) {
     while (next() != '\n') {
     }
-    return read0SkipWhitespace();
+    return continuation.invoke();
+  }
+
+  private Term readMinus() {
+    if (isNumericStart(peek()))
+      return readNum().neg();
+    return readSymbol();
   }
 
   private static final Symbol deref = H.symbol("maaj.core", "deref");
@@ -251,11 +296,13 @@ public class MaajReader {
   private static final Symbol unquoteSplicing = H.symbol("maaj.core", "unquote-splicing");
 
   private static boolean isWhitespace(int c) {
+    if (c < 0) return false;
     return Character.isWhitespace(c) || c == ',' || c < 32 || Character.isIdentifierIgnorable(c);
   }
 
   private static boolean isNumericStart(int c) {
-    return Character.isDigit(c);
+    //should't accept \-
+    return c > 47 && c < 58;//Character.isDigit(c);
   }
 
   private static boolean isNumeric(int c) {
@@ -272,7 +319,7 @@ public class MaajReader {
   }
 
   private static boolean isSymbolic(int c) {
-    return c == '/' || c == '#' || isSymbolicStart(c) || Character.isDigit(c);
+    return c == '/' || c == '#' || c == '\'' || isSymbolicStart(c) || Character.isDigit(c);
   }
 
   public static Seq read(Reader r, ReaderContext cxt) {
