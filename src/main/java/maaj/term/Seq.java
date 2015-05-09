@@ -84,7 +84,7 @@ public interface Seq extends Monad, SeqLike {
       w.append('(');
       first().show(w);
       for (Term t : rest()) {
-        w.append(" ");
+        w.append(' ');
         t.show(w);
       }
       w.append(')');
