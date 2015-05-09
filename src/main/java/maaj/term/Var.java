@@ -30,7 +30,6 @@ public final class Var implements Mimic, RefSet {
     this(MapH.emptyPersistent(), value);
   }
 
-
   @Override
   public Term unwrap() {
     if (value == null)
@@ -81,6 +80,13 @@ public final class Var implements Mimic, RefSet {
   @Override
   public Term deref() {
     return unwrap();
+  }
+
+  @Override
+  public synchronized Term update(Invocable setter) {
+    Term s = deref().transform(setter);
+    doSet(s);
+    return s;
   }
 
   public static Var empty() {
