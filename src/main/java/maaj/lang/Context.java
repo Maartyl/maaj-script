@@ -6,7 +6,9 @@
 package maaj.lang;
 
 import maaj.coll.traits.Lookup;
+import maaj.term.Map;
 import maaj.term.Term;
+import maaj.util.MapH;
 
 /**
  *
@@ -42,6 +44,29 @@ public class Context implements Lookup {
    -- in case I need to access ... complicated stuff
 
    */
+  private final Glob glob;
+
+  private Namespace curNs;
+
+  private Map scope;
+
+  public Context(Glob glob, Namespace curNs, Map scope) {
+    this.glob = glob;
+    this.curNs = curNs;
+    this.scope = scope;
+  }
+
+  public Context(Context c, Map scope) {
+    this(c.glob, c.curNs, scope);
+  }
+
+  public Context(Glob glob, Namespace curNs) {
+    this(glob, curNs, MapH.emptyPersistent());
+  }
+
+  public Context(Context c, Namespace curNs) {
+    this(c.glob, curNs, c.scope);
+  }
 
   @Override
   public Term valAt(Term key) {
@@ -57,4 +82,7 @@ public class Context implements Lookup {
     throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
+  public Context withNamespace(Namespace ns) {
+    return new Context(this, ns);
+  }
 }
