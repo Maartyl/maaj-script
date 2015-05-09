@@ -46,8 +46,24 @@ public class MapH {
   }
 
   public static Map update(Map what, Iterable<? extends KVEntry> with) {
-    //TODO: create something optimized for small 'with' (I don't know size of iterable...)
     return update(what.asTransient(), with).asPersistent();
+  }
+
+  public static Map update(Map what, Map with) {
+    if (what.getCountAsInteger() == 0)
+      return with;
+    switch (with.getCountAsInteger()) {
+    case 0: return what;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      for (KVEntry e : with)
+        what = what.assoc(e);
+      return what;
+    default:
+      return update(what.asTransient(), with).asPersistent();
+    }
   }
 
   public static Map emptyPersistent() {
