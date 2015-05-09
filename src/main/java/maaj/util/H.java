@@ -6,6 +6,8 @@
 package maaj.util;
 
 import com.github.krukow.clj_lang.IPersistentVector;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.Map.Entry;
@@ -18,6 +20,8 @@ import maaj.coll.Tuple3;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.Seqable;
 import maaj.coll.wrap.VecPWrap;
+import maaj.reader.MaajReader;
+import maaj.reader.ReaderContext;
 import maaj.term.*;
 
 /**
@@ -44,6 +48,8 @@ public class H {
    * for use only in .uniqueInt()
    */
   private static final AtomicInteger UNIQUE = new AtomicInteger(0);
+
+  private static final ReaderContext staticReaderContext = new ReaderContext();
 
   private static <TIn> Term wrapNonNull(TIn val, Function<TIn, Term> transformNonNull) {
     if (val == null)
@@ -124,6 +130,25 @@ public class H {
   public static Object unwrap(Term t) {
     if (t == null) return null;
     return t.getContent();
+  }
+
+  public static Seq read(Reader r, ReaderContext cxt) {
+    return MaajReader.read(r, cxt);
+  }
+
+  public static Seq read(Reader r) {
+    return read(r, staticReaderContext);
+  }
+
+  public static Seq read(String txt) {
+    return read(new StringReader(txt));
+  }
+
+  public static Term read1(Reader r) {
+    return read(r).first();
+  }
+  public static Term read1(String txt) {
+    return read(txt).first();
   }
 
   public static Map map(Term key, Term val) {
