@@ -7,7 +7,8 @@ package maaj.reader;
 
 import java.io.Reader;
 import maaj.exceptions.ReaderException;
-import maaj.term.Invocable0;
+import maaj.term.Dbl;
+import maaj.term.Int;
 import maaj.term.Map;
 import maaj.term.MapT;
 import maaj.term.Num;
@@ -54,6 +55,10 @@ public class MaajReader {
     reader.unread();
   }
 
+  private int peek() {
+    return reader.peek();
+  }
+
   private int nextSkipWhitespace() {
     while (isWhitespace(next())) {
     }
@@ -62,6 +67,14 @@ public class MaajReader {
 
   private <T> T fail(String message) {
     throw new ReaderException(context, reader.getRow(), reader.getColumn(), message);
+  }
+
+  private Term read0SkipWhitespace() {
+    return read0(nextSkipWhitespace());
+  }
+
+  private Term read0Cur() {
+    return read0(cur());
   }
 
   private Term read0(int c) {
@@ -93,12 +106,47 @@ public class MaajReader {
     return fail("read0: " + (char) c + " /:" + c);
   }
 
-  private Term read0SkipWhitespace() {
-    return read0(nextSkipWhitespace());
+  private Term readHash() {
+    int c = nextSkipWhitespace();
+    switch (c) {
+    case '(': return fail("not implemented yet: fn syntax");
+    case '[': return fail("not implemented yet: array? something...");
+    case '{': return fail("not implemented yet: set");
+    case '"': return fail("not implemented yet: regexp");
+    case '_': return fail("not implemented yet: ignore next");
+    case '#': return fail("hash inside hash ? what does that do?");
+    case ';': return readComment(); //this should continue with reading hash... !!!
+    case '/': return fail("not implemented yet: core functions");
+    case '^': return fail("not implemented yet: I can pick anything...");
+    case '~': return fail("not implemented yet: I can pick anything...");
+    case '\\': return fail("not implemented yet: I can pick anything...");
+    case '`': return fail("not implemented yet: I can pick anything...");
+    case '\'': return fail("not implemented yet: I can pick anything...");
+    case '@': return fail("not implemented yet: I can pick anything...");
+    case ')': return fail("unmatched: )");
+    case ']': return fail("unmatched: ]");
+    case '}': return fail("unmatched: }");
+    }
+    if (c < 0) return fail("unexpected EOF");
+    if (isNumericStart(c))
+      return fail("not implemented yet: hash number ... ?");
+    if (isSymbolicStart(c))
+      return fail("not implemented yet: should be something dynamic...");
+
+    return fail("readHash: " + (char) cur() + " /:" + cur());
   }
 
-  private Term read0Cur() {
-    return read0(cur());
+  private Term readSlash() {
+    //symbols cannot start with /, unless / - DECIDE what to do with this
+    return fail("readSlash: " + (char) cur() + " /:" + cur());
+  }
+
+  private Term readMeta() {
+    return fail("readMeta : meta not implemented yet");
+  }
+
+  private Term readEscape() {
+    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
   private Seq readList() {
@@ -126,16 +174,6 @@ public class MaajReader {
       m.doAssoc(key, val);
     }
     return m.asPersistent();
-  }
-
-  private Term readHash() {
-
-    return fail("readHash: " + (char) cur() + " /:" + cur());
-  }
-
-  private Term readSlash() {
-    //symbols cannot start with /, unless / - DECIDE what to do with this
-    return fail("readSlash: " + (char) cur() + " /:" + cur());
   }
 
   private Str readStr() {
@@ -171,29 +209,39 @@ public class MaajReader {
   }
 
   private Num readNum() {
-    return fail("readStr: " + (char) cur() + " /:" + cur());
-  }
-
-  private Term readMeta() {
-    return fail("readMeta : meta not implemented yet");
+    boolean metDot = false;
+    StringBuilder sb = new StringBuilder();
+    while (isNumeric(next())) {
+      if (cur() == '.')
+        metDot = true;
+      sb.append((char) cur());
+    }
+    unread(); //last read char is not part of number
+    if (metDot) 
+      return Dbl.of(Double.parseDouble(sb.toString()));
+     else 
+      return Int.of(Long.parseLong(sb.toString()));
   }
 
   private Term readSymbol() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    StringBuilder sb = new StringBuilder();
+    while (isSymbolic(next())) sb.append((char) cur());
+    unread(); //last read char is not part of symbol
+    return H.symbol(sb.toString());
   }
 
   private Term readUnquote() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    if (peek() == '@') {
+      next();
+      return H.list(unquoteSplicing, read0SkipWhitespace());
+    }
+    return H.list(unquote, read0SkipWhitespace());
   }
 
   private Term readComment() {
     while (next() != '\n') {
     }
     return read0SkipWhitespace();
-  }
-
-  private Term readEscape() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
   private static final Symbol deref = H.symbol("maaj.core", "deref");
@@ -224,7 +272,7 @@ public class MaajReader {
   }
 
   private static boolean isSymbolic(int c) {
-    return c == '/' || isSymbolicStart(c) || c == '#';
+    return c == '/' || c == '#' || isSymbolicStart(c) || Character.isDigit(c);
   }
 
   public static Seq read(Reader r, ReaderContext cxt) {
