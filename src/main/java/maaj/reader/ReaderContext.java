@@ -11,4 +11,8 @@ package maaj.reader;
  */
 public class ReaderContext {
 
+  public String getCurrentNamespaceName() {
+    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+  }
+
 }

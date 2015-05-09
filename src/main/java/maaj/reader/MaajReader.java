@@ -10,6 +10,7 @@ import maaj.exceptions.ReaderException;
 import maaj.term.Dbl;
 import maaj.term.Int;
 import maaj.term.Invocable0;
+import maaj.term.Keyword;
 import maaj.term.Map;
 import maaj.term.MapT;
 import maaj.term.Num;
@@ -275,7 +276,14 @@ public class MaajReader {
     do sb.append((char) cur());
     while (isSymbolic(next()));
     unread(); //last read char is not part of symbol
-    return H.symbol(sb.toString());
+    return qualifyKeywordIfShould(H.symbol(sb.toString()));
+  }
+
+  private Symbol qualifyKeywordIfShould(Symbol s) {
+    //is not qualified and is keyword
+    if (s.getType() == Keyword.class && s.getNm().startsWith(":"))
+      return Keyword.qualified(context.getCurrentNamespaceName(), s.getNm().substring(1));
+    return s;
   }
 
   private Term readUnquote() {

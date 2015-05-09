@@ -76,9 +76,11 @@ public class TestMain {
 
     StringReader sr = new StringReader("1[  2 4  ]3  \"hel\\u1234l\\to\" \n"
                                        + " `(hello? :from ('this ({}recursive[])test!))  {1 2, 3 4}\n"
-                                       + "--5  (])");
+                                       + "--5  (a/a/a/a/a/?)");
     for (Term t : MaajReader.read(sr, null)) {
+      System.out.println("--");
       System.out.println(t.print());
+      System.out.println(t.evalMacros(new Context()).print());
     }
   }
 
