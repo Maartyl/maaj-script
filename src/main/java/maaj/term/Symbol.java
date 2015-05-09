@@ -8,7 +8,10 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
+import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.util.H;
+import maaj.util.SeqH;
 
 /**
  *
@@ -29,8 +32,25 @@ public class Symbol implements Term {
     return Str.EMPTY;
   }
 
-  protected String getNs() {
+  public String getNs() {
     return null;
+  }
+
+  public String getNm() {
+    return name;
+  }
+
+
+  public boolean isQualified() {
+    return false;
+  }
+
+  public boolean isKeyword() {
+    return false;
+  }
+
+  public Symbol prependNamespace(String ns) {
+    return qualified(ns, name);
   }
 
   @Override
@@ -45,7 +65,13 @@ public class Symbol implements Term {
 
   @Override
   public Term apply(Context cxt, Seq args) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    //this is not function application: it only uses eval() and then calls apply on that fn.
+    args = SeqH.mapEval(args, cxt);
+    if (args.first().getContent() instanceof Symbol) {
+      //infinite recursion
+      throw new InvalidOperationException("applying symbol to a symbol");
+    }
+    return args.first().apply(cxt, H.cons(this, args.rest()));
   }
 
   @Override

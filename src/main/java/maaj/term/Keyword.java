@@ -20,8 +20,18 @@ public class Keyword extends Symbol {
   }
 
   @Override
+  public boolean isKeyword() {
+    return true;
+  }
+
+  @Override
+  public Symbol prependNamespace(String ns) {
+    return qualified(ns, name);
+  }
+
+  @Override
   public Term evalMacros(Context c) {
-    return this;
+    return qualified(c.getCurrentNamespaceName(), name);
   }
 
   @Override
@@ -38,6 +48,10 @@ public class Keyword extends Symbol {
     w.append(composeShow());
   }
 
+  @Override
+  public int hashCode() {
+    return 3 * name.hashCode() - 3;
+  }
 
   @Override
   public String toString() {

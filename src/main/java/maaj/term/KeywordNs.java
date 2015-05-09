@@ -6,6 +6,7 @@
 package maaj.term;
 
 import java.util.Objects;
+import maaj.lang.Context;
 
 /**
  *
@@ -21,13 +22,28 @@ public class KeywordNs extends Keyword {
   }
 
   @Override
-  protected String getNs() {
+  public String getNs() {
     return ns;
+  }
+
+  @Override
+  public boolean isQualified() {
+    return true;
+  }
+
+  @Override
+  public Keyword prependNamespace(String ns) {
+    return qualified(ns, this.ns + '/' + name);
   }
 
   @Override
   protected String composeShow() {
     return ':' + ns + '/' + name;
+  }
+
+  @Override
+  public Term evalMacros(Context c) {
+    return this;
   }
 
   @Override

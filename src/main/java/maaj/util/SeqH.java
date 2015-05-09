@@ -10,7 +10,6 @@ import maaj.coll.Cons;
 import maaj.coll.Sexp;
 import maaj.lang.Context;
 import maaj.term.*;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 /**
  * Seq helpers - operations on seqs
@@ -29,6 +28,10 @@ public class SeqH {
 
   public static Cons cons(Term t, Seq s) {
     return new Cons(t, s);
+  }
+
+  public static Seq mapEval(Seq s, Context c) {
+    return s.fmap((Invocable1) x -> x.eval(c));
   }
 
   //--eager variants

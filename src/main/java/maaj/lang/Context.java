@@ -42,4 +42,8 @@ public class Context implements Lookup {
     throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
+  public String getCurrentNamespaceName() {
+    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+  }
+
 }

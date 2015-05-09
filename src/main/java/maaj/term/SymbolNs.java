@@ -22,8 +22,18 @@ public class SymbolNs extends Symbol {
   }
 
   @Override
-  protected String getNs() {
+  public String getNs() {
     return ns;
+  }
+
+  @Override
+  public Symbol prependNamespace(String ns) {
+    return qualified(ns, this.ns + '/' + name);
+  }
+
+  @Override
+  public boolean isQualified() {
+    return true;
   }
 
   @Override
