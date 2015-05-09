@@ -7,17 +7,29 @@ package maaj.term;
 
 import java.io.IOException;
 import java.io.Writer;
+import maaj.coll.traits.RefSet;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.util.H;
 import maaj.util.MapH;
 
 /**
  *
  * @author maartyl
  */
-public class Var implements Mimic {
-  private Map meta;
-  private Term value;
+public final class Var implements Mimic, RefSet {
+  private volatile Map meta;
+  private volatile Term value;
+
+  private Var(Map meta, Term value) {
+    this.meta = meta;
+    this.value = value;
+  }
+
+  private Var(Term value) {
+    this(MapH.emptyPersistent(), value);
+  }
+
 
   @Override
   public Term unwrap() {
@@ -27,7 +39,7 @@ public class Var implements Mimic {
   }
 
   @Override
-  public Term addMeta(Map meta) {
+  public synchronized Term addMeta(Map meta) {
     this.meta = MapH.update(this.meta, meta);
     return this;
   }
@@ -39,18 +51,47 @@ public class Var implements Mimic {
 
   @Override
   public Term transform(Invocable transformer) {
-    return Mimic.super.transform(transformer);
+    //Shouldn't change this!
+    //options: return new var; return result only...
+    //... returning new var is fairly nonsensical...
+    //meta belongs to var, not the underlying term
+    // // btw. terms in vars loose their metadata
+    return unwrap().transform(transformer); // in the end, the most logical is this
   }
 
   @Override
   public void show(Writer w) throws IOException {
-    Mimic.super.show(w);
+    if (meta.containsKey(H.symbol("name")))
+      H.list(H.symbol("var"), meta.valAt(H.symbol("name")), unwrap()).show(w);
+    else Mimic.super.show(w);
   }
 
   @Override
   public Term evalMacros(Context c) {
-    return Mimic.super.evalMacros(c);
+    //needs this : Mimic could do something else...
+    return this;
   }
 
+  @Override
+  public RefSet doSet(Term t) {
+    value = t;
+    return this;
+  }
 
+  @Override
+  public Term deref() {
+    return unwrap();
+  }
+
+  public static Var empty() {
+    return new Var(null);
+  }
+
+  public static Var of(Term val) {
+    return of(val.unwrap(), val.getMeta());
+  }
+
+  public static Var of(Term val, Map meta) {
+    return new Var(meta, val);
+  }
 }
