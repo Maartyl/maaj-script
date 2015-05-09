@@ -6,6 +6,7 @@
 package maaj.coll;
 
 import maaj.coll.traits.VecLike;
+import maaj.coll.wrap.VecTWrap;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
@@ -75,7 +76,7 @@ public class Tuple0 implements Vec {
 
   @Override
   public VecT asTransient() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return VecH.emptyTransient();
   }
 
   @Override

@@ -10,7 +10,6 @@ import maaj.coll.traits.VecLike;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
-import maaj.term.Invocable;
 import maaj.term.KVPair;
 import maaj.term.Seq;
 import maaj.term.Term;
@@ -78,13 +77,8 @@ public class Tuple2 implements Vec, KVPair {
   }
 
   @Override
-  public Term reduce(Term start, Invocable reducer) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
-  }
-
-  @Override
   public VecT asTransient() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return VecH.emptyTransient().doConj(t0).doConj(t1);
   }
 
 

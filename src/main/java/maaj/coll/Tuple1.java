@@ -78,7 +78,7 @@ public class Tuple1 implements Vec {
 
   @Override
   public VecT asTransient() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return VecH.emptyTransient().doConj(t0);
   }
 
   @Override

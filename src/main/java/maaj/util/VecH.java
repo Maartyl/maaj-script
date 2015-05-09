@@ -5,13 +5,17 @@
  */
 package maaj.util;
 
+import com.github.krukow.clj_lang.IPersistentVector;
+import com.github.krukow.clj_lang.PersistentVector;
 import maaj.coll.Tuple0;
 import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
 import maaj.coll.traits.VecLike;
+import maaj.coll.wrap.VecTWrap;
 import maaj.term.Invocable2;
 import maaj.term.Seq;
+import maaj.term.Term;
 import maaj.term.Vec;
 import maaj.term.VecT;
 
@@ -51,6 +55,12 @@ public class VecH {
     return Tuple0.EMPTY_VEC;
   }
   public static VecT emptyTransient() {
-    return emptyPersistent().asTransient();
+    //return emptyPersistent().asTransient(); //doesn't work: requires this
+    return VecTWrap.ofNil(emptyPersistentClj());
+  }
+
+  @SuppressWarnings("unchecked")
+  static IPersistentVector<Term> emptyPersistentClj() {
+    return PersistentVector.EMPTY;
   }
 }

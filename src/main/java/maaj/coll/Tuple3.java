@@ -65,7 +65,7 @@ public class Tuple3 implements Vec {
 
   @Override
   public Vec conj(Term t) {
-    return VecH.emptyTransient().doConj(t0).doConj(t1).doConj(t2).doConj(t).asPersistent();
+    return asTransient().doConj(t).asPersistent();
   }
 
   @Override
@@ -80,7 +80,7 @@ public class Tuple3 implements Vec {
 
   @Override
   public VecT asTransient() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return VecH.emptyTransient().doConj(t0).doConj(t1).doConj(t2);
   }
 
   @Override
