@@ -39,13 +39,13 @@ public class MapH {
     throw new IllegalArgumentException("doConj: Cannot coerce " + "arg" + "(" + t.getClass().getName() + ") into key-value pair.");
   }
 
-  public static MapT update(MapT what, Iterable<KVEntry> with) {
+  public static MapT update(MapT what, Iterable<? extends KVEntry> with) {
     for (KVEntry e : with)
       what.doAssoc(e);
     return what;
   }
 
-  public static Map update(Map what, Iterable<KVEntry> with) {
+  public static Map update(Map what, Iterable<? extends KVEntry> with) {
     //TODO: create something optimized for small 'with' (I don't know size of iterable...)
     return update(what.asTransient(), with).asPersistent();
   }

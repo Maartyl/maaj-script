@@ -98,8 +98,8 @@ public interface Mimic extends Term {
   }
 
   @Override
-  public default Term withMeta(maaj.term.Map meta) {
-    return unwrap().withMeta(meta);
+  public default Term addMeta(maaj.term.Map meta) {
+    return unwrap().addMeta(meta);
   }
 
   @Override

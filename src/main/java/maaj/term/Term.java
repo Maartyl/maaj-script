@@ -40,7 +40,7 @@ public interface Term {
     return MapH.emptyPersistent();
   }
 
-  default Term withMeta(Map meta) {
+  default Term addMeta(Map meta) {
     throw new UnsupportedOperationException("with meta: not implementet meta, yet");
   }
 
