@@ -308,11 +308,11 @@ public class MaajReader {
     return readSymbol();
   }
 
-  private static final Symbol deref = H.symbol("maaj.core", "deref");
-  private static final Symbol quote = H.symbol("maaj.core", "quote");
-  private static final Symbol quoteQualified = H.symbol("maaj.core", "quote-qualified");
-  private static final Symbol unquote = H.symbol("maaj.core", "unquote");
-  private static final Symbol unquoteSplicing = H.symbol("maaj.core", "unquote-splicing");
+  private static final Symbol deref = H.symbol("maaj,core", "deref");
+  private static final Symbol quote = H.symbol("#macro", "quote");
+  private static final Symbol quoteQualified = H.symbol("#macro", "quote-qualified");
+  private static final Symbol unquote = H.symbol("#macro", "unquote");
+  private static final Symbol unquoteSplicing = H.symbol("#macro", "unquote-splicing");
 
   private static boolean isWhitespace(int c) {
     if (c < 0) return false;
