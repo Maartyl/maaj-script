@@ -8,7 +8,8 @@ package maaj.term;
 import maaj.lang.Context;
 
 /**
- *
+ * A Fn that doesn't evaluate it's args and macro expands it's result.
+ * <p>
  * @author maartyl
  */
 public class Macro extends Fn {
