@@ -307,6 +307,39 @@ public class H {
     return UNIQUE.getAndIncrement();
   }
 
+  /**
+   * unique symbol, name starts with given string
+   * <p>
+   * @param name
+   * @return
+   */
+  public static Symbol uniqueSymbol(String name) {
+    return symbol(name + "_#" + uniqueInt());
+  }
+  /**
+   * unique symbol of form '_auto_#456
+   * <p>
+   * @return
+   */
+  public static Symbol uniqueSymbol() {
+    return uniqueSymbol("_auto");
+  }
+
+  /**
+   * Generates unique symbol with the name (and possibly same namespace) of given symbol, but adds some unique number to the name.
+   * <p>
+   * @param s 'a ; 'a/b
+   * @return 'a_#156 ; 'a/b_#245
+   */
+  public static Symbol uniqueSymbol(Symbol s) {
+    if (s.isQualified()) {
+      //this is not super efficient, but also not common
+      return uniqueSymbol(s.getNm()).prependNamespace(s.getNs());
+    } else {
+      return uniqueSymbol(s.getNm());
+    }
+  }
+
 
   /**
    * Allows to perform arbitrary statement in second argument for side effects in any place, thanks to returning first.
