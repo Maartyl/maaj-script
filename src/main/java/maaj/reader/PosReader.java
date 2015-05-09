@@ -21,7 +21,7 @@ import maaj.util.H;
  * <p>
  * @author maartyl
  */
-public class PosReader {
+public final class PosReader {
   private final PushbackReader rdr;
   private int row = 1;   //first row is 1
   private int column = 0;//first col is 1 (incremented upon reading first char)
