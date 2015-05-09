@@ -5,6 +5,7 @@
  */
 package maaj.lang;
 
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import maaj.term.Map;
 import maaj.term.Symbol;
@@ -18,7 +19,12 @@ import maaj.term.Var;
 public class Namespace {
   private final Symbol nsName;
 
+  //these symbols are not qualified : they "would" be qualified with this namespace
   private final java.util.Map<Symbol, Var> vars = new ConcurrentHashMap<>();
+  //these symbols can be qualified to avoid name collisions
+  //all of them are ALSO fully qualified
+  //this might not be a good way to do it, but for now should be good enough...
+  private final java.util.Map<Symbol, Var> imported = new ConcurrentHashMap<>();
 
   private Namespace(Symbol name) {
     this.nsName = name;
@@ -42,6 +48,29 @@ public class Namespace {
 
   public Var get(Symbol name) {
     return vars.get(name);
+  }
+
+  public void importQualified(Namespace ns, Symbol prefix) {
+    if (ns.getName().getNm().equals(prefix.getNm()))
+      importFullyQualified(ns);
+    else
+      for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
+        imported.put(e.getKey().withNamespace(prefix), e.getValue());
+        imported.put(e.getKey().withNamespace(ns.getName()), e.getValue());
+      }
+  }
+
+  public void importFullyQualified(Namespace ns) {
+    for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
+      imported.put(e.getKey().withNamespace(ns.getName()), e.getValue());
+    }
+  }
+
+  public void importNotQualified(Namespace ns) {
+    for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
+      imported.put(e.getKey().asSimple(), e.getValue());
+      imported.put(e.getKey().withNamespace(ns.getName()), e.getValue());
+    }
   }
 
   public static abstract class Loader {
