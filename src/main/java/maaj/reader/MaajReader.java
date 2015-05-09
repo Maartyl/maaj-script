@@ -7,6 +7,7 @@ package maaj.reader;
 
 import java.io.Reader;
 import maaj.exceptions.ReaderException;
+import maaj.term.Char;
 import maaj.term.Dbl;
 import maaj.term.Int;
 import maaj.term.Invocable0;
@@ -188,11 +189,42 @@ public class MaajReader {
   }
 
   private Term readMeta() {
-    return fail("readMeta : meta not implemented yet");
+    Map meta = normalizeMeta(read0SkipWhitespace());
+    return read0SkipWhitespace().addMeta(meta);
   }
 
-  private Term readEscape() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+  private Map normalizeMeta(Term m) {
+    Map metaOnMeta = m.getMeta();
+    Term mu = m.unwrap();
+    if (mu instanceof Map)
+      return MapH.update(metaOnMeta, (Map) mu);
+    if (mu instanceof Keyword)
+      return MapH.update(metaOnMeta, H.map(mu, mu));
+    if (mu instanceof Symbol || mu instanceof Str)
+      return MapH.update(metaOnMeta, H.map(H.symbol("tag"), mu));
+
+    return fail("unexpected meta term type: " + mu.getType().getName());
+  }
+
+  private Char readEscape() {
+    if (isMulticharEscape(next())) 
+      return readMulticharEscape();
+    else
+      return Char.of((char) cur());
+  }
+
+  private boolean isMulticharEscape(int cur) {
+    if (cur == 'u' && isNumeric16(peek()))
+      return true;
+    return cur == '_';
+  }
+
+  private Char readMulticharEscape() {
+    switch (cur()) {
+    case 'u': return Char.of((char) read4Num16Int());
+    default:
+      return fail("not implemented: textual char literals");
+    }
   }
 
   private Seq readList() {
@@ -245,13 +277,18 @@ public class MaajReader {
     case 'b': return '\b';
     case 'f': return '\f';
     case '\'': return '\'';
-    case 'u':
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < 4; ++i)
-        sb.append((char) next());
-      return (char) Integer.parseInt(sb.toString(), 16);
+    case 'u': return (char) read4Num16Int();
     }
     return fail("unrecognized escape sequence: \\" + (char) cur());
+  }
+  /**
+   * read 4 characters (0-f) and return them read into integer using radix 16
+   */
+  private int read4Num16Int() {
+    StringBuilder sb = new StringBuilder(4);
+    for (int i = 0; i < 4; ++i)
+      sb.append((char) next());
+    return Integer.parseInt(sb.toString(), 16);
   }
 
   private Num readNum() {
@@ -308,6 +345,8 @@ public class MaajReader {
     return readSymbol();
   }
 
+ 
+
   private static final Symbol deref = H.symbol("maaj,core", "deref");
   private static final Symbol quote = H.symbol("#macro", "quote");
   private static final Symbol quoteQualified = H.symbol("#macro", "quote-qualified");
@@ -326,6 +365,11 @@ public class MaajReader {
 
   private static boolean isNumeric(int c) {
     return isNumericStart(c) || c == '.';
+  }
+
+  private static boolean isNumeric16(int c) {
+    //0-9,a-f,A-F
+    return (c > 47 && c < 58) || (c > 64 && c < 71) || (c > 96 && c < 103);
   }
 
   private static boolean isSymbolicStart(int c) {
