@@ -19,6 +19,7 @@ public class Context implements Lookup {
    reference to 'global' scope :: Symbol/Term -> ? / Var? / Term
    - all other lisps have Vars - why? - to change stuff? can't I just change the map?
    -- so closures can remember mutable values? - I will look it up repeatedly, no? ... maybe not, then it could help...
+   -- EDIT: nope: vars are saved inside fns / stuff and only content changes
 
    local scope variables map :: Map // my or IPersistentMap<Symbol, Term>
    - using MyMap makes no sense: I wil never need it and it would only be slower
@@ -29,6 +30,16 @@ public class Context implements Lookup {
 
    and some reference to truly global scope
    - way to access other objects in JVM
+
+   EDIT:
+   - I will need namespaces:
+   current namespace + name
+   lang namespace: #
+   special namespaces that are referenced through # starting names
+   - these are lang features / ...
+   required namespaces
+   - namespace should be more then just a map
+   -- in case I need to access ... complicated stuff
 
    */
 
