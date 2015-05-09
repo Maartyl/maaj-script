@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.coll.traits.MapLike;
 
 /**
@@ -17,5 +19,23 @@ public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
   public default Map asPersistent() {
     return this;
   }
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    w.append("{");
+    boolean first = true;
+    for (KVPair t : this) {
+      if (first) {
+        first = false;
+      } else {
+        w.append(" ");
+      }
+      t.getKey().show(w);
+      w.append(" ");
+      t.getValue().show(w);
+    }
+    w.append("}");
+  }
+
 
 }

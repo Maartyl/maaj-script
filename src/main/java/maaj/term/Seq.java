@@ -1,10 +1,11 @@
 
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.coll.Sexp;
 import maaj.coll.traits.SeqLike;
 import maaj.lang.Context;
-import maaj.util.H;
 import maaj.exceptions.InvalidOperationException;
 import maaj.util.SeqH;
 
@@ -74,5 +75,21 @@ public interface Seq extends Monad, SeqLike {
   public static Seq retM1(Term content) {
     return Sexp.retM1(content);
   }
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    if (isNil())
+      w.append("()");
+    else {
+      w.append('(');
+      first().show(w);
+      for (Term t : rest()) {
+        w.append(" ");
+        t.show(w);
+      }
+      w.append(')');
+    }
+  }
+
 
 }

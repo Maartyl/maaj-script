@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.coll.traits.MapTLike;
 
 /**
@@ -17,5 +19,11 @@ public interface MapT extends CollectionT<MapT>, MapBase<MapT>, MapTLike<MapT, M
   public default MapT asTransient() {
     return this;
   }
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    w.append("#<transient map>");
+  }
+
 
 }

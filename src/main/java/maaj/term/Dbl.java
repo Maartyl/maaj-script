@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.lang.Context;
 
 /**
@@ -40,7 +42,6 @@ public final class Dbl implements Num {
     return Num.super.dec(diff);
   }
 
-
   @Override
   public long asLong() {
     return (long) value;
@@ -58,6 +59,31 @@ public final class Dbl implements Num {
   public boolean lt(Num other) {
     return value < other.asDouble();
   }
+
+  @Override
+  public void show(Writer w) throws IOException {
+    w.append(this.toString());
+  }
+
+  @Override
+  public String toString() {
+    return Double.toString(value);
+  }
+
+  @Override
+  public int hashCode() {
+    return (int) (Double.doubleToLongBits(this.value) ^ (Double.doubleToLongBits(this.value) >>> 32));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final Dbl other = (Dbl) obj;
+    if (Double.doubleToLongBits(this.value) != Double.doubleToLongBits(other.value)) return false;
+    return true;
+  }
+
 
   @Override
   public Term eval(Context c) {

@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Objects;
 import maaj.lang.Context;
 
@@ -75,6 +77,11 @@ public final class Int implements Num {
       return value < other.asLong();
     }
     return value < other.asDouble();
+  }
+
+  @Override
+  public void show(Writer w) throws IOException {
+    w.append(this.toString());
   }
 
   @Override

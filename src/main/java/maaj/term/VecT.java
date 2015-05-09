@@ -6,6 +6,8 @@
 package maaj.term;
 
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.coll.traits.VecTLike;
 
 /**
@@ -34,5 +36,11 @@ public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, V
     //TODO: maybe make it mutate vect?
     throw new UnsupportedOperationException("not yet");
   }
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    w.append("#<transient vector>");
+  }
+
 
 }

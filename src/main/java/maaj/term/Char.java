@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Objects;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
@@ -80,6 +82,11 @@ public final class Char implements Num {
       return value < ((Char) other).value;
     }
     return value < other.asDouble();
+  }
+
+  @Override
+  public void show(Writer w) throws IOException {
+    w.append(toString());
   }
 
   @Override

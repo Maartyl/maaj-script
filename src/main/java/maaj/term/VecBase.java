@@ -7,6 +7,7 @@ package maaj.term;
 
 import com.github.krukow.clj_lang.ArityException;
 import java.io.IOException;
+import java.io.Writer;
 import maaj.coll.traits.Functor;
 import maaj.coll.traits.VecLikeBase;
 import maaj.lang.Context;
@@ -68,6 +69,24 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
     }
     return this;
   }
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    int count = getCountAsInteger();
+    switch (count) {
+    case 0: w.append("[]");
+      break;
+    default:
+      w.append('[');
+      nth(0).show(w);
+      for (int i = 1; i < count; i++) {
+        w.append(' ');
+        nth(i).show(w);
+      }
+      w.append(']');
+    }
+  }
+
 
   @Override
   default public void serialize(java.io.Writer w) throws IOException {
