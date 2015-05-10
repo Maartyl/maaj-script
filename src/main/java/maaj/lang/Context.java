@@ -6,8 +6,11 @@
 package maaj.lang;
 
 import maaj.coll.traits.Lookup;
+import maaj.exceptions.InvalidOperationException;
 import maaj.term.Map;
+import maaj.term.Symbol;
 import maaj.term.Term;
+import maaj.util.H;
 import maaj.util.MapH;
 
 /**
@@ -70,7 +73,23 @@ public class Context implements Lookup {
 
   @Override
   public Term valAt(Term key) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    if (key instanceof Symbol)
+      return valAt((Symbol) key);
+
+    Term t = scope.valAt(key, scope);
+    if (t != scope)
+      return t;
+    return H.NIL;
+  }
+
+  public Term valAt(Symbol key) {
+    Term t = scope.valAt(key, scope);
+    if (t != scope)
+      return t;
+    Term v = glob.getVar(key, curNs);
+    if (v == null)
+      throw new InvalidOperationException("cannot resolve symbol: " + key);
+    return v;
   }
 
   @Override
@@ -78,12 +97,12 @@ public class Context implements Lookup {
     throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
-  public String getCurrentNamespaceName() {
-    return curNs.getName().getNm();
-  }
-
   public Context withNamespace(Namespace ns) {
     return new Context(this, ns);
+  }
+
+  public Context addToScope(Map let) {
+    return new Context(this, MapH.update(scope, let));
   }
 
   public static Context buildStubWithoutNamespace(Glob g) {
@@ -97,11 +116,6 @@ public class Context implements Lookup {
     }
 
     @Override
-    public String getCurrentNamespaceName() {
-      throw new UnsupportedOperationException("not initialized with namespace"); 
-    }
-
-    @Override
     public Term valAt(Term key, Term dflt) {
       throw new UnsupportedOperationException("not initialized with namespace");
     }
@@ -110,6 +124,12 @@ public class Context implements Lookup {
     public Term valAt(Term key) {
       throw new UnsupportedOperationException("not initialized with namespace");
     }
+
+    @Override
+    public Context addToScope(Map let) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
 
 
   }

@@ -15,7 +15,8 @@ public class CoreLoader extends Namespace.Loader {
 
   @Override
   public Namespace loadNamespaceFor(Symbol nsName, Context cxt) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return createEmptyWithName(nsName);
+    //throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
 }

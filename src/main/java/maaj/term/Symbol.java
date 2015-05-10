@@ -135,6 +135,12 @@ public class Symbol implements Term {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return print();
+  }
+
+
 
   //-- STATIC
   public static Symbol of(String str) {

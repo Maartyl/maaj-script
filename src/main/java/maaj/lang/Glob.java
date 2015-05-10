@@ -17,6 +17,7 @@ public class Glob {
   private final NamespaceStore store;
   private final Namespace coreAcc;
   private final PathLoader defaultLoader = new PathLoader();
+  private final Namespace.Loader emptyLoader = new EmptyLoader();
   private final Context loaderContext = Context.buildStubWithoutNamespace(this);
 
 
@@ -44,6 +45,14 @@ public class Glob {
     if (v == null)
       v = current.get(s);
     return v;
+  }
+
+  public Context start(Symbol emptyNsName) {
+    return loaderContext.withNamespace(store.getNamespaceFor(emptyNsName, emptyLoader, loaderContext));
+  }
+
+  public static Glob create() {
+    return new Glob(new NamespaceStore());
   }
 
 }
