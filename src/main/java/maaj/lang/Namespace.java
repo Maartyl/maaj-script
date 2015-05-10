@@ -16,7 +16,7 @@ import maaj.term.Var;
  *
  * @author maartyl
  */
-public class Namespace {
+public final class Namespace {
   private final Symbol nsName;
 
   //these symbols are not qualified : they "would" be qualified with this namespace
