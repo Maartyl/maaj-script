@@ -6,7 +6,9 @@
 package maaj.lang;
 
 import maaj.exceptions.InvalidOperationException;
+import maaj.term.FnSeq;
 import maaj.term.Keyword;
+import maaj.term.MacroSeq;
 import maaj.term.Map;
 import maaj.term.Seq;
 import maaj.term.Sf;
@@ -77,6 +79,9 @@ public class CoreLoader extends Namespace.Loader {
         throw new InvalidOperationException("#/let: bindings must be a vector");
       return H.cons(doSym, a.rest()).eval(letReduceBindings(c, (Vec) a.first()));
     });
+    def(core, "fnseq", "(fnseq body body $args body)", (c, a) -> FnSeq.of(a, c));
+    def(core, "macroseq", "(macroseq body body $args body)", (c, a) -> MacroSeq.of(a, c));
+    
   }
 
   private Context letReduceBindings(Context cxt, Vec v) {
@@ -113,12 +118,12 @@ public class CoreLoader extends Namespace.Loader {
     return false;
   }
 
-  private void loadCore(Context c, Namespace ns) {
+  private void loadCore(Context cxt, Namespace core) {
     //throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
-  private void loadMacro(Context c, Namespace ns) {
-    //throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+  private void loadMacro(Context cxt, Namespace macro) {
+    def(macro, "quote", "returns first arg without evaluating it", (c, a) -> a.isNil() ? H.NIL : a.first());
   }
 
   private static final Symbol docSym = H.symbol(":doc");
