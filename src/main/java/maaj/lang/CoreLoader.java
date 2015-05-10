@@ -27,20 +27,23 @@ public class CoreLoader extends Namespace.Loader {
 
   @Override
   public Namespace loadNamespaceFor(Symbol nsName, Context cxt) {
+    if (!nsName.isSimple())
+      throw new IllegalArgumentException("invalid namespace name: " + nsName.print());
     Namespace ns = createEmptyWithName(nsName);
-    Context c = cxt.withNamespace(ns);
     switch (nsName.getNm()) {
-    case "#": loadSf(c, ns);
+    case "#": loadSf(ns);
       break;
-    case "#core": loadCore(c, ns);
+    case "#core": loadCore(ns);
       break;
-    case "#macro": loadMacro(c, ns);
+    case "#macro": loadMacro(ns);
       break;
+    default:
+      throw new IllegalArgumentException("no core namespace with name: " + nsName.print());
     }
     return ns;
   }
 
-  private void loadSf(Context cxt, Namespace core) {
+  private void loadSf(Namespace core) {
     def(core, "if", "", (c, a) -> {
       int len = a.boundLength(3);
       if (len == 2)
@@ -118,11 +121,14 @@ public class CoreLoader extends Namespace.Loader {
     return false;
   }
 
-  private void loadCore(Context cxt, Namespace core) {
+  private void loadCore(Namespace core) {
     //throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
-  private void loadMacro(Context cxt, Namespace macro) {
+  /**
+   * this does not define macros; but namespace for working with macros
+   */
+  private void loadMacro(Namespace macro) {
     def(macro, "quote", "returns first arg without evaluating it", (c, a) -> a.isNil() ? H.NIL : a.first());
   }
 
