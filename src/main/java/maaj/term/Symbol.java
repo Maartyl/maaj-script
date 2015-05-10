@@ -108,7 +108,7 @@ public class Symbol implements Term {
 
   @Override
   public Term evalMacros(Context c) {
-    return this;
+    return c.valAt(this);
   }
 
   @Override
