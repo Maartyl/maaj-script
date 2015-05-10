@@ -9,6 +9,7 @@ import java.util.Iterator;
 import maaj.term.Invocable;
 import maaj.term.Seq;
 import maaj.term.Term;
+import maaj.util.H;
 
 /**
  *
@@ -64,6 +65,14 @@ public interface SeqLike extends Numerable, Seqable, Reducible, Iterable<Term> {
         return v;
       }
     };
+  }
+
+  public default Term firstOrNil() {
+    return isNil() ? H.NIL : first();
+  }
+
+  public default Seq restOrNil() {
+    return isNil() ? H.END : rest();
   }
 
 }
