@@ -5,12 +5,15 @@
  */
 package maaj.lang;
 
+import maaj.coll.traits.Reducible;
 import maaj.exceptions.InvalidOperationException;
 import maaj.term.Fn;
 import maaj.term.FnSeq;
+import maaj.term.Invocable;
 import maaj.term.Keyword;
 import maaj.term.Macro;
 import maaj.term.MacroSeq;
+import maaj.term.Num;
 import maaj.term.Seq;
 import maaj.term.Sf;
 import maaj.term.Str;
@@ -92,6 +95,7 @@ public class CoreLoader extends Namespace.Loader {
       arityRequire(1, a, "eval");
       return a.first().eval(c);
     });
+
   }
 
   private Context letReduceBindings(Context cxt, Vec v) {
@@ -144,9 +148,17 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
 
-    def(core, "reduce", "get meta data of term", (c, a) -> {
-      return H.NIL;
+    defn(core, "reduce", "get meta data of term", a -> {
+      arityRequire(3, a, "reduce");
+      Invocable fn = H.requireInvocable(a.first());
+      Term start = a.rest().first();
+      Reducible coll = H.requireReducible(a.rest().rest().first());
+      return coll.reduce(start, fn);
     });
+
+    defn(core, "+#", "sums 2 args", (Num.Num2Op) Num::plus);
+    defn(core, "-#", "subtracts 2 args", (Num.Num2Op) Num::minus);
+
   }
 
   /**

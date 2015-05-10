@@ -18,6 +18,7 @@ import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
 import maaj.coll.traits.Indexed;
+import maaj.coll.traits.Reducible;
 import maaj.coll.traits.Seqable;
 import maaj.coll.wrap.VecPWrap;
 import maaj.reader.MaajReader;
@@ -314,20 +315,47 @@ public class H {
 
   //--requires:
 
-  public static Int requireInt(Term t) {
+  public static Int requireInt(Term tt) {
     //TODO: change all requires to default methods on Term
     // - actually: another interfece extended by Term
+    Term t = tt.unwrap();
     if (t instanceof Int)
       return (Int) t;
 
     throw new IllegalArgumentException("Requires Int, got: " + t.getClass().getName());
   }
-  public static Char requireChar(Term t) {
-    //TODO: change all requires to default methods on Term
+  public static Char requireChar(Term tt) {
+    Term t = tt.unwrap();
     if (t instanceof Char)
       return (Char) t;
 
     throw new IllegalArgumentException("Requires Char, got: " + t.getClass().getName());
+  }
+
+  public static Invocable requireInvocable(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Char)
+      return (Invocable) t;
+
+    throw new IllegalArgumentException("Requires Invocable, got: " + t.getClass().getName());
+  }
+
+  public static Num requireNum(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Num)
+      return (Num) t;
+
+    throw new IllegalArgumentException("Requires Num, got: " + t.getClass().getName());
+  }
+
+  public static Reducible requireReducible(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Reducible)
+      return (Reducible) t;
+    if (t instanceof Seqable)
+      return ((Seqable) t).seq();
+
+    throw new IllegalArgumentException("Requires Reducible, got: " + t.getClass().getName());
   }
 
   public static int inc(int i) {

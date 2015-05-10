@@ -8,7 +8,6 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
-import maaj.lang.Context;
 
 /**
  * wrapped longs
@@ -20,11 +19,6 @@ public final class Int implements Num {
 
   private Int(long value) {
     this.value = value;
-  }
-
-  @Override
-  public Term apply(Context cxt, Seq args) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
   @Override
@@ -51,6 +45,41 @@ public final class Int implements Num {
   @Override
   public Int dec(Num diff) {
     return Int.of(value - diff.asLong());
+  }
+
+  @Override
+  public int abilty() {
+    return 20;
+  }
+
+  @Override
+  public Num plus(Num other) {
+    return Num.arithmetic(this, other, x -> of(value + x.asLong()), other::plus);
+  }
+
+  @Override
+  public Num minus(Num other) {
+    return Num.arithmetic(this, other, x -> of(value - x.asLong()), other::minusR);
+  }
+
+  @Override
+  public Num minusR(Num other) {
+    return Num.arithmetic(this, other, x -> of(x.asLong() - value), other::minus);
+  }
+
+  @Override
+  public Num mul(Num other) {
+    return Num.arithmetic(this, other, x -> of(value * x.asLong()), other::mul);
+  }
+
+  @Override
+  public Num div(Num other) {
+    return Num.arithmetic(this, other, x -> of(value / x.asLong()), other::divR);
+  }
+
+  @Override
+  public Num divR(Num other) {
+    return Num.arithmetic(this, other, x -> of(x.asLong() / value), other::div);
   }
 
   @Override
@@ -101,11 +130,12 @@ public final class Int implements Num {
 
   @Override
   public boolean equals(Object obj) {
+//    if (value <= 256 && value >= -255)
+//      return this == obj;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     final Int other = (Int) obj;
-    if (this.value != other.value) return false;
-    return true;
+    return this.value == other.value;
   }
 
 

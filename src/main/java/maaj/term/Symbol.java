@@ -103,6 +103,7 @@ public class Symbol implements Term {
   @Override
   public Term eval(Context c) {
     //don't evaluate
+    //TODO: only unwrap vars!!! //or something that represents that...
     return c.valAt(this).unwrap();
   }
 

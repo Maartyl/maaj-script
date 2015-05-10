@@ -55,6 +55,41 @@ public final class Char implements Num {
   }
 
   @Override
+  public int abilty() {
+    return 10;
+  }
+
+  @Override
+  public Num plus(Num other) {
+    return Num.arithmetic(this, other, x -> of(value + x.asLong()), other::plus);
+  }
+
+  @Override
+  public Num minus(Num other) {
+    return Num.arithmetic(this, other, x -> of(value - x.asLong()), other::minusR);
+  }
+
+  @Override
+  public Num minusR(Num other) {
+    return Num.arithmetic(this, other, x -> of(x.asLong() - value), other::minus);
+  }
+
+  @Override
+  public Num mul(Num other) {
+    return Num.arithmetic(this, other, x -> of(value * x.asLong()), other::mul);
+  }
+
+  @Override
+  public Num div(Num other) {
+    return Num.arithmetic(this, other, x -> of(value / x.asLong()), other::divR);
+  }
+
+  @Override
+  public Num divR(Num other) {
+    return Num.arithmetic(this, other, x -> of(x.asLong() / value), other::div);
+  }
+
+  @Override
   public long asLong() {
     return value;
   }
@@ -128,6 +163,10 @@ public final class Char implements Num {
       return cache[val];
     }
     return new Char(val);
+  }
+
+  private static Char of(long val) {
+    return of((char) val);
   }
 
 }

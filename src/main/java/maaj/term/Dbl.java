@@ -43,6 +43,42 @@ public final class Dbl implements Num {
   }
 
   @Override
+  public int abilty() {
+    return 40;
+  }
+
+  @Override
+  public Num plus(Num other) {
+    return Num.arithmetic(this, other, x -> of(value + x.asDouble()), other::plus);
+  }
+
+  @Override
+  public Num minus(Num other) {
+    return Num.arithmetic(this, other, x -> of(value - x.asDouble()), other::minusR);
+  }
+
+  @Override
+  public Num minusR(Num other) {
+    return Num.arithmetic(this, other, x -> of(x.asDouble() - value), other::minus);
+  }
+
+  @Override
+  public Num mul(Num other) {
+    return Num.arithmetic(this, other, x -> of(value * x.asDouble()), other::mul);
+  }
+
+  @Override
+  public Num div(Num other) {
+    return Num.arithmetic(this, other, x -> of(value / x.asDouble()), other::divR);
+  }
+
+  @Override
+  public Num divR(Num other) {
+    return Num.arithmetic(this, other, x -> of(x.asDouble() / value), other::div);
+  }
+
+
+  @Override
   public long asLong() {
     return (long) value;
   }
