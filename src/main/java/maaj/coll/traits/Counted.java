@@ -26,4 +26,13 @@ public interface Counted extends Numerable {
   public default boolean isEmpty() {
     return getCountAsInteger() == 0;
   }
+
+  /**
+   * just a shortcut for: getCountAsInteger()
+   * shouldn't be overriden or exposed
+   * @return this.getCountAsInteger();
+   */
+  public default int cnt() {
+    return getCountAsInteger();
+  }
 }
