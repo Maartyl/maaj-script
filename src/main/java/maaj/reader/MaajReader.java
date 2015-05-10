@@ -347,7 +347,7 @@ public class MaajReader {
 
  
 
-  private static final Symbol deref = H.symbol("maaj,core", "deref");
+  private static final Symbol deref = H.symbol("#core", "deref");
   private static final Symbol quote = H.symbol("#macro", "quote");
   private static final Symbol quoteQualified = H.symbol("#macro", "quote-qualified");
   private static final Symbol unquote = H.symbol("#macro", "unquote");
