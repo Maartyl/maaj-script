@@ -62,6 +62,11 @@ public interface NilSeq extends Seq {
   }
 
   @Override
+  public default Term eval(Context c) {
+    return this;
+  }
+
+  @Override
   public default Term evalMacros(Context c) {
     return this;
   }
