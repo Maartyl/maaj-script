@@ -158,7 +158,10 @@ public class CoreLoader extends Namespace.Loader {
 
     defn(core, "+#", "sums 2 args", (Num.Num2Op) Num::plus);
     defn(core, "-#", "subtracts 2 args", (Num.Num2Op) Num::minus);
-
+    defn(core, "*#", "multiplies 2 args", (Num.Num2Op) Num::mul);
+    defn(core, "/#", "multiplies 2 args", (Num.Num2Op) Num::div);
+    defn(core, "min#", "multiplies 2 args", (Num.Num2Op) Num::min);
+    defn(core, "max#", "multiplies 2 args", (Num.Num2Op) Num::max);
   }
 
   /**
