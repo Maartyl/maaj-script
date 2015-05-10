@@ -15,19 +15,10 @@ import maaj.util.H;
  * <p>
  * @author maartyl
  */
-public final class FnSeq implements Fn {
-
-  private final Seq fn;
-  private final Context closure;
+public final class FnSeq extends InvSeq implements Fn {
 
   protected FnSeq(Seq fn, Context closure) {
-    this.fn = fn;
-    this.closure = closure;
-  }
-
-  @Override
-  public Term invokeSeq(Seq args) {
-    return H.cons(doSym, fn).eval(closure.addToScope(H.map(argsSym, args)));
+    super(fn, closure);
   }
 
   @Override
@@ -36,11 +27,9 @@ public final class FnSeq implements Fn {
   }
 
   private static final Symbol fnseqSym = H.symbol("#", "fnseq");
-  private static final Symbol argsSym = H.symbol("$args");
-  private static final Symbol doSym = H.symbol("#", "do");
 
   public static FnSeq of(Seq fn, Context closure) {
-    return new FnSeq(fn.fmap((Invocable1) x -> x.evalMacros(closure)), closure);
+    return new FnSeq(fn, closure);
   }
 
 
