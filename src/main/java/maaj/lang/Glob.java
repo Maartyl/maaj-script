@@ -24,16 +24,12 @@ public class Glob {
 
   private Glob(NamespaceStore store) {
     this.store = store;
-    this.coreAcc = loadCore();
+    CoreLoader l = new CoreLoader();
+    this.coreAcc = store.getNamespaceFor(H.symbol("#"), l, loaderContext);
+    coreAcc.importFullyQualified(store.getNamespaceFor(H.symbol("#macro"), l, loaderContext));
+    coreAcc.importNotQualified(store.getNamespaceFor(H.symbol("#core"), l, loaderContext));
   }
 
-  private Namespace loadCore() {
-    CoreLoader l = new CoreLoader();
-    Namespace core = store.getNamespaceFor(H.symbol("#"), l, loaderContext);
-    core.importFullyQualified(store.getNamespaceFor(H.symbol("#macro"), l, loaderContext));
-    core.importNotQualified(store.getNamespaceFor(H.symbol("#core"), l, loaderContext));
-    return core;
-  }
 
   public Namespace require(Symbol s) {
     return store.getNamespaceFor(s, defaultLoader, loaderContext);

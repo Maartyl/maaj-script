@@ -359,6 +359,22 @@ public class H {
     throw new IllegalArgumentException("Requires Char, got: " + t.getClass().getName());
   }
 
+  public static Seq requireSeq(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Seq)
+      return (Seq) t;
+
+    throw new IllegalArgumentException("Requires Seq, got: " + t.getClass().getName());
+  }
+
+  public static Seqable requireSeqable(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Seqable)
+      return (Seqable) t;
+
+    throw new IllegalArgumentException("Requires Seqable, got: " + t.getClass().getName());
+  }
+
   public static Invocable requireInvocable(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Invocable)

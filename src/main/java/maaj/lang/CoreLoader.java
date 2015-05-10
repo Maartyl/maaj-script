@@ -150,6 +150,11 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
 
+    defn(core, "cons", "prepends to list; O(1)", a -> {
+      arityRequire(2, a, "cons");
+      return H.cons(a.first(), H.requireSeqable(a.rest().first()).seq());
+    });
+
     defn(core, "reduce", "get meta data of term", a -> {
       arityRequire(3, a, "reduce");
       Invocable fn = H.requireInvocable(a.first());
@@ -168,7 +173,8 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "inc", "(+ % 1)", (Num.NumOp) Num::inc);
     defn(core, "dec", "(- % 1)", (Num.NumOp) Num::dec);
 
-    //(def + (fnseq (reduce +# 0 $args)))
+    H.eval("(def + (fnseq (reduce +# 0 $args)))", cxt, rcxt);
+    H.eval("(def * (fnseq (reduce *# 1 $args)))", cxt, rcxt);
 
   }
 
