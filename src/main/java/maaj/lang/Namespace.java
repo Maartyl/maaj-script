@@ -45,9 +45,19 @@ public class Namespace {
   public Var def(Symbol name, Term val, Map meta) {
     return vars.computeIfAbsent(name, n -> Var.of(val, meta));
   }
-
+  /**
+   *
+   * @param name symbol to lookup
+   * @return null if not found; corresponding Var otherwise
+   */
   public Var get(Symbol name) {
-    return vars.get(name);
+    Var v = vars.get(name);
+    if (v == null) {
+      v = imported.get(name);
+      if (v == null && getName().getNm().equals(name.getNs()))
+        v = vars.get(name.asSimple());
+    }
+    return v;
   }
 
   public void importQualified(Namespace ns, Symbol prefix) {
