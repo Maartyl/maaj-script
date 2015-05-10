@@ -41,7 +41,7 @@ public interface Term {
   }
 
   default Term addMeta(Map meta) {
-    throw new UnsupportedOperationException("with meta: not implementet meta, yet");
+    return Meta.of(this, meta);
   }
 
   /**
