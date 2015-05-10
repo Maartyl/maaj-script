@@ -5,8 +5,6 @@
  */
 package maaj.term;
 
-import java.io.IOException;
-import java.io.Writer;
 import maaj.util.H;
 import maaj.util.MapH;
 
@@ -23,7 +21,6 @@ public class Meta implements Mimic {
     this.val = val; //TODO: decide : unwrap?
     this.meta = MapH.update(val.getMeta(), meta);
   }
-
 
   @Override
   public Term unwrap() {
@@ -48,30 +45,6 @@ public class Meta implements Mimic {
     if (u == t)
       return this;
     return of(t, meta);
-  }
-
-  @Override
-  public Str show() {
-    return Mimic.super.show();
-  }
-
-  @Override
-  public void serialize(Writer w) throws IOException {
-    if (meta.isEmpty()) {
-      w.append('^');
-      meta.serialize(w);
-    }
-    val.serialize(w);
-  }
-
-
-  @Override
-  public void show(Writer w) throws IOException {
-    if (meta.isEmpty()) {
-      w.append('^');
-      meta.show(w);
-    }
-    val.show(w);
   }
 
   public static Meta of(Term val) {
