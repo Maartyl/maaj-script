@@ -35,7 +35,10 @@ public class SymbolNs extends Symbol {
   public Symbol asSimple() {
     return simple(name);
   }
-
+  @Override
+  public boolean isSimple() {
+    return false;
+  }
   @Override
   public boolean isQualified() {
     return true;

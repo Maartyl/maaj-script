@@ -5,9 +5,6 @@
  */
 package maaj;
 
-import maaj.coll.traits.Persistent;
-import maaj.coll.traits.TraPer;
-import maaj.coll.traits.Transient;
 import maaj.lang.Repl;
 import maaj.util.H;
 import maaj.util.SeqH;
@@ -21,19 +18,6 @@ import maaj.util.Generators;
  * @author maartyl
  */
 public class TestMain {
-
-  private static interface Set extends TraPer<PSet, TSet> {
-
-  }
-
-  private static interface PSet extends Set, Persistent<PSet, TSet> {
-
-  }
-
-  private static interface TSet extends Set, Transient<PSet, TSet> {
-
-  }
-
   public static void main(String[] args) {
     Int a = Int.of(3);
     System.out.println(a.neg());

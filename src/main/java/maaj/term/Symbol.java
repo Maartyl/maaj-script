@@ -49,6 +49,14 @@ public class Symbol implements Term {
     return false;
   }
 
+  /**
+   * not a keyword or qualified
+   * @return
+   */
+  public boolean isSimple() {
+    return true;
+  }
+
   public Symbol prependNamespace(String ns) {
     return qualified(ns, name);
   }
@@ -82,6 +90,14 @@ public class Symbol implements Term {
 
   public Symbol asSimple() {
     return this;
+  }
+
+  public boolean hasSameNs(Symbol other) {
+    return !(isQualified() || other.isQualified()) || Objects.equals(getNs(), other.getNs());
+  }
+
+  public boolean hasSameName(Symbol other) {
+    return Objects.equals(getNm(), other.getNm());
   }
 
   @Override

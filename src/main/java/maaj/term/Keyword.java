@@ -25,6 +25,11 @@ public class Keyword extends Symbol {
   }
 
   @Override
+  public boolean isSimple() {
+    return false;
+  }
+
+  @Override
   public Symbol prependNamespace(String ns) {
     return qualified(ns, name);
   }

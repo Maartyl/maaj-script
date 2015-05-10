@@ -35,6 +35,8 @@ public final class Namespace {
   }
 
   public Var def(Symbol name) {
+    if (name.isQualified())
+      throw new IllegalArgumentException("cannot create var from qualified name");
     return vars.computeIfAbsent(name, n -> Var.empty());
   }
 
@@ -63,7 +65,9 @@ public final class Namespace {
   }
 
   public void importQualified(Namespace ns, Symbol prefix) {
-    if (ns.getName().getNm().equals(prefix.getNm()))
+    if (!prefix.isSimple())
+      throw new IllegalArgumentException("cannot import qualifying with qualified prefix");
+    if (ns.getName().hasSameName(prefix))
       importFullyQualified(ns);
     else
       for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
