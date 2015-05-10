@@ -13,6 +13,7 @@ import maaj.term.Term;
 import maaj.term.Var;
 import maaj.util.H;
 import maaj.util.MapH;
+import static maaj.util.Sym.nameSym;
 
 /**
  *
@@ -77,8 +78,12 @@ public class Context implements Lookup {
   }
 
   public Var def(Symbol name, Term val, Map meta) {
-    meta = MapH.update(meta, H.map(nameSym, name));
+    meta = meta.assoc(nameSym, name);
     return curNs.def(name, val, meta);
+  }
+
+  public Var def(Symbol name, Map meta) {
+    return curNs.def(name).addMeta(meta);
   }
 
   public void importQualified(Namespace ns, Symbol prefix) {
@@ -138,8 +143,6 @@ public class Context implements Lookup {
   public Context addToScope(Term key, Term val) {
     return new Context(this, scope.assoc(key, val));
   }
-
-  private static final Symbol nameSym = H.symbol("name");
 
   public static Context buildStubWithoutNamespace(Glob g) {
     return new Starting(g);

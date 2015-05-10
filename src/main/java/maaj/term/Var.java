@@ -38,7 +38,7 @@ public final class Var implements Mimic, RefSet<Var> {
   }
 
   @Override
-  public synchronized Term addMeta(Map meta) {
+  public synchronized Var addMeta(Map meta) {
     this.meta = MapH.update(this.meta, meta);
     return this;
   }

@@ -11,6 +11,8 @@ import maaj.term.Map;
 import maaj.term.Symbol;
 import maaj.term.Term;
 import maaj.term.Var;
+import maaj.util.H;
+import static maaj.util.Sym.nameSym;
 
 /**
  *
@@ -37,7 +39,7 @@ public final class Namespace {
   public Var def(Symbol name) {
     if (name.isQualified())
       throw new IllegalArgumentException("cannot create var from qualified name");
-    return vars.computeIfAbsent(name, n -> Var.empty());
+    return vars.computeIfAbsent(name, n -> Var.empty().addMeta(H.map(nameSym, n)));
   }
 
   public Var def(Symbol name, Term val) {

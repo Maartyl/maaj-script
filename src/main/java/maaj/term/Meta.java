@@ -5,6 +5,7 @@
  */
 package maaj.term;
 
+import maaj.lang.Context;
 import maaj.util.H;
 import maaj.util.MapH;
 
@@ -46,6 +47,18 @@ public class Meta implements Mimic {
       return this;
     return of(t, meta);
   }
+
+  @Override
+  public Term evalMacros(Context c) {
+    return of(Mimic.super.evalMacros(c), meta);
+  }
+
+  @Override
+  public Term eval(Context c) {
+    Term t = Mimic.super.eval(c);
+    return of(t, meta);
+  }
+
 
   public static Meta of(Term val) {
     //they generally shouldn't have any meta

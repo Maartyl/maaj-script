@@ -19,6 +19,7 @@ import maaj.term.Term;
 import maaj.term.Var;
 import maaj.term.Vec;
 import maaj.util.H;
+import maaj.util.Sym;
 
 /**
  *
@@ -61,7 +62,7 @@ public class CoreLoader extends Namespace.Loader {
       Term name = a.first();
       Term val = a.rest().first().eval(c);
       Term nu = name.unwrap();
-      if (defCheckIsQualified(nu, c.getCurNs().getName())) {
+      if (defCheckAndRetIfQualified(nu, c.getCurNs().getName())) {
         Var v = c.getVar((Symbol) nu);
         if (v == null) throw new InvalidOperationException("#/def: cannot create qualified var:" + nu.print());
         v.doSet(val);
@@ -83,7 +84,7 @@ public class CoreLoader extends Namespace.Loader {
         throw new InvalidOperationException("#/let: requires bindings");
       if (!(a.first().getContent() instanceof Vec))
         throw new InvalidOperationException("#/let: bindings must be a vector");
-      return H.cons(doSym, a.rest()).eval(letReduceBindings(c, (Vec) a.first()));
+      return H.cons(Sym.doSymC, a.rest()).eval(letReduceBindings(c, (Vec) a.first()));
     });
     def(core, "fnseq", "(fnseq body body $args body)", (c, a) -> FnSeq.of(a, c));
     def(core, "macroseq", "(macroseq body body $args body)", (c, a) -> MacroSeq.of(a, c));
@@ -103,7 +104,7 @@ public class CoreLoader extends Namespace.Loader {
         throw new InvalidOperationException("#/let: binding requires symbol; got: " + k.print());
       Term exp = s.rest().first();
       Term r = exp.eval(cxt);
-      if (!(ignoreSym).equals(k))
+      if (!(Sym.ignoreSym).equals(k))
         cxt = cxt.addToScope(k, r);
     }
     return cxt;
@@ -113,7 +114,7 @@ public class CoreLoader extends Namespace.Loader {
    * throws on on any problem; only returns if nu is valid Symbol
    * returns if ((Sym)nu).isQualified
    */
-  private boolean defCheckIsQualified(Term nu, Symbol curNs) {
+  private boolean defCheckAndRetIfQualified(Term nu, Symbol curNs) {
     if (nu instanceof Keyword)
       throw new InvalidOperationException("#/def: requires symbol for name, got:" + nu.getType().getName());
     if (!(nu instanceof Symbol))
@@ -128,22 +129,20 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private void loadCore(Namespace core) {
-    def(core, "meta", "get meta data of term", (c, a) -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
+    defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
 
-    Symbol firstSym = H.symbol("first");
-    Symbol restSym = H.symbol("rest");
-    defn(core, firstSym, "first of seq (head)", a -> {
+    defn(core, Sym.firstSym, "first of seq (head)", a -> {
       arityRequire(1, a, "first");
       return (H.seqFrom(a.first())).firstOrNil();
     });
-    defn(core, restSym, "rest of seq (tail)", a -> {
+    defn(core, Sym.restSym, "rest of seq (tail)", a -> {
       arityRequire(1, a, "rest");
       return (H.seqFrom(a.first())).restOrNil();
     });
-    defmacro(core, "car", "first of seq (head)", a -> H.cons(firstSym, a));
-    defmacro(core, "cdr", "rest of seq (head)", a -> H.cons(restSym, a));
-    defmacro(core, "cadr", "(first (rest a))", a -> H.list(firstSym, H.cons(restSym, a)));
-    defmacro(core, "cddr", "(rest (rest a))", a -> H.list(restSym, H.cons(restSym, a)));
+    defmacro(core, "car", "first of seq (head)", a -> H.cons(Sym.firstSym, a));
+    defmacro(core, "cdr", "rest of seq (head)", a -> H.cons(Sym.restSym, a));
+    defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
+    defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
 
     def(core, "reduce", "get meta data of term", (c, a) -> {
       return H.NIL;
@@ -157,10 +156,6 @@ public class CoreLoader extends Namespace.Loader {
     def(macro, "quote", "returns first arg without evaluating it", (c, a) -> a.isNil() ? H.NIL : a.first());
   }
 
-  private static final Symbol docSym = H.symbol(":doc");
-  private static final Symbol doSym = H.symbol("#", "do");
-  private static final Symbol ignoreSym = H.symbol("_");
-
   private static Seq arityRequire(int arity, Seq s, String errMsg) {
     if (s.boundLength(arity) != arity)
       throw new IllegalArgumentException(errMsg + " requires arity: " + arity + " but got: " + s.boundLength(30));
@@ -172,7 +167,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private static void def(Namespace ns, Symbol name, String doc, Sf sf) {
-    ns.def(name, sf, H.map(docSym, Str.of(doc)));
+    ns.def(name, sf, H.map(Sym.docSymK, Str.of(doc)));
   }
 
   private static void defn(Namespace ns, String name, String doc, Fn fn) {
@@ -180,7 +175,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private static void defn(Namespace ns, Symbol name, String doc, Fn fn) {
-    ns.def(name, fn, H.map(docSym, Str.of(doc)));
+    ns.def(name, fn, H.map(Sym.docSymK, Str.of(doc)));
   }
 
   private static void defmacro(Namespace ns, String name, String doc, Macro m) {
@@ -188,7 +183,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private static void defmacro(Namespace ns, Symbol name, String doc, Macro m) {
-    ns.def(name, m, H.map(docSym, Str.of(doc)));
+    ns.def(name, m, H.map(Sym.docSymK, Str.of(doc)));
   }
 
 }
