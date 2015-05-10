@@ -128,6 +128,8 @@ public class H {
   }
 
   public static Object unwrap(Term t) {
+    //TODO: resolve name crash: Term.unwrap vs. this (different concept)
+
     if (t == null) return null;
     return t.getContent();
   }
