@@ -12,18 +12,11 @@ import maaj.lang.Context;
  * <p>
  * @author maartyl
  */
-public class Macro extends Fn {
-
-  protected Macro(Seq fn, Context closure) {
-    super(fn, closure);
-  }
+public interface Macro extends Invocable {
 
   @Override
-  public Term apply(Context cxt, Seq args) {
+  public default Term apply(Context cxt, Seq args) {
     return invokeSeq(args);
   }
 
-  public static Macro of(Seq fn, Context closure) {
-    return new Macro(fn.fmap((Invocable1) x -> x.evalMacros(closure)), closure);
-  }
 }
