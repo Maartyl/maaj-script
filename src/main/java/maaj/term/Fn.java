@@ -20,4 +20,7 @@ public interface Fn extends Invocable {
     return invokeSeq(SeqH.mapEval(args, cxt));
   }
 
+  @Override
+  public Term invokeSeq(Seq args);
+
 }

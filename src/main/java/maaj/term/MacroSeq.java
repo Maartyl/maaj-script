@@ -15,12 +15,12 @@ import maaj.util.H;
  * <p>
  * @author maartyl
  */
-public final class FnSeq implements Fn {
+public final class MacroSeq implements Macro {
 
   private final Seq fn;
   private final Context closure;
 
-  protected FnSeq(Seq fn, Context closure) {
+  protected MacroSeq(Seq fn, Context closure) {
     this.fn = fn;
     this.closure = closure;
   }
@@ -32,13 +32,13 @@ public final class FnSeq implements Fn {
 
   @Override
   public void show(Writer w) throws IOException {
-    H.list(H.symbol("#/fn"), fn).show(w);
+    H.list(H.symbol("#/macro"), fn).show(w);
   }
 
   protected static final Symbol argsSym = H.symbol("$args");
 
-  public static FnSeq of(Seq fn, Context closure) {
-    return new FnSeq(fn.fmap((Invocable1) x -> x.evalMacros(closure)), closure);
+  public static MacroSeq of(Seq fn, Context closure) {
+    return new MacroSeq(fn.fmap((Invocable1) x -> x.evalMacros(closure)), closure);
   }
 
 
