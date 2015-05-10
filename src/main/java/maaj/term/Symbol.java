@@ -102,7 +102,8 @@ public class Symbol implements Term {
 
   @Override
   public Term eval(Context c) {
-    return c.valAt(this).eval(c);
+    //don't evaluate
+    return c.valAt(this).unwrap();
   }
 
   @Override
