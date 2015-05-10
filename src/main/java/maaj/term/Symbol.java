@@ -53,6 +53,37 @@ public class Symbol implements Term {
     return qualified(ns, name);
   }
 
+  /**
+   * Always just return a symbol with the same name and given ns.
+   * // not meant to be overriden.
+   * @param ns
+   * @return
+   */
+  public Symbol withNamespace(String ns) {
+    return qualified(ns, name);
+  }
+
+  /**
+   * Uses ns.name for new namespace name
+   * @param ns
+   * @return
+   */
+  public Symbol withNamespace(Symbol ns) {
+    return qualified(ns.getNm(), name);
+  }
+  /**
+   * copies namespace from arg.
+   * @param ns
+   * @return
+   */
+  public Symbol withSameNamespace(Symbol ns) {
+    return qualified(ns.getNs(), name);
+  }
+
+  public Symbol asSimple() {
+    return this;
+  }
+
   @Override
   public Term eval(Context c) {
     return c.valAt(this);

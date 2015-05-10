@@ -50,21 +50,21 @@ public class Context implements Lookup {
 
   private Map scope;
 
-  public Context(Glob glob, Namespace curNs, Map scope) {
+  private Context(Glob glob, Namespace curNs, Map scope) {
     this.glob = glob;
     this.curNs = curNs;
     this.scope = scope;
   }
 
-  public Context(Context c, Map scope) {
+  private Context(Context c, Map scope) {
     this(c.glob, c.curNs, scope);
   }
 
-  public Context(Glob glob, Namespace curNs) {
+  private Context(Glob glob, Namespace curNs) {
     this(glob, curNs, MapH.emptyPersistent());
   }
 
-  public Context(Context c, Namespace curNs) {
+  private Context(Context c, Namespace curNs) {
     this(c.glob, curNs, c.scope);
   }
 
@@ -79,10 +79,38 @@ public class Context implements Lookup {
   }
 
   public String getCurrentNamespaceName() {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return curNs.getName().getNm();
   }
 
   public Context withNamespace(Namespace ns) {
     return new Context(this, ns);
+  }
+
+  public static Context buildStubWithoutNamespace(Glob g) {
+    return new Starting(g);
+  }
+
+  private static class Starting extends Context {
+
+    public Starting(Glob glob) {
+      super(glob, null);
+    }
+
+    @Override
+    public String getCurrentNamespaceName() {
+      throw new UnsupportedOperationException("not initialized with namespace"); 
+    }
+
+    @Override
+    public Term valAt(Term key, Term dflt) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
+    @Override
+    public Term valAt(Term key) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
+
   }
 }
