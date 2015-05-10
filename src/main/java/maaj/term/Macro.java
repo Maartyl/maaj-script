@@ -16,7 +16,7 @@ public interface Macro extends Invocable {
 
   @Override
   public default Term apply(Context cxt, Seq args) {
-    return invokeSeq(args).evalMacros(cxt);
+    return invokeSeq(args).evalMacros(cxt).eval(cxt);
   }
 
   @Override
