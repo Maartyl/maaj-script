@@ -21,7 +21,7 @@ public class Glob {
   private final Context loaderContext = Context.buildStubWithoutNamespace(this);
 
 
-  public Glob(NamespaceStore store) {
+  private Glob(NamespaceStore store) {
     this.store = store;
     this.coreAcc = loadCore();
   }
