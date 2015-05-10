@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.exceptions.InvalidOperationException;
+import maaj.lang.Context;
 
 /**
  *
@@ -58,6 +59,11 @@ public interface NilSeq extends Seq {
   @Override
   public default void show(Writer w) throws IOException {
     w.append("()");
+  }
+
+  @Override
+  public default Term evalMacros(Context c) {
+    return this;
   }
 
 
