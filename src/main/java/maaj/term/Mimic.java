@@ -47,15 +47,15 @@ public interface Mimic extends Term {
     unwrap().serialize(w);
   }
 
-  @Override
-  public default String print() {
-    return unwrap().print();
-  }
+//  @Override
+//  public default String print() {
+//    return unwrap().print();
+//  }
 
-  @Override
-  public default Str show() {
-    return unwrap().show();
-  }
+//  @Override
+//  public default Str show() {
+//    return unwrap().show();
+//  }
 
   @Override
   public default Term transform(Invocable transformer) {
