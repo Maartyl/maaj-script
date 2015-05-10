@@ -61,7 +61,7 @@ public interface Nil extends Ground {
 
     @Override
     public String toString() {
-      return "nil";
+      return "()";
     }
 
     @Override
