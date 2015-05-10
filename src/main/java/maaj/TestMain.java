@@ -5,12 +5,10 @@
  */
 package maaj;
 
-import java.io.StringReader;
 import maaj.coll.traits.Persistent;
 import maaj.coll.traits.TraPer;
 import maaj.coll.traits.Transient;
-import maaj.lang.Context;
-import maaj.reader.MaajReader;
+import maaj.lang.Repl;
 import maaj.util.H;
 import maaj.util.SeqH;
 import maaj.term.Int;
@@ -75,6 +73,7 @@ public class TestMain {
       System.out.println(t.print());
       //System.out.println(t.evalMacros(new Context()).print());
     }
+    Repl.main(args);
   }
 
 

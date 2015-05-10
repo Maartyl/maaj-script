@@ -76,15 +76,8 @@ public class Context implements Lookup {
     return curNs;
   }
 
-  public Var def(Symbol name) {
-    return curNs.def(name);
-  }
-
-  public Var def(Symbol name, Term val) {
-    return curNs.def(name, val);
-  }
-
   public Var def(Symbol name, Term val, Map meta) {
+    meta = MapH.update(meta, H.map(nameSym, name));
     return curNs.def(name, val, meta);
   }
 
@@ -100,6 +93,13 @@ public class Context implements Lookup {
     curNs.importNotQualified(ns);
   }
 
+  public Namespace require(Symbol s) {
+    return glob.require(s);
+  }
+
+  public Var getVar(Symbol s) {
+    return glob.getVar(s, getCurNs());
+  }
 
   @Override
   public Term valAt(Term key) {
@@ -134,6 +134,12 @@ public class Context implements Lookup {
   public Context addToScope(Map let) {
     return new Context(this, MapH.update(scope, let));
   }
+
+  public Context addToScope(Term key, Term val) {
+    return new Context(this, scope.assoc(key, val));
+  }
+
+  private static final Symbol nameSym = H.symbol("name");
 
   public static Context buildStubWithoutNamespace(Glob g) {
     return new Starting(g);
@@ -170,7 +176,35 @@ public class Context implements Lookup {
       throw new UnsupportedOperationException("not initialized with namespace");
     }
 
+    @Override
+    public Var getVar(Symbol s) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
 
+    @Override
+    public Namespace require(Symbol s) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
+    @Override
+    public void importNotQualified(Namespace ns) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
+    @Override
+    public void importFullyQualified(Namespace ns) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
+    @Override
+    public void importQualified(Namespace ns, Symbol prefix) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
+    @Override
+    public Var def(Symbol name, Term val, Map meta) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
 
   }
 }

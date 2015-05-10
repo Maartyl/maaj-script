@@ -72,6 +72,12 @@ public final class Var implements Mimic, RefSet<Var> {
   }
 
   @Override
+  public Term eval(Context c) {
+    return unwrap().eval(c);
+  }
+
+
+  @Override
   public Var doSet(Term t) {
     value = t;
     return this;
