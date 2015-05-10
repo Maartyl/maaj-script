@@ -6,10 +6,11 @@
 package maaj.lang;
 
 import maaj.exceptions.InvalidOperationException;
+import maaj.term.Fn;
 import maaj.term.FnSeq;
 import maaj.term.Keyword;
+import maaj.term.Macro;
 import maaj.term.MacroSeq;
-import maaj.term.Map;
 import maaj.term.Seq;
 import maaj.term.Sf;
 import maaj.term.Str;
@@ -42,7 +43,9 @@ public class CoreLoader extends Namespace.Loader {
     }
     return ns;
   }
-
+  /**
+   * special forms
+   */
   private void loadSf(Namespace core) {
     def(core, "if", "", (c, a) -> {
       int len = a.boundLength(3);
@@ -84,7 +87,10 @@ public class CoreLoader extends Namespace.Loader {
     });
     def(core, "fnseq", "(fnseq body body $args body)", (c, a) -> FnSeq.of(a, c));
     def(core, "macroseq", "(macroseq body body $args body)", (c, a) -> MacroSeq.of(a, c));
-    
+    def(core, "eval", "evaluates given term", (c, a) -> {
+      arityRequire(1, a, "eval");
+      return a.first().eval(c);
+    });
   }
 
   private Context letReduceBindings(Context cxt, Vec v) {
@@ -122,8 +128,26 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private void loadCore(Namespace core) {
-    //throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
     def(core, "meta", "get meta data of term", (c, a) -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
+
+    Symbol firstSym = H.symbol("first");
+    Symbol restSym = H.symbol("rest");
+    defn(core, firstSym, "first of seq (head)", a -> {
+      arityRequire(1, a, "first");
+      return (H.seqFrom(a.first())).firstOrNil();
+    });
+    defn(core, restSym, "rest of seq (tail)", a -> {
+      arityRequire(1, a, "rest");
+      return (H.seqFrom(a.first())).restOrNil();
+    });
+    defmacro(core, "car", "first of seq (head)", a -> H.cons(firstSym, a));
+    defmacro(core, "cdr", "rest of seq (head)", a -> H.cons(restSym, a));
+    defmacro(core, "cadr", "(first (rest a))", a -> H.list(firstSym, H.cons(restSym, a)));
+    defmacro(core, "cddr", "(rest (rest a))", a -> H.list(restSym, H.cons(restSym, a)));
+
+    def(core, "reduce", "get meta data of term", (c, a) -> {
+      return H.NIL;
+    });
   }
 
   /**
@@ -137,7 +161,34 @@ public class CoreLoader extends Namespace.Loader {
   private static final Symbol doSym = H.symbol("#", "do");
   private static final Symbol ignoreSym = H.symbol("_");
 
-  private static void def(Namespace ns, String name, String doc, Sf sf) {
-    ns.def(H.symbol(name), sf, H.map(docSym, Str.of(doc)));
+  private static Seq arityRequire(int arity, Seq s, String errMsg) {
+    if (s.boundLength(arity) != arity)
+      throw new IllegalArgumentException(errMsg + " requires arity: " + arity + " but got: " + s.boundLength(30));
+    return s;
   }
+
+  private static void def(Namespace ns, String name, String doc, Sf sf) {
+    def(ns, H.symbol(name), doc, sf);
+  }
+
+  private static void def(Namespace ns, Symbol name, String doc, Sf sf) {
+    ns.def(name, sf, H.map(docSym, Str.of(doc)));
+  }
+
+  private static void defn(Namespace ns, String name, String doc, Fn fn) {
+    defn(ns, H.symbol(name), doc, fn);
+  }
+
+  private static void defn(Namespace ns, Symbol name, String doc, Fn fn) {
+    ns.def(name, fn, H.map(docSym, Str.of(doc)));
+  }
+
+  private static void defmacro(Namespace ns, String name, String doc, Macro m) {
+    defmacro(ns, H.symbol(name), doc, m);
+  }
+
+  private static void defmacro(Namespace ns, Symbol name, String doc, Macro m) {
+    ns.def(name, m, H.map(docSym, Str.of(doc)));
+  }
+
 }

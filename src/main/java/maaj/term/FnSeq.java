@@ -5,8 +5,6 @@
  */
 package maaj.term;
 
-import java.io.IOException;
-import java.io.Writer;
 import maaj.lang.Context;
 import maaj.util.H;
 
@@ -22,8 +20,8 @@ public final class FnSeq extends InvSeq implements Fn {
   }
 
   @Override
-  public void show(Writer w) throws IOException {
-    H.cons(fnseqSym, fn).show(w);
+  protected Symbol getShowName() {
+    return fnseqSym;
   }
 
   private static final Symbol fnseqSym = H.symbol("#", "fnseq");
@@ -31,6 +29,5 @@ public final class FnSeq extends InvSeq implements Fn {
   public static FnSeq of(Seq fn, Context closure) {
     return new FnSeq(fn, closure);
   }
-
 
 }

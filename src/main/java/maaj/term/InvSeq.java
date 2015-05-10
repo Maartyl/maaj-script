@@ -5,6 +5,8 @@
  */
 package maaj.term;
 
+import java.io.IOException;
+import java.io.Writer;
 import maaj.lang.Context;
 import maaj.util.H;
 
@@ -12,7 +14,7 @@ import maaj.util.H;
  *
  * @author maartyl
  */
-public class InvSeq implements InvocableSeq {
+public abstract class InvSeq implements InvocableSeq {
 
   protected final Seq fn;
   protected final Context closure;
@@ -24,7 +26,6 @@ public class InvSeq implements InvocableSeq {
 //      fn1 = H.cons(doSym, (Seq) t.unwrap());
 //    else
 //      fn1 = H.list(doSym, t.unwrap());
-//
 
     fn1 = H.cons(doSym, fn).fmap((Invocable1) x -> x.evalMacros(closure));
     this.fn = fn1;
@@ -35,6 +36,13 @@ public class InvSeq implements InvocableSeq {
   public Term invokeSeq(Seq args) {
     return fn.eval(closure.addToScope(H.map(argsSym, args)));
   }
+
+  @Override
+  public void show(Writer w) throws IOException {
+    H.cons(getShowName(), fn.rest()).show(w);
+  }
+
+  protected abstract Symbol getShowName();
 
   private static final Symbol argsSym = H.symbol("$args");
   private static final Symbol doSym = H.symbol("#", "do");

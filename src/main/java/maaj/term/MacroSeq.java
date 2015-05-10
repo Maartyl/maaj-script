@@ -27,15 +27,17 @@ public final class MacroSeq implements Macro {
 
   @Override
   public Term invokeSeq(Seq args) {
-    return fn.eval(closure.addToScope(H.map(argsSym, args)));
+    return H.cons(doSym, fn).eval(closure.addToScope(H.map(argsSym, args)));
   }
 
   @Override
   public void show(Writer w) throws IOException {
-    H.list(H.symbol("#/macro"), fn).show(w);
+    H.cons(macroseqSym, fn).show(w);
   }
 
-  protected static final Symbol argsSym = H.symbol("$args");
+  private static final Symbol macroseqSym = H.symbol("#", "macroseq");
+  private static final Symbol argsSym = H.symbol("$args");
+  private static final Symbol doSym = H.symbol("#", "do");
 
   public static MacroSeq of(Seq fn, Context closure) {
     return new MacroSeq(fn.fmap((Invocable1) x -> x.evalMacros(closure)), closure);
