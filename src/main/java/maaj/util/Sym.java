@@ -22,6 +22,12 @@ public class Sym {
   public static final Symbol ignoreSym = H.symbol("_");
   public static final Symbol firstSym = H.symbol("first");
   public static final Symbol restSym = H.symbol("rest");
+  public static final Symbol quote = H.symbol("#macro", "quote");
+  public static final Symbol unquote = H.symbol("#macro", "unquote");
+  public static final Symbol tagKSym = H.symbol(":tag");
+  public static final Symbol unquoteSplicing = H.symbol("#macro", "unquote-splicing");
+  public static final Symbol deref = H.symbol("#core", "deref");
+  public static final Symbol quoteQualified = H.symbol("#macro", "quote-qualified");
 
 
 }
