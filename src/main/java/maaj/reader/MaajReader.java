@@ -94,9 +94,9 @@ public class MaajReader {
     case '^': return readMeta();
     case '~': return readUnquote();
     case '\\': return readEscape();
-    case '`': return H.list(Sym.quoteQualified, read0SkipWhitespace());
-    case '\'': return H.list(Sym.quote, read0SkipWhitespace());
-    case '@': return H.list(Sym.deref, read0SkipWhitespace());
+    case '`': return H.list(Sym.quoteQualifiedSymC, read0SkipWhitespace());
+    case '\'': return H.list(Sym.quoteSymC, read0SkipWhitespace());
+    case '@': return H.list(Sym.derefSymC, read0SkipWhitespace());
     case ')': return fail("unmatched: )");
     case ']': return fail("unmatched: ]");
     case '}': return fail("unmatched: }");
@@ -202,7 +202,7 @@ public class MaajReader {
     if (mu instanceof Keyword)
       return MapH.update(metaOnMeta, H.map(mu, mu));
     if (mu instanceof Symbol || mu instanceof Str)
-      return MapH.update(metaOnMeta, H.map(Sym.tagKSym, mu));
+      return MapH.update(metaOnMeta, H.map(Sym.tagSymK, mu));
 
     return fail("unexpected meta term type: " + mu.getType().getName());
   }
@@ -327,9 +327,9 @@ public class MaajReader {
   private Term readUnquote() {
     if (peek() == '@') {
       next();
-      return H.list(Sym.unquoteSplicing, read0SkipWhitespace());
+      return H.list(Sym.unquoteSplicingSymC, read0SkipWhitespace());
     }
-    return H.list(Sym.unquote, read0SkipWhitespace());
+    return H.list(Sym.unquoteSymC, read0SkipWhitespace());
   }
 
   private Term readComment(Invocable0 continuation) {
