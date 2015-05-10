@@ -10,6 +10,7 @@ import maaj.exceptions.InvalidOperationException;
 import maaj.term.Map;
 import maaj.term.Symbol;
 import maaj.term.Term;
+import maaj.term.Var;
 import maaj.util.H;
 import maaj.util.MapH;
 
@@ -71,15 +72,38 @@ public class Context implements Lookup {
     this(c.glob, curNs, c.scope);
   }
 
+  public Namespace getCurNs() {
+    return curNs;
+  }
+
+  public Var def(Symbol name) {
+    return curNs.def(name);
+  }
+
+  public Var def(Symbol name, Term val) {
+    return curNs.def(name, val);
+  }
+
+  public Var def(Symbol name, Term val, Map meta) {
+    return curNs.def(name, val, meta);
+  }
+
+  public void importQualified(Namespace ns, Symbol prefix) {
+    curNs.importQualified(ns, prefix);
+  }
+
+  public void importFullyQualified(Namespace ns) {
+    curNs.importFullyQualified(ns);
+  }
+
+  public void importNotQualified(Namespace ns) {
+    curNs.importNotQualified(ns);
+  }
+
+
   @Override
   public Term valAt(Term key) {
-    if (key instanceof Symbol)
-      return valAt((Symbol) key);
-
-    Term t = scope.valAt(key, scope);
-    if (t != scope)
-      return t;
-    return H.NIL;
+    return valAt(key, H.NIL);
   }
 
   public Term valAt(Symbol key) {
@@ -94,7 +118,13 @@ public class Context implements Lookup {
 
   @Override
   public Term valAt(Term key, Term dflt) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    if (key instanceof Symbol)
+      return valAt((Symbol) key);
+
+    Term t = scope.valAt(key, scope);
+    if (t != scope)
+      return t;
+    return dflt;
   }
 
   public Context withNamespace(Namespace ns) {
@@ -113,6 +143,16 @@ public class Context implements Lookup {
 
     public Starting(Glob glob) {
       super(glob, null);
+    }
+
+    @Override
+    public Term valAt(Symbol key) {
+      throw new UnsupportedOperationException("not initialized with namespace");
+    }
+
+    @Override
+    public Namespace getCurNs() {
+      throw new UnsupportedOperationException("not initialized with namespace");
     }
 
     @Override
