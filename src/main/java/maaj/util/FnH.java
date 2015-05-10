@@ -5,6 +5,7 @@
  */
 package maaj.util;
 
+import java.util.function.BiFunction;
 import maaj.term.*;
 
 /**
@@ -18,5 +19,24 @@ public class FnH {
 //      if (fn2 instanceof Invocable)
     //return x -> ((Invocable)fn2).
     throw new UnsupportedOperationException("not implemented");
+  }
+
+  /**
+   * assumes first arg to by an invocable
+   * will apply first argument with second
+   * <p>
+   * @return
+   */
+  public static Invocable2 invoke1() {
+    return (fn, arg) -> ((Invocable) fn).invoke(arg);
+  }
+
+  public static Term invoke1l(Term fn, Term arg) {
+    return ((Invocable) fn).invoke(arg);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T, U, V> Invocable2 liftTypeUncheched2(BiFunction<T, U, V> fn) {
+    return (t, u) -> (Term) fn.apply((T) t, (U) u);
   }
 }

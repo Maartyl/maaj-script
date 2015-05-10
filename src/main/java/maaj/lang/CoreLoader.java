@@ -11,9 +11,12 @@ import maaj.reader.ReaderContext;
 import maaj.term.Fn;
 import maaj.term.FnSeq;
 import maaj.term.Invocable;
+import maaj.term.Invocable1;
+import maaj.term.Invocable2;
 import maaj.term.Keyword;
 import maaj.term.Macro;
 import maaj.term.MacroSeq;
+import maaj.term.Map;
 import maaj.term.Num;
 import maaj.term.Seq;
 import maaj.term.Sf;
@@ -22,8 +25,13 @@ import maaj.term.Symbol;
 import maaj.term.Term;
 import maaj.term.Var;
 import maaj.term.Vec;
+import maaj.term.VecT;
+import maaj.util.FnH;
 import maaj.util.H;
+import maaj.util.MapH;
+import maaj.util.SeqH;
 import maaj.util.Sym;
+import maaj.util.VecH;
 
 /**
  *
@@ -95,7 +103,7 @@ public class CoreLoader extends Namespace.Loader {
     def(core, "macroseq", "(macroseq body body $args body)", (c, a) -> MacroSeq.of(a, c));
     def(core, "eval", "evaluates given term", (c, a) -> {
       arityRequire(1, a, "eval");
-      return a.first().eval(c);
+      return a.first().eval(c).eval(c);
     });
 
   }
@@ -106,12 +114,12 @@ public class CoreLoader extends Namespace.Loader {
     
     for (Seq s = v.seq(); !s.isNil(); s = s.rest().rest()) {
       Term k = s.first().unwrap();
-      if (!(k instanceof Symbol)) //TODO: yup, keywords will be passed, but it's not really that much of a problem...
-        throw new InvalidOperationException("#/let: binding requires symbol; got: " + k.print());
+//      if (!(k instanceof Symbol)) //TODO: yup, keywords will be passed, but it's not really that much of a problem...
+//        throw new InvalidOperationException("#/let: binding requires symbol; got: " + k.print());
+      Invocable ptrn = patternBinder(k);
       Term exp = s.rest().first();
       Term r = exp.eval(cxt);
-      if (!(Sym.ignoreSym).equals(k))
-        cxt = cxt.addToScope(k, r);
+      cxt = cxt.addToScope(applyPatternBinder(ptrn, r));
     }
     return cxt;
   }
@@ -132,6 +140,65 @@ public class CoreLoader extends Namespace.Loader {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Creates pattern binder
+   * produces function that takes 1 arg.
+   * it destructures the argument into subparts that are named in term by structure in term
+   * returns map from these names to subvalues of arg
+   */
+  private Invocable patternBinder(Term t) {
+    // I only have limited breaker for now : vector : firss and rest of seq
+    //or just symbol
+    Term tptrn = t.unwrap();
+    if (tptrn instanceof Symbol) { //fast path
+      Symbol s = (Symbol) tptrn;
+      if (!s.isSimple())
+        throw new IllegalArgumentException("Cannot create pattern binder from qualified symbol: " + s);
+      if (s.equals(Sym.ignoreSym))
+        return (Invocable1) x -> MapH.emptyPersistent();
+      return (Invocable1) x -> H.map(s, x);
+    }
+    if (tptrn instanceof Vec) {
+      /*
+       how it works:
+       I recursively map ptrnBinder over the vector aof patterns I get
+       then, with vector of functions: I zip it with args, applying it -> seq of maps
+       I then join these maps (MapH.update)
+       - if next to last is '&
+       -- I make the vector 2 shorter, do the same on it as before
+       -- I get the last thing and append the map as last,
+       --- invoking it's binder on (drop <v2 captured cnt> args)
+       */
+      Vec v = (Vec) tptrn;
+      if (v.cnt() > 1) {
+        if (v.nth(v.cnt() - 2).equals(Sym.ampSym)) {
+          //has rest capture:
+          Vec v2 = v.pop().pop();
+          int size = v2.cnt() - 1; //I essentially want index
+          Vec vptrn = v2.fmap((Invocable1) this::patternBinder);
+          Invocable restPtrn = patternBinder(v.peek());
+          return (Invocable1) a
+                  -> MapH.update(applyVectorPatternBinder(a, vptrn),
+                                 (Map) restPtrn.invoke(SeqH.drop(size, H.seqFrom(a))));
+        }
+      }
+      if (v.isEmpty())
+        return (Invocable1) x -> MapH.emptyPersistent();
+      Vec vptrn = v.fmap((Invocable1) this::patternBinder);
+      return (Invocable1) a -> applyVectorPatternBinder(a, vptrn);
+    }
+    throw new IllegalArgumentException("Cannot create pattern binder from: " + tptrn.getType().getName() + " : " + tptrn.print());
+  }
+
+  private Map applyVectorPatternBinder(Term term, Vec ptrn) {
+    return (Map) SeqH.zip(FnH.invoke1(), ptrn.seq(), H.seqFrom(term))
+            .reduce(MapH.emptyPersistent(), FnH.<Map, Map, Map>liftTypeUncheched2(MapH::update));
+  }
+
+  private Map applyPatternBinder(Invocable binder, Term t) {
+    return (Map) binder.invoke(t);
   }
 
   private void loadCore(Context cxt, Namespace core, ReaderContext rcxt) {
@@ -172,9 +239,12 @@ public class CoreLoader extends Namespace.Loader {
 
     defn(core, "inc", "(+ % 1)", (Num.NumOp) Num::inc);
     defn(core, "dec", "(- % 1)", (Num.NumOp) Num::dec);
+    defn(core, "neg", "(- 0 %)", (Num.NumOp) Num::neg);
 
     H.eval("(def + (fnseq (reduce +# 0 $args)))", cxt, rcxt);
     H.eval("(def * (fnseq (reduce *# 1 $args)))", cxt, rcxt);
+    H.eval("(def min (fnseq (reduce min# 1 $args)))", cxt, rcxt);
+    H.eval("(def max (fnseq (reduce max# 1 $args)))", cxt, rcxt);
 
   }
 

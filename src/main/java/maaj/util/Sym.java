@@ -21,6 +21,7 @@ public class Sym {
   public static final Symbol doSymC = H.symbol("#", "do");
   public static final Symbol docSymK = H.symbol(":doc");
   public static final Symbol ignoreSym = H.symbol("_");
+  public static final Symbol ampSym = H.symbol("&");
   public static final Symbol firstSym = H.symbol("first");
   public static final Symbol restSym = H.symbol("rest");
   public static final Symbol quoteSymC = H.symbol("#macro", "quote");

@@ -100,6 +100,29 @@ public class SeqH {
     return H.lazy(mapper.invoke(coll.first()), () -> mapLazyInner(coll.rest(), mapper));
   }
 
+  public static Seq zip(Invocable with, Seq l, Seq r) {
+    if (l.isNil() || r.isNil())
+      return H.END;
+    return H.lazy(with.invoke(l.first(), r.first()), () -> zip(with, l.rest(), r.rest()));
+  }
+
+  public static Seq zip(Invocable with, Seq l, Seq m, Seq r) {
+    if (l.isNil() || m.isNil() || r.isNil())
+      return H.END;
+    return H.lazy(with.invoke(l.first(), m.first(), r.first()), () -> zip(with, l.rest(), m.rest(), r.rest()));
+  }
+
+  public static Seq take(int n, Seq s) {
+    if (n <= 0 || s.isNil()) return H.END;
+    return H.lazy(s.first(), () -> take(n - 1, s.rest()));
+  }
+
+  public static Seq drop(int n, Seq s) {
+    while (n-- >= 0 && !s.isNil())
+      s = s.rest();
+    return s;
+  }
+
   /**
    * @param iterable
    * @return seq of all results from calling .next() on iterator
@@ -186,6 +209,7 @@ public class SeqH {
   public static boolean isSingle(Seq data) {
     return data != null && !data.isNil() && data.rest().isNil();
   }
+
   public static interface PerIndexRetriever<T> {
 
     T valAt(int i);
