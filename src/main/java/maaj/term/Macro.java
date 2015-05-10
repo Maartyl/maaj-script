@@ -14,10 +14,16 @@ import maaj.lang.Context;
  */
 public class Macro extends Fn {
 
-  @Override
-  public Term apply(Context cxt, Seq args) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+  protected Macro(Seq fn, Context closure) {
+    super(fn, closure);
   }
 
+  @Override
+  public Term apply(Context cxt, Seq args) {
+    return invokeSeq(args);
+  }
 
+  public static Macro of(Seq fn, Context closure) {
+    return new Macro(fn.fmap((Invocable1) x -> x.evalMacros(closure)), closure);
+  }
 }

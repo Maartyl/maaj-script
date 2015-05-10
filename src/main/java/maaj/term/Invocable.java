@@ -8,6 +8,7 @@ package maaj.term;
 import com.github.krukow.clj_lang.ArityException;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.concurrent.Callable;
 import maaj.lang.Context;
 import maaj.util.H;
 
@@ -15,7 +16,7 @@ import maaj.util.H;
  *
  * @author maartyl
  */
-public interface Invocable extends Ground, Runnable {
+public interface Invocable extends Ground, Runnable, Callable<Term> {
 
   default Term invokeSeq(Seq args) {
     //TODO: periodically un-default this; check if everything ok; re-default
@@ -57,6 +58,12 @@ public interface Invocable extends Ground, Runnable {
   public default void run() {
     invoke();
   }
+
+  @Override
+  public default Term call() throws Exception {
+    return invoke();
+  }
+
 
   default Term throwArity(int n) {
     String name = getClass().getSimpleName();
