@@ -27,15 +27,17 @@ public final class FnSeq implements Fn {
 
   @Override
   public Term invokeSeq(Seq args) {
-    return fn.eval(closure.addToScope(H.map(argsSym, args)));
+    return H.cons(doSym, fn).eval(closure.addToScope(H.map(argsSym, args)));
   }
 
   @Override
   public void show(Writer w) throws IOException {
-    H.list(H.symbol("#/fn"), fn).show(w);
+    H.cons(fnseqSym, fn).show(w);
   }
 
-  protected static final Symbol argsSym = H.symbol("$args");
+  private static final Symbol fnseqSym = H.symbol("#", "fnseq");
+  private static final Symbol argsSym = H.symbol("$args");
+  private static final Symbol doSym = H.symbol("#", "do");
 
   public static FnSeq of(Seq fn, Context closure) {
     return new FnSeq(fn.fmap((Invocable1) x -> x.evalMacros(closure)), closure);
