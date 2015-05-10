@@ -26,9 +26,4 @@ public interface MapBase<M extends MapBase<M>> extends CollectionBase<M>, MapLik
     throw new ArityException(count, "Map - expects: (key) or (key default).");
   }
 
-  @Override
-  public default M fmap(Invocable mapper) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
-  }
-
 }

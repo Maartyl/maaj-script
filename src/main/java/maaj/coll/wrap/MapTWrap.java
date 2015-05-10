@@ -36,9 +36,13 @@ public final class MapTWrap implements MapT {
 
   @Override
   public MapT bindM(Invocable fn2Monad) {
-    throw new UnsupportedOperationException("Transient maps cennot be iterated over.");
+    throw new UnsupportedOperationException("Transient maps cannot be iterated over.");
   }
 
+    @Override
+  public MapT fmap(Invocable mapper) {
+      throw new UnsupportedOperationException("Transient maps cannot be iterated over.");
+  }
 
   @Override
   public Int getCount() {

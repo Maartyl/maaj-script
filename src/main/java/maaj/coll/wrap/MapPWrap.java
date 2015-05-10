@@ -49,7 +49,10 @@ public final class MapPWrap implements Map {
 
   @Override
   public Map fmap(Invocable mapper) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    MapT m = MapH.emptyTransient();
+    for (KVPair p : this)
+      m.doConj(p.transform(mapper));
+    return m.asPersistent();
   }
 
   @Override
