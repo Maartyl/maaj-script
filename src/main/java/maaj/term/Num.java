@@ -116,7 +116,7 @@ public interface Num extends Ground {
 
   static interface Num2Op extends Fn {
 
-    Num op(Num t, Num a);
+    Num op(Num l, Num r);
 
     @Override
     public default Term invokeSeq(Seq args) {
