@@ -60,8 +60,8 @@ public final class Var implements Mimic, RefSet<Var> {
 
   @Override
   public void show(Writer w) throws IOException {
-    if (meta.containsKey(H.symbol("name")))
-      H.list(H.symbol("var"), meta.valAt(H.symbol("name")), unwrap()).show(w);
+    if (meta.containsKey(nameSym))
+      H.list(varSym, meta.valAt(nameSym), unwrap()).show(w);
     else Mimic.super.show(w);
   }
 
@@ -75,7 +75,6 @@ public final class Var implements Mimic, RefSet<Var> {
   public Term eval(Context c) {
     return unwrap().eval(c);
   }
-
 
   @Override
   public Var doSet(Term t) {
@@ -94,6 +93,8 @@ public final class Var implements Mimic, RefSet<Var> {
     doSet(s);
     return s;
   }
+  private static final Symbol nameSym = H.symbol("name");
+  private static final Symbol varSym = H.symbol("var");
 
   public static Var empty() {
     return new Var(null);
@@ -106,4 +107,5 @@ public final class Var implements Mimic, RefSet<Var> {
   public static Var of(Term val, Map meta) {
     return new Var(meta, val);
   }
+
 }
