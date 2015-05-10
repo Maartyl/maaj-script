@@ -70,7 +70,7 @@ public class CoreLoader extends Namespace.Loader {
       }
       return a.first().eval(c);
     });
-    def(core, "let", "(let1 [v exp] (... v ... v ...)); ", (c, a) -> {
+    def(core, "let", "(let [v exp] (... v ... v ...)); ", (c, a) -> {
       if (a.isNil())
         throw new InvalidOperationException("#/let: requires bindings");
       if (!(a.first().getContent() instanceof Vec))
