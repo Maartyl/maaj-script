@@ -10,7 +10,8 @@ import maaj.term.Var;
 import maaj.util.H;
 
 /**
- *
+ * Global context. Expected to be extended by some connection to system etc.
+ * <p>
  * @author maartyl
  */
 public class Glob {
