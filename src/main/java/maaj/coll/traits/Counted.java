@@ -22,4 +22,8 @@ public interface Counted extends Numerable {
   public default Int count() {
     return getCount();
   }
+
+  public default boolean isEmpty() {
+    return getCountAsInteger() == 0;
+  }
 }
