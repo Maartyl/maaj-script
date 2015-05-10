@@ -39,12 +39,13 @@ public class Glob {
   }
 
   public Var getVar(Symbol s, Namespace current) {
-//    if (!s.isQualified() || !s.getNs().startsWith("#"))
-//      return current.get(s);
-    //core:
-    Var v = coreAcc.get(s);
-    if (v == null)
-      v = current.get(s);
+    Var v = coreAcc.getOwn(s);
+    if (v != null) return v;
+    v = current.get(s);
+    if (v != null) return v;
+    v = coreAcc.get(s);
+    // if (v != null) return v;
+    // no need to search in others: current has imported anything acessible
     return v;
   }
 

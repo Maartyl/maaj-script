@@ -64,6 +64,15 @@ public final class Namespace {
     return v;
   }
 
+  /**
+   * like get, but deosn't search in imported symbols
+   * @param name var name to lookup
+   * @return null if not found
+   */
+  public Var getOwn(Symbol name) {
+    return vars.get(name);
+  }
+
   public void importQualified(Namespace ns, Symbol prefix) {
     if (!prefix.isSimple())
       throw new IllegalArgumentException("cannot import qualifying with qualified prefix");
