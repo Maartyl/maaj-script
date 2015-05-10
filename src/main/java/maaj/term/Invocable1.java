@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.util.H;
+import maaj.util.SeqH;
 
 /**
  * Invocable0..5,Seq : allows me to use these as lambda functions -- functionalInterface
@@ -18,7 +19,7 @@ public interface Invocable1 extends Invocable {
 
   @Override
   public default Term invokeSeq(Seq args) {
-    if (H.isSingle(args))
+    if (SeqH.isSingle(args))
       return invoke(args.first());
 
     return throwArityFor(args);

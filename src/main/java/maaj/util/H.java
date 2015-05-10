@@ -239,10 +239,6 @@ public class H {
     return SeqH.sexp(t1, list(t2, t3, t4, t5));
   }
 
-  public static boolean isSingle(Seq data) {
-    return data != null && !data.isNil() && data.rest().isNil();
-  }
-
   public static Class[] typesOfElems(Seq seq) {
     Class[] clss = new Class[seq.count().asInteger()];
     RangeSeeder rs = new RangeSeeder(); //lambda cannot bind mutable reference

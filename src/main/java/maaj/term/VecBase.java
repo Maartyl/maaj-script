@@ -12,6 +12,7 @@ import maaj.coll.traits.Functor;
 import maaj.coll.traits.VecLikeBase;
 import maaj.lang.Context;
 import maaj.util.H;
+import maaj.util.SeqH;
 import maaj.util.VecH;
 
 /**
@@ -56,7 +57,7 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
 
   @Override
   default public Term apply(Context cxt, Seq args) {
-    if (H.isSingle(args))
+    if (SeqH.isSingle(args))
       return valAt(args.first().eval(cxt));
     throw new ArityException(args.boundLength(20), "Vector - can only be applied to 1 Int argument.");
   }

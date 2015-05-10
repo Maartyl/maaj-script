@@ -182,6 +182,10 @@ public class SeqH {
     if (testEnd.isEnd(startIndex)) return H.END;
     return H.lazy(getter.valAt(startIndex), () -> incremental2lazySeq(updater.update(startIndex), getter, updater, testEnd));
   }
+
+  public static boolean isSingle(Seq data) {
+    return data != null && !data.isNil() && data.rest().isNil();
+  }
   public static interface PerIndexRetriever<T> {
 
     T valAt(int i);
