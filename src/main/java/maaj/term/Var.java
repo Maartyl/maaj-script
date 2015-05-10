@@ -17,7 +17,7 @@ import maaj.util.MapH;
  *
  * @author maartyl
  */
-public final class Var implements Mimic, RefSet {
+public final class Var implements Mimic, RefSet<Var> {
   private volatile Map meta;
   private volatile Term value;
 
@@ -72,7 +72,7 @@ public final class Var implements Mimic, RefSet {
   }
 
   @Override
-  public RefSet doSet(Term t) {
+  public Var doSet(Term t) {
     value = t;
     return this;
   }

@@ -11,9 +11,11 @@ import maaj.term.Term;
 /**
  *
  * @author maartyl
+ * @param <R> self
  */
-public interface RefSet extends Ref {
-  public RefSet doSet(Term t);
+public interface RefSet<R extends RefSet<R>> extends Ref {
+
+  public R doSet(Term t);
 
   @Override
   public default Term update(Invocable setter) {
