@@ -39,11 +39,13 @@ public final class Namespace {
   }
 
   public Var def(Symbol name, Term val) {
-    return vars.computeIfAbsent(name, n -> Var.of(val));
+    return def(name, val, val.getMeta());
   }
 
   public Var def(Symbol name, Term val, Map meta) {
-    return vars.computeIfAbsent(name, n -> Var.of(val, meta));
+    Var v = def(name).doSet(val);
+    v.addMeta(meta);
+    return v;
   }
   /**
    *
