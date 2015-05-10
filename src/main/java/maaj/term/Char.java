@@ -35,7 +35,7 @@ public final class Char implements Num {
 
   @Override
   public Char inc(Num diff) {
-    //todo: 'plus' variant that will add mathematically: Int + Dbl => Dbl
+    //todo: 'add' variant that will add mathematically: Int + Dbl => Dbl
     return Char.of((char) (value + diff.asLong()));
   }
 
@@ -60,18 +60,18 @@ public final class Char implements Num {
   }
 
   @Override
-  public Num plus(Num other) {
-    return Num.arithmetic(this, other, x -> of(value + x.asLong()), other::plus);
+  public Num add(Num other) {
+    return Num.arithmetic(this, other, x -> of(value + x.asLong()), other::add);
   }
 
   @Override
-  public Num minus(Num other) {
+  public Num sub(Num other) {
     return Num.arithmetic(this, other, x -> of(value - x.asLong()), other::minusR);
   }
 
   @Override
   public Num minusR(Num other) {
-    return Num.arithmetic(this, other, x -> of(x.asLong() - value), other::minus);
+    return Num.arithmetic(this, other, x -> of(x.asLong() - value), other::sub);
   }
 
   @Override

@@ -21,6 +21,7 @@ import maaj.coll.traits.Indexed;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.Seqable;
 import maaj.coll.wrap.VecPWrap;
+import maaj.lang.Context;
 import maaj.reader.MaajReader;
 import maaj.reader.ReaderContext;
 import maaj.term.*;
@@ -135,9 +136,6 @@ public class H {
     return t.getContent();
   }
 
-  public static Seq read(Reader r, ReaderContext cxt) {
-    return MaajReader.read(r, cxt);
-  }
 
   public static Seq read(Reader r) {
     return read(r, staticReaderContext);
@@ -147,11 +145,40 @@ public class H {
     return read(new StringReader(txt));
   }
 
+  public static Seq read(Reader r, ReaderContext cxt) {
+    return MaajReader.read(r, cxt);
+  }
+
+
+  public static Seq read(String txt, ReaderContext cxt) {
+    return read(new StringReader(txt), cxt);
+  }
+
   public static Term read1(Reader r) {
     return read(r).first();
   }
   public static Term read1(String txt) {
     return read(txt).first();
+  }
+
+  public static Term read1(Reader r, ReaderContext cxt) {
+    return read(r, cxt).first();
+  }
+
+  public static Term read1(String txt, ReaderContext cxt) {
+    return read(txt, cxt).first();
+  }
+
+  public static Term eval(Term term, Context cxt) {
+    return term.eval(cxt);
+  }
+
+  public static Term eval(String term, Context cxt) {
+    return eval(read1(term), cxt);
+  }
+
+  public static Term eval(String term, Context cxt, ReaderContext rcxt) {
+    return eval(read1(term, rcxt), cxt);
   }
 
   public static Map map(Term key, Term val) {
@@ -334,7 +361,7 @@ public class H {
 
   public static Invocable requireInvocable(Term tt) {
     Term t = tt.unwrap();
-    if (t instanceof Char)
+    if (t instanceof Invocable)
       return (Invocable) t;
 
     throw new IllegalArgumentException("Requires Invocable, got: " + t.getClass().getName());

@@ -7,6 +7,7 @@ package maaj.lang;
 
 import maaj.coll.traits.Reducible;
 import maaj.exceptions.InvalidOperationException;
+import maaj.reader.ReaderContext;
 import maaj.term.Fn;
 import maaj.term.FnSeq;
 import maaj.term.Invocable;
@@ -35,10 +36,11 @@ public class CoreLoader extends Namespace.Loader {
     if (!nsName.isSimple())
       throw new IllegalArgumentException("invalid namespace name: " + nsName.print());
     Namespace ns = createEmptyWithName(nsName);
+    Context c = cxt.withNamespace(ns);
     switch (nsName.getNm()) {
     case "#": loadSf(ns);
       break;
-    case "#core": loadCore(ns);
+    case "#core": loadCore(c, ns, new ReaderContext(nsName, "<?>"));
       break;
     case "#macro": loadMacro(ns);
       break;
@@ -132,7 +134,7 @@ public class CoreLoader extends Namespace.Loader {
     return false;
   }
 
-  private void loadCore(Namespace core) {
+  private void loadCore(Context cxt, Namespace core, ReaderContext rcxt) {
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
 
     defn(core, Sym.firstSym, "first of seq (head)", a -> {
@@ -156,12 +158,18 @@ public class CoreLoader extends Namespace.Loader {
       return coll.reduce(start, fn);
     });
 
-    defn(core, "+#", "sums 2 args", (Num.Num2Op) Num::plus);
-    defn(core, "-#", "subtracts 2 args", (Num.Num2Op) Num::minus);
+    defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
+    defn(core, "-#", "subtracts 2 args", (Num.Num2Op) Num::sub);
     defn(core, "*#", "multiplies 2 args", (Num.Num2Op) Num::mul);
-    defn(core, "/#", "multiplies 2 args", (Num.Num2Op) Num::div);
-    defn(core, "min#", "multiplies 2 args", (Num.Num2Op) Num::min);
-    defn(core, "max#", "multiplies 2 args", (Num.Num2Op) Num::max);
+    defn(core, "div#", "divides 2 args", (Num.Num2Op) Num::div);
+    defn(core, "min#", "(if (< l r) l r)", (Num.Num2Op) Num::min);
+    defn(core, "max#", "(if (> l r) l r)", (Num.Num2Op) Num::max);
+
+    defn(core, "inc", "(+ % 1)", (Num.NumOp) Num::inc);
+    defn(core, "dec", "(- % 1)", (Num.NumOp) Num::dec);
+
+    //(def + (fnseq (reduce +# 0 $args)))
+
   }
 
   /**

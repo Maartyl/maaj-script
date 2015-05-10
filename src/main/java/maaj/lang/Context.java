@@ -111,20 +111,31 @@ public class Context implements Lookup {
     return valAt(key, H.NIL);
   }
 
-  public Term valAt(Symbol key) {
+  private Term valAtOrNull(Symbol key) {
     Term t = scope.valAt(key, scope);
     if (t != scope)
       return t;
-    Term v = glob.getVar(key, curNs);
+    return glob.getVar(key, curNs);
+  }
+
+  public Term valAt(Symbol key) {
+    Term v = valAtOrNull(key);
     if (v == null)
       throw new InvalidOperationException("cannot resolve symbol: " + key);
+    return v;
+  }
+
+  public Term valAt(Symbol key, Term dflt) {
+    Term v = valAtOrNull(key);
+    if (v == null)
+      return dflt;
     return v;
   }
 
   @Override
   public Term valAt(Term key, Term dflt) {
     if (key instanceof Symbol)
-      return valAt((Symbol) key);
+      return valAt((Symbol) key, dflt);
 
     Term t = scope.valAt(key, scope);
     if (t != scope)

@@ -40,9 +40,9 @@ public interface Num extends Ground {
    */
   int abilty();
 
-  Num plus(Num other);
+  Num add(Num other);
 
-  Num minus(Num other);
+  Num sub(Num other);
 
   Num minusR(Num other);
 
@@ -115,7 +115,6 @@ public interface Num extends Ground {
   }
 
   static interface Num2Op extends Fn {
-
     Num op(Num l, Num r);
 
     @Override
