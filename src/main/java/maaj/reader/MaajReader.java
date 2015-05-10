@@ -120,7 +120,7 @@ public class MaajReader {
     case '#': return fail("reserved: hash inside hash");
     //case '-': return readMinus(); - always interpret as symbol
     case ';': return readComment(this::readHash);
-    case '/': return fail("not implemented yet: core functions");
+    case '/': return readSymbol().withNamespace("#");
     case '^': return fail("not implemented yet: I can pick anything...");
     case '~': return fail("not implemented yet: I can pick anything...");
     case '\\': return fail("not implemented yet: I can pick anything... (var)");
