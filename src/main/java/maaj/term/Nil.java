@@ -48,7 +48,7 @@ public interface Nil extends Ground {
 
   @Override
   public default void show(Writer w) throws IOException {
-    w.append("nil");
+    w.append("()");
   }
 
 
