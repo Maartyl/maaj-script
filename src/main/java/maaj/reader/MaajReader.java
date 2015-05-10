@@ -201,7 +201,7 @@ public class MaajReader {
     if (mu instanceof Keyword)
       return MapH.update(metaOnMeta, H.map(mu, mu));
     if (mu instanceof Symbol || mu instanceof Str)
-      return MapH.update(metaOnMeta, H.map(H.symbol("tag"), mu));
+      return MapH.update(metaOnMeta, H.map(tagKSym, mu));
 
     return fail("unexpected meta term type: " + mu.getType().getName());
   }
@@ -345,8 +345,7 @@ public class MaajReader {
     return readSymbol();
   }
 
- 
-
+  private static final Symbol tagKSym = H.symbol(":tag");
   private static final Symbol deref = H.symbol("#core", "deref");
   private static final Symbol quote = H.symbol("#macro", "quote");
   private static final Symbol quoteQualified = H.symbol("#macro", "quote-qualified");

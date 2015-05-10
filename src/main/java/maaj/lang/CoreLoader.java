@@ -123,6 +123,7 @@ public class CoreLoader extends Namespace.Loader {
 
   private void loadCore(Namespace core) {
     //throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    def(core, "meta", "get meta data of term", (c, a) -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
   }
 
   /**
