@@ -23,6 +23,7 @@ public class Sym {
   public static final Symbol letSymC = H.symbol("#", "let");
   public static final Symbol defSymC = H.symbol("#", "def");
   public static final Symbol docSymK = H.symbol(":doc");
+  public static final Symbol macroSymK = H.symbol(":macro");
   public static final Symbol ignoreSym = H.symbol("_");
   public static final Symbol ampSym = H.symbol("&");
   public static final Symbol firstSym = H.symbol("first");
