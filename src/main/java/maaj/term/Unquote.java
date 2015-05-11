@@ -21,7 +21,7 @@ public class Unquote implements Term {
   private final boolean isSplicing;
   private final Term body;
 
-  public Unquote(boolean isSplicing, Term body) {
+  private Unquote(boolean isSplicing, Term body) {
     this.isSplicing = isSplicing;
     this.body = body;
   }
@@ -53,5 +53,13 @@ public class Unquote implements Term {
   @Override
   public void show(Writer w) throws IOException {
     H.list(isSplicing ? Sym.unquoteSplicingSymC : Sym.unquoteSymC, body).show(w);
+  }
+
+  public static Unquote createSimple(Term content) {
+    return new Unquote(false, content);
+  }
+
+  public static Unquote createSplicing(Term content) {
+    return new Unquote(true, content);
   }
 }
