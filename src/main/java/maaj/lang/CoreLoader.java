@@ -123,13 +123,9 @@ public class CoreLoader extends Namespace.Loader {
       throw new InvalidOperationException("#/let: binding requires even number of terms");
     
     for (Seq s = v.seq(); !s.isNil(); s = s.rest().rest()) {
-      Term k = s.first().unwrap();
-//      if (!(k instanceof Symbol)) //TODO: yup, keywords will be passed, but it's not really that much of a problem...
-//        throw new InvalidOperationException("#/let: binding requires symbol; got: " + k.print());
-      Invocable ptrn = patternBinder(k);
-      Term exp = s.rest().first();
-      Term r = exp.eval(cxt);
-      cxt = cxt.addToScope(applyPatternBinder(ptrn, r));
+      Invocable ptrn = patternBinder(s.first().unwrap()); //create patternBinder from first in pair
+      Term r = s.rest().first().eval(cxt); //evaluate second
+      cxt = cxt.addToScope(applyPatternBinder(ptrn, r)); //pattern bind result; add to scope
     }
     return cxt;
   }
