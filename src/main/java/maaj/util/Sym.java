@@ -5,6 +5,7 @@
  */
 package maaj.util;
 
+import maaj.term.Map;
 import maaj.term.Symbol;
 
 /**
@@ -37,6 +38,8 @@ public class Sym {
   public static final Symbol fnseqSymC = H.symbol("#", "fnseq");
   public static final Symbol fnSymC = H.symbol("#", "fn");
   public static final Symbol macroSymC = H.symbol("#", "macro");
+
+  public static final Map macroMapTag = H.map(macroSymK, macroSymK);
 
 
 }

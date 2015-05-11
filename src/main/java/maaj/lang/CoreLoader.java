@@ -213,7 +213,7 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "defn", "creates and defs a function", a
              -> H.list(Sym.defSymC, a.first(), H.cons(Sym.fnSymC, a.rest())));
     defmacro(core, "defmacro", "creates and defs a function", a
-             -> H.list(Sym.defSymC, a.first(), H.cons(Sym.macroSymC, a.rest())));
+             -> H.list(Sym.defSymC, a.first().addMeta(Sym.macroMapTag), H.cons(Sym.macroSymC, a.rest())));
 
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
 
@@ -297,7 +297,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private static void defmacro(Namespace ns, Symbol name, String doc, Macro m) {
-    ns.def(name, m, H.map(Sym.docSymK, Str.of(doc)));
+    ns.def(name, m, H.map(Sym.docSymK, Str.of(doc), Sym.macroSymK, Sym.macroSymK));
   }
 
 }
