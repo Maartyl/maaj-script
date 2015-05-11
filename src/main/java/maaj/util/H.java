@@ -396,6 +396,14 @@ public class H {
     throw new IllegalArgumentException("Requires Num, got: " + t.getClass().getName());
   }
 
+  public static Collection requireCollection(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Collection)
+      return (Collection) t;
+
+    throw new IllegalArgumentException("Requires Collection, got: " + t.getClass().getName());
+  }
+
   public static Reducible requireReducible(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Reducible)
