@@ -109,6 +109,8 @@ public class Symbol implements Term {
 
   @Override
   public Term evalMacros(Context c) {
+    //TODO: 2 variants: only return macros; "compile" <- everything, espacially native methods
+    // or somethig alongh the lines...
     return c.valAt(this, this);
   }
 
