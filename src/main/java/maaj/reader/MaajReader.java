@@ -156,7 +156,7 @@ public class MaajReader {
     case '#': return fail("maybe, this should work normally?");
     // case '-': return readMinus(); // for now, interpret as symbol...
     case ';': return readComment(() -> readHashSymbol(s));
-    case '/': return fail("not implemented yet: core functions with namespace");
+    case '/': return fail("not implemented yet: core fns with ns"); //not really, there must have had been space or something...
     case '^': return fail("not implemented yet: work normally? ... applying to rest: not syntax based...");
     case '~': return fail("not implemented yet: ???");
     case '\\': return fail("not implemented yet: ???");
