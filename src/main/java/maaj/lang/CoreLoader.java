@@ -114,7 +114,7 @@ public class CoreLoader extends Namespace.Loader {
     Seq body = a.rest();
     if (body.isNil())
       return H.list(fnType); // nothing would use the pattern anyway...
-    Invocable pb = patternBinder(ptrn);
+    Term pb = patternBinder(ptrn).addMeta(H.map(Sym.patternSym, ptrn));
     return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
   }
 
