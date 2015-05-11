@@ -17,6 +17,7 @@ import maaj.coll.Tuple0;
 import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
+import maaj.coll.traits.Functor;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.Seqable;
@@ -326,6 +327,10 @@ public class H {
       return ((Seqable) t).seq();
 
     throw new IllegalArgumentException("Cannot create Seq from: " + t.getClass().getName());
+  }
+
+  public static <T extends Functor<T>> T fmap(T f, Invocable1 m) {
+    return f.fmap(m);
   }
 
   /**
