@@ -20,6 +20,7 @@ public class Sym {
   public static final Symbol nameSym = H.symbol("name");
   public static final Symbol doSymC = H.symbol("#", "do");
   public static final Symbol letSymC = H.symbol("#", "let");
+  public static final Symbol defSymC = H.symbol("#", "def");
   public static final Symbol docSymK = H.symbol(":doc");
   public static final Symbol ignoreSym = H.symbol("_");
   public static final Symbol ampSym = H.symbol("&");
@@ -32,6 +33,8 @@ public class Sym {
   public static final Symbol argsSym = H.symbol("$args");
   public static final Symbol macroseqSymC = H.symbol("#", "macroseq");
   public static final Symbol fnseqSymC = H.symbol("#", "fnseq");
+  public static final Symbol fnSymC = H.symbol("#", "fn");
+  public static final Symbol macroSymC = H.symbol("#", "macro");
 
 
 }

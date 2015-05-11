@@ -107,7 +107,7 @@ public class CoreLoader extends Namespace.Loader {
     });
 
     defmacro(core, "fn", "creates function that binds args", a -> argsBindMacro(a, Sym.fnseqSymC));
-    defmacro(core, "macro", "creates function that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
+    defmacro(core, "macro", "creates macro that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
   }
 
   private Term argsBindMacro(Seq a, Symbol fnType) {
@@ -143,13 +143,13 @@ public class CoreLoader extends Namespace.Loader {
    */
   private boolean defCheckAndRetIfQualified(Term nu, Symbol curNs) {
     if (nu instanceof Keyword)
-      throw new InvalidOperationException("#/def: requires symbol for name, got:" + nu.getType().getName());
+      throw new InvalidOperationException("#/def: requires symbol for name, got: " + nu.getType().getName());
     if (!(nu instanceof Symbol))
-      throw new InvalidOperationException("#/def: requires symbol for name, got:" + nu.getType().getName());
+      throw new InvalidOperationException("#/def: requires symbol for name, got: " + nu.getType().getName());
     Symbol s = (Symbol) nu;
     if (s.isQualified()) {
       if (s.getNs() == null ? curNs.getNm() != null : !s.getNs().equals(curNs.getNm()))
-        throw new InvalidOperationException("#/def: cannot modify vars outside current namespace:" + s.print());
+        throw new InvalidOperationException("#/def: cannot modify vars outside current namespace: " + s.print());
       return true;
     }
     return false;
@@ -217,6 +217,11 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private void loadCore(Context cxt, Namespace core, ReaderContext rcxt) {
+    defmacro(core, "defn", "creates and defs a function", a
+             -> H.list(Sym.defSymC, a.first(), H.list(Sym.fnSymC, a.rest())));
+    defmacro(core, "defmacro", "creates and defs a function", a
+             -> H.list(Sym.defSymC, a.first(), H.list(Sym.macroSymC, a.rest())));
+
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
 
     defn(core, Sym.firstSym, "first of seq (head)", a -> {
@@ -268,6 +273,8 @@ public class CoreLoader extends Namespace.Loader {
    */
   private void loadMacro(Namespace macro) {
     def(macro, "quote", "returns first arg without evaluating it", (c, a) -> a.isNil() ? H.NIL : a.first());
+
+    def(macro, "expand", "expand macro without evaluating it", (c, a) -> a.firstOrNil().evalMacros(c));
   }
 
   private static Seq arityRequire(int arity, Seq s, String errMsg) {

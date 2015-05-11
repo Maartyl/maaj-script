@@ -78,7 +78,7 @@ public interface Invocable extends Ground, Runnable, Callable<Term> {
 
   @Override
   public default void show(Writer w) throws IOException {
-    w.append("#<invocable>");
+    w.append("#<$>");
   }
 
 }
