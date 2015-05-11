@@ -404,6 +404,15 @@ public class H {
     throw new IllegalArgumentException("Requires Collection, got: " + t.getClass().getName());
   }
 
+  public static Monad requireMonad(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Monad)
+      return (Monad) t;
+
+    throw new IllegalArgumentException("Requires Monad, got: " + t.getClass().getName());
+  }
+
+
   public static Reducible requireReducible(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Reducible)

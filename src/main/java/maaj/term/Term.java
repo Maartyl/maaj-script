@@ -26,7 +26,7 @@ import maaj.util.SeqH;
  * <p>
  * @author maartyl
  */
-public interface Term {
+public interface Term extends Quotable {
 
   default boolean isNil() {
     return false;

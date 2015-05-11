@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
+import maaj.util.H;
 
 /**
  *
@@ -22,5 +23,11 @@ public interface Ground extends Term {
   default Term evalMacros(Context c) {
     return this;
   }
+
+  @Override
+  public default Collection unquoteTraverse(Context c) {
+    return H.tuple(this);
+  }
+
 
 }

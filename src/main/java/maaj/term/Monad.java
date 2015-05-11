@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.coll.traits.Functor;
+import maaj.lang.Context;
 
 /**
  *
@@ -40,4 +41,8 @@ public interface Monad<M extends Monad<M>> extends Term, Functor<M> {
     return bindM((Invocable1) x -> x);
   }
 
+  @Override
+  public default M unquoteTraverse(Context c) {
+    return bindM((Invocable1) x -> x.unquoteTraverse(c));
+  }
 }

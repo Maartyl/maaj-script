@@ -38,6 +38,11 @@ public interface Mimic extends Term {
   }
 
   @Override
+  public default Monad unquoteTraverse(Context c) {
+    return unwrap().unquoteTraverse(c);
+  }
+
+  @Override
   public default void show(Writer w) throws IOException {
     unwrap().show(w);
   }

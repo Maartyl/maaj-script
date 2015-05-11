@@ -103,6 +103,11 @@ public class Symbol implements Term {
   }
 
   @Override
+  public Collection unquoteTraverse(Context c) {
+    return H.tuple(this);
+  }
+
+  @Override
   public Term eval(Context c) {
     //don't evaluate
     //ok to unwrap: don't reatain meta 

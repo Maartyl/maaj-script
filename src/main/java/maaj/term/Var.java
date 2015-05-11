@@ -77,6 +77,11 @@ public final class Var implements Mimic, RefSet<Var> {
   }
 
   @Override
+  public Collection unquoteTraverse(Context c) {
+    return H.tuple(this);
+  }
+
+  @Override
   public Var doSet(Term t) {
     value = t;
     return this;
