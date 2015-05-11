@@ -126,7 +126,8 @@ public final class Char implements Num {
 
   @Override
   public String toString() {
-    return String.valueOf(value);
+    //TODO: when doing chars: also return special as \newline etc.
+    return "\\" + value;
   }
 
   @Override
