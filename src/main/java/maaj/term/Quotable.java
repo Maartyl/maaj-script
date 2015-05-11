@@ -20,9 +20,12 @@ public interface Quotable {
    * can produce other number of elements then 1
    * - single elements just return itself wrapped in some cheap collection (tuple1)
    * <p>
+   * returned value is a monad that should contain exactly 1 element : the transformed structure
+   * - potentially could return more: that is wrong
+   * - or none: that is also wrong...
    * <p>
    * @param c context to eval unquote terms in
-   * @return represents ~concat.map : original quoted data or evaluated unquoted
+   * @return monad with result ; represents ~concat.map : original quoted data or evaluated unquoted
    */
   Monad unquoteTraverse(Context c);
 }

@@ -43,7 +43,7 @@ public class SeqH {
    */
   public static Seq concatSexp(Seq seqs) {
     if (seqs.isNil()) return H.END;
-    return concatSexp((Seq) seqs.first(), seqs.rest());
+    return concatSexp(H.seqFrom(seqs.first()), seqs.rest());
   }
   /**
    * eager, recursive

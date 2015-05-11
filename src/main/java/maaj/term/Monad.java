@@ -43,6 +43,6 @@ public interface Monad<M extends Monad<M>> extends Term, Functor<M> {
 
   @Override
   public default M unquoteTraverse(Context c) {
-    return bindM((Invocable1) x -> x.unquoteTraverse(c));
+    return retM(bindM((Invocable1) x -> x.unquoteTraverse(c)));
   }
 }

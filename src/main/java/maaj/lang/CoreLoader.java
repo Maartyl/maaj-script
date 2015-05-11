@@ -265,7 +265,12 @@ public class CoreLoader extends Namespace.Loader {
    * this does not define macros; but namespace for working with macros
    */
   private void loadMacro(Namespace macro) {
-    def(macro, "quote", "returns first arg without evaluating it", (c, a) -> a.isNil() ? H.NIL : a.first());
+    def(macro, Sym.quoteSymC.getNm(), "returns first arg without evaluating it", (c, a) -> a.isNil() ? H.NIL : a.first());
+    def(macro, Sym.quoteQualifiedSymC.getNm(), //getNm : they are qualified
+        "returns first arg without evaluating it; "
+        + "recursively looking for unquote, evaluating those "
+        + "and returning them in their original place in the structure",
+        (c, a) -> a.isNil() ? H.NIL : a.first().unquoteTraverse(c));
 
     def(macro, "expand", "expand macro without evaluating it", (c, a) -> a.firstOrNil().evalMacros(c));
   }
