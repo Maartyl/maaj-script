@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
 import maaj.util.H;
+import maaj.util.Sym;
 
 /**
  *
@@ -27,14 +28,14 @@ public abstract class InvSeq implements InvocableSeq {
 //    else
 //      fn1 = H.list(doSym, t.unwrap());
 
-    fn1 = H.cons(doSym, fn).fmap((Invocable1) x -> x.evalMacros(closure));
+    fn1 = H.cons(Sym.doSymC, fn).fmap((Invocable1) x -> x.evalMacros(closure));
     this.fn = fn1;
     this.closure = closure;
   }
 
   @Override
   public Term invokeSeq(Seq args) {
-    return fn.eval(closure.addToScope(H.map(argsSym, args)));
+    return fn.eval(closure.addToScope(H.map(Sym.argsSym, args)));
   }
 
   @Override
@@ -43,7 +44,4 @@ public abstract class InvSeq implements InvocableSeq {
   }
 
   protected abstract Symbol getShowName();
-
-  private static final Symbol argsSym = H.symbol("$args");
-  private static final Symbol doSym = H.symbol("#", "do");
 }

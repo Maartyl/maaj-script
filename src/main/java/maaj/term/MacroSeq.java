@@ -6,7 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
-import maaj.util.H;
+import maaj.util.Sym;
 
 /**
  * basic functions that operate on evaluated arguments
@@ -21,10 +21,8 @@ public final class MacroSeq extends InvSeq implements Macro {
 
   @Override
   protected Symbol getShowName() {
-    return macroseqSym;
+    return Sym.macroseqSymC;
   }
-
-  private static final Symbol macroseqSym = H.symbol("#", "macroseq");
 
   public static MacroSeq of(Seq fn, Context closure) {
     return new MacroSeq(fn, closure);

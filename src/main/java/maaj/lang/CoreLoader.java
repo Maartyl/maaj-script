@@ -106,6 +106,19 @@ public class CoreLoader extends Namespace.Loader {
       return a.first().eval(c).eval(c);
     });
 
+    defmacro(core, "fn", "creates function that binds args", a -> argsBindMacro(a, Sym.fnseqSymC));
+    defmacro(core, "macro", "creates function that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
+  }
+
+  private Term argsBindMacro(Seq a, Symbol fnType) {
+    if (a.isNil())
+      throw new InvalidOperationException("Cannot bind args withut binding form");
+    Term ptrn = a.first();
+    Seq body = a.rest();
+    if (body.isNil())
+      return H.list(fnType); // nothing would use the pattern anyway...
+    Invocable pb = patternBinder(ptrn);
+    return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
   }
 
   private Context letReduceBindings(Context cxt, Vec v) {
@@ -189,6 +202,8 @@ public class CoreLoader extends Namespace.Loader {
       Vec vptrn = v.fmap((Invocable1) this::patternBinder);
       return (Invocable1) a -> applyVectorPatternBinder(a, vptrn);
     }
+    if (tptrn instanceof Invocable)
+      return (Invocable) tptrn; //Assume to be something able of pattern binding; if not : used incorrectly ...
     throw new IllegalArgumentException("Cannot create pattern binder from: " + tptrn.getType().getName() + " : " + tptrn.print());
   }
 

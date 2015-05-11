@@ -60,7 +60,7 @@ public interface Term {
     //when applying to symbol: must ask if represents macro or something... - addressed in symbol.evalMacro
     //macros will reimplement
     //it's ok to call on things that cannot be applied ... probably makes little sense, but won't break anything
-    return SeqH.sexp(this, args.fmap((Invocable1) x -> x.evalMacros(cxt)));
+    return SeqH.cons(this, args.fmap((Invocable1) x -> x.evalMacros(cxt)));
   }
 
   default Term invokeMethod(Str methodName, Seq args) {

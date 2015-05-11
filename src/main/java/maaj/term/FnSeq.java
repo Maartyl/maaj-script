@@ -6,7 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
-import maaj.util.H;
+import maaj.util.Sym;
 
 /**
  * basic functions that operate on evaluated arguments
@@ -21,10 +21,8 @@ public final class FnSeq extends InvSeq implements Fn {
 
   @Override
   protected Symbol getShowName() {
-    return fnseqSym;
+    return Sym.fnseqSymC;
   }
-
-  private static final Symbol fnseqSym = H.symbol("#", "fnseq");
 
   public static FnSeq of(Seq fn, Context closure) {
     return new FnSeq(fn, closure);

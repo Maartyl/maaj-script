@@ -46,6 +46,7 @@ public interface NilSeq extends Seq {
     return Int.of(0);
   }
 
+
   @Override
   public default Seq bindM(Invocable fn2Monad) {
     return this;
