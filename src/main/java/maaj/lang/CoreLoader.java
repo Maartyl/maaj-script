@@ -12,7 +12,6 @@ import maaj.term.Fn;
 import maaj.term.FnSeq;
 import maaj.term.Invocable;
 import maaj.term.Invocable1;
-import maaj.term.Invocable2;
 import maaj.term.Keyword;
 import maaj.term.Macro;
 import maaj.term.MacroSeq;
@@ -25,13 +24,11 @@ import maaj.term.Symbol;
 import maaj.term.Term;
 import maaj.term.Var;
 import maaj.term.Vec;
-import maaj.term.VecT;
 import maaj.util.FnH;
 import maaj.util.H;
 import maaj.util.MapH;
 import maaj.util.SeqH;
 import maaj.util.Sym;
-import maaj.util.VecH;
 
 /**
  *
@@ -218,9 +215,9 @@ public class CoreLoader extends Namespace.Loader {
 
   private void loadCore(Context cxt, Namespace core, ReaderContext rcxt) {
     defmacro(core, "defn", "creates and defs a function", a
-             -> H.list(Sym.defSymC, a.first(), H.list(Sym.fnSymC, a.rest())));
+             -> H.list(Sym.defSymC, a.first(), H.cons(Sym.fnSymC, a.rest())));
     defmacro(core, "defmacro", "creates and defs a function", a
-             -> H.list(Sym.defSymC, a.first(), H.list(Sym.macroSymC, a.rest())));
+             -> H.list(Sym.defSymC, a.first(), H.cons(Sym.macroSymC, a.rest())));
 
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
 
