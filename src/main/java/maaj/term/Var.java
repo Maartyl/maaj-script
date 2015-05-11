@@ -12,6 +12,7 @@ import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
 import maaj.util.H;
 import maaj.util.MapH;
+import maaj.util.Sym;
 
 /**
  *
@@ -60,8 +61,8 @@ public final class Var implements Mimic, RefSet<Var> {
 
   @Override
   public void show(Writer w) throws IOException {
-    if (meta.containsKey(nameSym))
-      H.list(varSym, meta.valAt(nameSym), unwrap()).show(w);
+    if (meta.containsKey(Sym.nameSym))
+      H.list(Sym.varSym, meta.valAt(Sym.nameSym), unwrap()).show(w);
     else Mimic.super.show(w);
   }
 
@@ -98,8 +99,6 @@ public final class Var implements Mimic, RefSet<Var> {
     doSet(s);
     return s;
   }
-  private static final Symbol nameSym = H.symbol("name");
-  private static final Symbol varSym = H.symbol("var");
 
   public static Var empty() {
     return new Var(null);
