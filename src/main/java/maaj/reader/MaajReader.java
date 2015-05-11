@@ -19,6 +19,7 @@ import maaj.term.Seq;
 import maaj.term.Str;
 import maaj.term.Symbol;
 import maaj.term.Term;
+import maaj.term.Unquote;
 import maaj.term.Vec;
 import maaj.term.VecT;
 import maaj.util.H;
@@ -327,9 +328,9 @@ public class MaajReader {
   private Term readUnquote() {
     if (peek() == '@') {
       next();
-      return H.list(Sym.unquoteSplicingSymC, read0SkipWhitespace());
+      return Unquote.createSplicing(read0SkipWhitespace());
     }
-    return H.list(Sym.unquoteSymC, read0SkipWhitespace());
+    return Unquote.createSimple(read0SkipWhitespace());
   }
 
   private Term readComment(Invocable0 continuation) {
