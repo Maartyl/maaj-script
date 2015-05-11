@@ -18,6 +18,7 @@ public class Sym {
   public static final Symbol derefSymC = H.symbol("#core", "deref");
   public static final Symbol tagSymK = H.symbol(":tag");
   public static final Symbol nameSym = H.symbol("name");
+  public static final Symbol patternSym = H.symbol("pattern");
   public static final Symbol doSymC = H.symbol("#", "do");
   public static final Symbol letSymC = H.symbol("#", "let");
   public static final Symbol defSymC = H.symbol("#", "def");
