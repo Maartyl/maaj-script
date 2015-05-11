@@ -256,8 +256,8 @@ public class CoreLoader extends Namespace.Loader {
 
     H.eval("(def + (fnseq (reduce +# 0 $args)))", cxt, rcxt);
     H.eval("(def * (fnseq (reduce *# 1 $args)))", cxt, rcxt);
-    H.eval("(def min (fnseq (reduce min# 1 $args)))", cxt, rcxt);
-    H.eval("(def max (fnseq (reduce max# 1 $args)))", cxt, rcxt);
+    //H.eval("(def min (fnseq (reduce min# 1 $args)))", cxt, rcxt);
+    //H.eval("(def max (fnseq (reduce max# 1 $args)))", cxt, rcxt);
 
   }
 
