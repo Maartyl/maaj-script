@@ -103,7 +103,7 @@ public class Symbol implements Term {
   @Override
   public Term eval(Context c) {
     //don't evaluate
-    //TODO: only unwrap vars!!! //or something that represents that...
+    //ok to unwrap: don't reatain meta 
     return c.valAt(this).unwrap();
   }
 
@@ -111,7 +111,9 @@ public class Symbol implements Term {
   public Term evalMacros(Context c) {
     //TODO: 2 variants: only return macros; "compile" <- everything, espacially native methods
     // or somethig alongh the lines...
-    return c.valAt(this, this);
+    Term rslt = c.valAt(this, this);
+    if (rslt == this) return this;
+    return rslt.evalMacros(c);
   }
 
   @Override
