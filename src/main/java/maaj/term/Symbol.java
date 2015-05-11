@@ -11,7 +11,9 @@ import java.util.Objects;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
 import maaj.util.H;
+import maaj.util.MapH;
 import maaj.util.SeqH;
+import maaj.util.Sym;
 
 /**
  *
@@ -110,9 +112,10 @@ public class Symbol implements Term {
   @Override
   public Term evalMacros(Context c) {
     //TODO: 2 variants: only return macros; "compile" <- everything, espacially native methods
-    // or somethig alongh the lines...
+    // yes, that is needed; unless otherwise specified in context in future
     Term rslt = c.valAt(this, this);
     if (rslt == this) return this;
+    if (!MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return this; //only "inline" what claims to be a macro
     return rslt.evalMacros(c);
   }
 

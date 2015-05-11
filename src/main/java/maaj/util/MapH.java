@@ -66,6 +66,10 @@ public class MapH {
     }
   }
 
+  public static boolean hasTag(Map m, Term tag) {
+    return !m.valAt(tag).isNil();
+  }
+
   public static Map emptyPersistent() {
     return EMPTY;
   }
