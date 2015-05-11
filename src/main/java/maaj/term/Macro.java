@@ -21,7 +21,8 @@ public interface Macro extends Invocable {
 
   @Override
   public default Term applyMacros(Context cxt, Seq args) {
-    return invokeSeq(args.fmap((Invocable1) x -> x.evalMacros(cxt))).evalMacros(cxt);
+    //return invokeSeq(args.fmap((Invocable1) x -> x.evalMacros(cxt))).evalMacros(cxt);
+    return invokeSeq(args).evalMacros(cxt);
   }
 
 
