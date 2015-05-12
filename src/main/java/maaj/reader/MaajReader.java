@@ -200,10 +200,12 @@ public class MaajReader {
     Term mu = m.unwrap();
     if (mu instanceof Map)
       return MapH.update(metaOnMeta, (Map) mu);
-    if (mu instanceof Keyword || mu instanceof Num)
+    if (mu instanceof Keyword)
       return MapH.update(metaOnMeta, H.map(mu, mu));
     if (mu instanceof Symbol || mu instanceof Str)
       return MapH.update(metaOnMeta, H.map(Sym.tagSymK, mu));
+    if (mu instanceof Num)
+      return MapH.update(metaOnMeta, H.map(Sym.numSymK, mu));
 
     return fail("unexpected meta term type: " + mu.getType().getName());
   }
