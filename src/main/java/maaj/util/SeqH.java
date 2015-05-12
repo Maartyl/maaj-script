@@ -72,8 +72,8 @@ public class SeqH {
    */
   public static Seq concatLazy(Seq seqs) {
     if (seqs.isNil()) return H.END;
-    if (seqs.rest().isNil()) return (Seq) seqs.first();
-    return concatLazy((Seq) seqs.first(), seqs.rest());
+    if (seqs.rest().isNil()) return H.seqFrom(seqs.first());
+    return concatLazy(H.seqFrom(seqs.first()), seqs.rest());
   }
 
   /**
