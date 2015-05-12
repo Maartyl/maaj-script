@@ -8,18 +8,13 @@ package maaj.coll.wrap;
 import com.github.krukow.clj_lang.IPersistentMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import maaj.coll.traits.Functor;
 import maaj.term.Int;
-import maaj.term.Invocable;
-import maaj.term.Invocable1;
 import maaj.term.KVPair;
 import maaj.term.Map;
 import maaj.term.MapT;
-import maaj.term.Seq;
 import maaj.term.Term;
 import maaj.util.H;
 import maaj.util.MapH;
-import maaj.util.SeqH;
 
 /**
  *
@@ -33,28 +28,6 @@ public final class MapPWrap implements Map {
     this.map = map;
   }
 
-
-  @Override
-  public Map retM(Term contents) {
-    return MapH.emptyPersistent().conj(contents);
-  }
-
-  @Override
-  public Map bindM(Invocable fn2Monad) {
-    MapT m = MapH.emptyTransient();
-    for (KVPair p : this)
-      ((Functor<?>) p.transform(fn2Monad)).foreach((Invocable1) x -> m.doConj(x));
-    return m.asPersistent();
-  }
-
-  @Override
-  public Map fmap(Invocable mapper) {
-    MapT m = MapH.emptyTransient();
-    for (KVPair p : this)
-      m.doConj(p.transform(mapper));
-    return m.asPersistent();
-  }
-
   @Override
   public Int getCount() {
     return Int.of(map.count());
@@ -63,11 +36,6 @@ public final class MapPWrap implements Map {
   @Override
   public int getCountAsInteger() {
     return (map.count());
-  }
-
-  @Override
-  public Seq seq() {
-    return SeqH.iterable2seq(this);
   }
 
   @Override
