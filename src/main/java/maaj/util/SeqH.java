@@ -144,6 +144,10 @@ public class SeqH {
     return s;
   }
 
+  public static Seq repeat(int times, Term t) {
+    return times <= 0 ? H.END : H.lazy(t, () -> repeat(times - 1, t));
+  }
+
   /**
    * @param iterable
    * @return seq of all results from calling .next() on iterator

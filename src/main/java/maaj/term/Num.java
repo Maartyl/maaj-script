@@ -5,8 +5,10 @@
  */
 package maaj.term;
 
+import maaj.coll.traits.Indexed;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.util.Generators;
 import maaj.util.H;
 import maaj.util.SeqH;
 
@@ -152,11 +154,14 @@ public interface Num extends Ground {
   @Override
   public default Term apply(Context cxt, Seq args) {
     args = SeqH.mapEval(args, cxt);
-    if (args.firstOrNil().unwrap() instanceof Num) {
-      //infinite recursion
-      throw new InvalidOperationException("applying Num to a Num");
+    if (args.firstOrNil().unwrap() instanceof Indexed) {
+      return args.firstOrNil().apply(cxt, H.cons(this, args.restOrNil()));
     }
-    return args.firstOrNil().apply(cxt, H.cons(this, args.restOrNil()));
+    switch (args.boundLength(3)) {
+    case 0: return Generators.range(asInteger());
+    }
+    Seq types = SeqH.mapLazy(args, (Invocable1) x -> H.symbol(x.getType().getName()));
+    throw new IllegalArgumentException("Don't know how to apply Num to: " + types.print());
   }
 
 }
