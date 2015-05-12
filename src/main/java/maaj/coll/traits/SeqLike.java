@@ -30,9 +30,12 @@ public interface SeqLike extends Numerable, Seqable, Reducible, Iterable<Term> {
 
   //--methods:
   default int boundLength(int maxLen) {
+    /**
+     * **: actually requires isNil: LazySeq doesn't evaluate to check if isCounted : could return false for nil
+     */
     int curLen = 0;
     for (SeqLike cur = this;
-         curLen <= maxLen; //no need to check nil: nil is counted
+         curLen <= maxLen && !cur.isNil(); //WRONG: no need to check nil: nil is counted*
          cur = cur.rest(), ++curLen)
       if (cur.isCounted())
         return curLen + cur.count().asInteger();

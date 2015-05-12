@@ -175,7 +175,7 @@ public class CoreLoader extends Namespace.Loader {
     case 0: throw new IllegalArgumentException("case: requires expression to match on");
     case 1: return H.NIL; //no match cases
     case 2: throw new IllegalArgumentException("case: match case withou body");
-    //(cond exp match body) -> (if (=# match exp) body)
+    //(cond exp match body) -> (if (=# match exp) body) // no need for let
     case 3: return H.list(Sym.ifSymC, H.list(Sym.equalSymCCore, a.rest().first(), a.first()), a.rest().rest().first());
     default:
       Symbol gensym = H.uniqueSymbol("exp");
@@ -284,10 +284,11 @@ public class CoreLoader extends Namespace.Loader {
              -> H.list(Sym.defSymC, a.first().addMeta(Sym.macroMapTag), H.cons(Sym.macroSymC, a.rest())));
 
     defmacro(core, "cond", "Takes pairs of - test body; evaluates only body after first successful test", this::condMacro);
+    defmacro(core, "case", "Takes expr pairs (match body); works like cond with =#; evaluates expr once", this::caseMacro);
 
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
-    defn(core, Sym.firstSym, "first of seq (head)", a -> H.seqFrom(arityRequire(1, a, "first").first()).firstOrNil());
-    defn(core, Sym.restSym, "rest of seq (tail)", a -> H.seqFrom(arityRequire(1, a, "rest").first()).restOrNil());
+    defn(core, Sym.firstSym.getNm(), "first of seq (head)", a -> H.seqFrom(arityRequire(1, a, "first").first()).firstOrNil());
+    defn(core, Sym.restSym.getNm(), "rest of seq (tail)", a -> H.seqFrom(arityRequire(1, a, "rest").first()).restOrNil());
     defmacro(core, "car", "first of seq (head)", a -> H.cons(Sym.firstSym, a));
     defmacro(core, "cdr", "rest of seq (tail)", a -> H.cons(Sym.restSym, a));
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
@@ -311,7 +312,7 @@ public class CoreLoader extends Namespace.Loader {
       return coll.reduce(start, fn);
     });
 
-    defn(core, Sym.equalSymCCore, "equals?", a -> {
+    defn(core, Sym.equalSymCCore.getNm(), "equals?", a -> {
       arityRequire(2, a, "=#");
       return H.wrap(a.first().equals(a.rest().first()));
     });
