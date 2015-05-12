@@ -322,13 +322,14 @@ public class H {
     return lazy(head, (Invocable) seqBuilder);
   }
 
-  public static Seq seqFrom(Term t) {
+  public static Seq seqFrom(Term tt) {
+    Term t = tt.unwrap();
     if (t instanceof Seq)
       return (Seq) t;
     if (t instanceof Seqable)
       return ((Seqable) t).seq();
 
-    throw new IllegalArgumentException("Cannot create Seq from: " + t.getClass().getName());
+    throw new IllegalArgumentException("Cannot create Seq from: " + t.getType().getName());
   }
 
   public static <T extends Functor<T>> T fmap(T f, Invocable1 m) {
