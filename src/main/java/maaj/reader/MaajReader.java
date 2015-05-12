@@ -200,7 +200,7 @@ public class MaajReader {
     Term mu = m.unwrap();
     if (mu instanceof Map)
       return MapH.update(metaOnMeta, (Map) mu);
-    if (mu instanceof Keyword)
+    if (mu instanceof Keyword || mu instanceof Num)
       return MapH.update(metaOnMeta, H.map(mu, mu));
     if (mu instanceof Symbol || mu instanceof Str)
       return MapH.update(metaOnMeta, H.map(Sym.tagSymK, mu));
