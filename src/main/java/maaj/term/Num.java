@@ -152,7 +152,7 @@ public interface Num extends Ground {
   @Override
   public default Term apply(Context cxt, Seq args) {
     args = SeqH.mapEval(args, cxt);
-    if (args.first().getContent() instanceof Num) {
+    if (args.firstOrNil().unwrap() instanceof Num) {
       //infinite recursion
       throw new InvalidOperationException("applying Num to a Num");
     }
