@@ -146,7 +146,9 @@ public class CoreLoader extends Namespace.Loader {
    * <p>
    * --
    * this could be defined in the language; sure : but I need it for arity dispatch
-   * and don't want to do it without it
+   * and prefer not to do it without it
+   * - but more importantly: it requires me to throw IllegalArgument ... can't do that yet
+   * - maybe rewrite as normal macro at some point later...
    */
   private Term condMacro(Seq a) {
     switch (a.boundLength(2)) {
@@ -256,6 +258,8 @@ public class CoreLoader extends Namespace.Loader {
              -> H.list(Sym.defSymC, a.first(), H.cons(Sym.fnSymC, a.rest())));
     defmacro(core, "defmacro", "creates and defs a function", a
              -> H.list(Sym.defSymC, a.first().addMeta(Sym.macroMapTag), H.cons(Sym.macroSymC, a.rest())));
+
+    defmacro(core, "cond", "Takes pairs of - test body; evaluates only body after first successful test", this::condMacro);
 
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
 
