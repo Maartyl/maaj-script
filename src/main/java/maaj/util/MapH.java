@@ -9,9 +9,11 @@ import com.github.krukow.clj_lang.PersistentArrayMap;
 import java.util.function.BiFunction;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.KVEntry;
+import maaj.coll.traits.Seqable;
 import maaj.coll.wrap.MapPWrap;
 import maaj.term.Map;
 import maaj.term.MapT;
+import maaj.term.Seq;
 import maaj.term.Term;
 
 /**
@@ -36,7 +38,13 @@ public class MapH {
     }
     if (t instanceof KVEntry)
       return assoc.apply(((KVEntry) t).getKey(), ((KVEntry) t).getValue());
-    throw new IllegalArgumentException("doConj: Cannot coerce " + "arg" + "(" + t.getClass().getName() + ") into key-value pair.");
+    if (t instanceof Seqable) {
+      Seq s = ((Seqable) t).seq();
+      if (s.boundLength(2) == 2)
+        return assoc.apply(s.first(), s.rest().first());
+    }
+    throw new IllegalArgumentException("conj: Cannot coerce arg: " + t.getClass().getName()
+                                       + " into key-value pair. //: " + o.print());
   }
 
   public static MapT update(MapT what, Iterable<? extends KVEntry> with) {
