@@ -126,6 +126,20 @@ public interface Num extends Ground {
 
   }
 
+  static interface NumPred extends Fn {
+
+    boolean op(Num l, Num r);
+
+    @Override
+    public default Term invokeSeq(Seq args) {
+      if (args.boundLength(2) != 2)
+        throw new IllegalArgumentException("core arithmetic operator: requires 2 args; got: " + args.boundLength(30));
+      return H.wrap(op(H.requireNum(args.first()), H.requireNum(args.rest().first())));
+    }
+
+  }
+
+
   //--- static - delegates to instances : abstraction level
   static Int of(long val) {
     return Int.of(val);

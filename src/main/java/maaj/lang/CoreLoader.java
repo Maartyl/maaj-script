@@ -235,12 +235,19 @@ public class CoreLoader extends Namespace.Loader {
       return H.cons(a.first(), H.requireSeqable(a.rest().first()).seq());
     });
 
+    //H.eval("(defn not )", cxt, rcxt);
+
     defn(core, "reduce", "get meta data of term", a -> {
       arityRequire(3, a, "reduce");
       Invocable fn = H.requireInvocable(a.first());
       Term start = a.rest().first();
       Reducible coll = H.requireReducible(a.rest().rest().first());
       return coll.reduce(start, fn);
+    });
+
+    defn(core, "=#", "equals?", a -> {
+      arityRequire(2, a, "=#");
+      return H.wrap(a.first().equals(a.rest().first()));
     });
 
     defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
@@ -253,6 +260,12 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "inc", "(+ % 1)", (Num.NumOp) Num::inc);
     defn(core, "dec", "(- % 1)", (Num.NumOp) Num::dec);
     defn(core, "neg", "(- 0 %)", (Num.NumOp) Num::neg);
+
+    defn(core, "<", "Num; is first arg less then second?", (Num.NumPred) (Num::lt));
+    defn(core, ">", "Num; is first arg greater then second?", (Num.NumPred) (Num::gt));
+    defn(core, "==", "Num; is first arg greater then second?", (Num.NumPred) (Num::eq));
+    defn(core, "<=", "Num; is first arg less then or equal to second?", (Num.NumPred) (Num::lteq));
+    defn(core, ">=", "Num; is first arg greater then or equal to second?", (Num.NumPred) (Num::gteq));
 
     H.eval("(def + (fnseq (reduce +# 0 $args)))", cxt, rcxt);
     H.eval("(def * (fnseq (reduce *# 1 $args)))", cxt, rcxt);
