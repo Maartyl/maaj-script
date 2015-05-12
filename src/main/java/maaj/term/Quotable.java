@@ -25,7 +25,7 @@ public interface Quotable {
    * - or none: that is also wrong...
    * <p>
    * @param c context to eval unquote terms in
-   * @return monad with result ; represents ~concat.map : original quoted data or evaluated unquoted
+   * @return Seqable monad with result ; represents ~concat.map : original quoted data or evaluated unquoted
    */
   Monad unquoteTraverse(Context c);
 }
