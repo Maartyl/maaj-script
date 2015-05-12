@@ -111,6 +111,8 @@ public class H {
       return (Term) o;
 
     Class oc = o.getClass();
+    if (oc == Boolean.class)
+      return H.wrap((boolean) o);
     if (oc == Integer.class)
       return Int.of((Integer) o);
     if (oc == Long.class)

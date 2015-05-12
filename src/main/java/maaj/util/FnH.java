@@ -37,6 +37,6 @@ public class FnH {
 
   @SuppressWarnings("unchecked")
   public static <T, U, V> Invocable2 liftTypeUncheched2(BiFunction<T, U, V> fn) {
-    return (t, u) -> (Term) fn.apply((T) t, (U) u);
+    return (t, u) -> H.wrap(fn.apply((T) t, (U) u));
   }
 }
