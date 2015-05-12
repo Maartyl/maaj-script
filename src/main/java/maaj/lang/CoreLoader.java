@@ -270,7 +270,7 @@ public class CoreLoader extends Namespace.Loader {
         "returns first arg without evaluating it; "
         + "recursively looking for unquote, evaluating those "
         + "and returning them in their original place in the structure",
-        (c, a) -> a.isNil() ? H.NIL : a.first().unquoteTraverse(c));
+        (c, a) -> a.isNil() ? H.NIL : H.seqFrom(a.first().unquoteTraverse(c)).firstOrNil());
 
     def(macro, "expand", "expand macro without evaluating it", (c, a) -> a.firstOrNil().evalMacros(c));
   }

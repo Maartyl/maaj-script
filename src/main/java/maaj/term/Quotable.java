@@ -23,6 +23,7 @@ public interface Quotable {
    * returned value is a monad that should contain exactly 1 element : the transformed structure
    * - potentially could return more: that is wrong
    * - or none: that is also wrong...
+   * It is read in quote application using: .seq().firstOrDefault()
    * <p>
    * @param c context to eval unquote terms in
    * @return Seqable monad with result ; represents ~concat.map : original quoted data or evaluated unquoted

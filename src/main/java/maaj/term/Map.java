@@ -67,7 +67,7 @@ public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
       Term v = H.seqFrom(p.getValue().unquoteTraverse(c)).firstOrNil();
       m.doAssoc(k, v);
     }
-    return m.asPersistent();
+    return H.tuple(m.asPersistent());
   }
 
 
