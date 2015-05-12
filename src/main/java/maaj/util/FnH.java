@@ -62,4 +62,8 @@ public class FnH {
   public static <T, U, V> Invocable2 liftTypeWrapping2(BiFunction<T, U, V> fn) {
     return (t, u) -> H.wrap(fn.apply((T) t, (U) u));
   }
+
+  public static <T> T id(T t) {
+    return t;
+  }
 }

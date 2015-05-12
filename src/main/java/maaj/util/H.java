@@ -19,6 +19,7 @@ import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
 import maaj.coll.traits.Functor;
 import maaj.coll.traits.Indexed;
+import maaj.coll.traits.Numerable;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.Seqable;
 import maaj.coll.wrap.VecPWrap;
@@ -292,6 +293,16 @@ public class H {
   public static Seq cons(Term head, Seq tail) {
     return SeqH.cons(head, tail);
   }
+  /**
+   *
+   * @param first
+   * @param second
+   * @param tail
+   * @return cons(first, cons(second, tail))
+   */
+  public static Seq cons(Term first, Term second, Seq tail) {
+    return cons(first, cons(second, tail));
+  }
 //  public static Seq sexp(Term head, Seq tail) {
 //    return SeqH.sexp(head, tail);
 //  }
@@ -396,6 +407,14 @@ public class H {
       return (Num) t;
 
     throw new IllegalArgumentException("Requires Num, got: " + t.getClass().getName());
+  }
+
+  public static Numerable requireNumerable(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Numerable)
+      return (Numerable) t;
+
+    throw new IllegalArgumentException("Requires Numerable, got: " + t.getClass().getName());
   }
 
   public static Collection requireCollection(Term tt) {

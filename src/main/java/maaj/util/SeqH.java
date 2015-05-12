@@ -60,7 +60,7 @@ public class SeqH {
    */
   public static Seq mapSexp(Seq coll, Invocable mapper) {
     if (coll.isNil()) return H.END;
-    return sexp(mapper.invoke(coll.first()), mapSexp(coll.rest(), mapper));
+    return sexp(coll.first().transform(mapper), mapSexp(coll.rest(), mapper));
   }
 
   //--lazy variants
@@ -97,7 +97,28 @@ public class SeqH {
 
   private static Seq mapLazyInner(Seq coll, Invocable mapper) {
     if (coll.isNil()) return H.END;
-    return H.lazy(mapper.invoke(coll.first()), () -> mapLazyInner(coll.rest(), mapper));
+    return H.lazy(coll.first().transform(mapper), () -> mapLazyInner(coll.rest(), mapper));
+  }
+
+  /**
+   * like mapLazy, but alternates between 2 functions
+   * <p>
+   * @param coll [a, b, c, d, e]
+   * @param m1   :: Term -> Term
+   * @param m2   :: Term -> Term
+   * @return [m1 a, m2 b, m1 c, m2 d, m1 e]
+   */
+  public static Seq mapAlternate(Seq coll, Invocable m1, Invocable m2) {
+    return H.lazy(() -> mapAlternateInner(coll, m1, m2));
+  }
+
+  public static Seq mapAlternate(Seq coll, Invocable1 m1, Invocable1 m2) {
+    return mapAlternate(coll, (Invocable) m1, (Invocable) m2);
+  }
+
+  private static Seq mapAlternateInner(Seq coll, Invocable m1, Invocable m2) {
+    if (coll.isNil()) return H.END;
+    return H.lazy(coll.first().transform(m1), () -> mapAlternateInner(coll.rest(), m2, m1));
   }
 
   public static Seq zip(Invocable with, Seq l, Seq r) {

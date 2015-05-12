@@ -162,6 +162,30 @@ public class CoreLoader extends Namespace.Loader {
     }
   }
 
+  /**
+   * like Java switch: evaluates expression once and then matches it with options
+   * _ is equal to default, but need not to be last ... everything afterwards is ignored, though
+   * (case (eval-exp) 1 body1 2 body2 45 body3)
+   * is defined in terms of cond and .equals
+   * - no matching: returns nil
+   * (case exp t1 b1 t2 b2) -> (let [g## exp] (cond (= g t1) b1 (= g t2) b2))
+   */
+  private Term caseMacro(Seq a) {
+    switch (a.boundLength(3)) {
+    case 0: throw new IllegalArgumentException("case: requires expression to match on");
+    case 1: return H.NIL; //no match cases
+    case 2: throw new IllegalArgumentException("case: match case withou body");
+    //(cond exp match body) -> (if (=# match exp) body)
+    case 3: return H.list(Sym.ifSymC, H.list(Sym.equalSymCCore, a.rest().first(), a.first()), a.rest().rest().first());
+    default:
+      Symbol gensym = H.uniqueSymbol("exp");
+      Term exp = a.first();
+      Seq matchList = SeqH.mapAlternate(a.rest(), x -> Sym.ignoreSym.equals(x) ? Sym.elseSymK :
+                                                       H.list(Sym.equalSymCCore, x, gensym), FnH::id);
+      return H.list(Sym.letSymC, H.tuple(gensym, exp), H.cons(Sym.condSymCore, matchList));
+    }
+  }
+
   private Context letEvalBindings(Context cxt, Vec v) {
     if (v.getCountAsInteger() % 2 != 0)
       throw new InvalidOperationException("#/let: binding requires even number of terms");
@@ -262,29 +286,22 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "cond", "Takes pairs of - test body; evaluates only body after first successful test", this::condMacro);
 
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
-
-    defn(core, Sym.firstSym, "first of seq (head)", a -> {
-      arityRequire(1, a, "first");
-      return (H.seqFrom(a.first())).firstOrNil();
-    });
-    defn(core, Sym.restSym, "rest of seq (tail)", a -> {
-      arityRequire(1, a, "rest");
-      return (H.seqFrom(a.first())).restOrNil();
-    });
+    defn(core, Sym.firstSym, "first of seq (head)", a -> H.seqFrom(arityRequire(1, a, "first").first()).firstOrNil());
+    defn(core, Sym.restSym, "rest of seq (tail)", a -> H.seqFrom(arityRequire(1, a, "rest").first()).restOrNil());
     defmacro(core, "car", "first of seq (head)", a -> H.cons(Sym.firstSym, a));
     defmacro(core, "cdr", "rest of seq (tail)", a -> H.cons(Sym.restSym, a));
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
+    defn(core, "seq", "seq from collection", a -> H.seqFrom(arityRequire(1, a, "seq").first()));
+    defn(core, "count", "number of elements in collection; possibly O(N)", a
+         -> H.requireNumerable(arityRequire(1, a, "count")).count());
 
     defn(core, "cons", "prepends to list; O(1)", a -> {
       arityRequire(2, a, "cons");
-      return H.cons(a.first(), H.requireSeqable(a.rest().first()).seq());
+      return H.cons(a.first(), H.seqFrom(a.rest().first()));
     });
 
-//    defn(core, "not", "(if % () 't)", a -> {
-//      arityRequire(1, a, "not");
-//      return  (a.first().isNil()) ? Sym.t
-//    });
+    defn(core, "not", "(if % () 't)", a -> arityRequire(1, a, "not").first().isNil() ? Sym.TRUE : H.NIL);
 
     defn(core, "reduce", "get meta data of term", a -> {
       arityRequire(3, a, "reduce");
@@ -294,7 +311,7 @@ public class CoreLoader extends Namespace.Loader {
       return coll.reduce(start, fn);
     });
 
-    defn(core, "=#", "equals?", a -> {
+    defn(core, Sym.equalSymCCore, "equals?", a -> {
       arityRequire(2, a, "=#");
       return H.wrap(a.first().equals(a.rest().first()));
     });
@@ -312,7 +329,7 @@ public class CoreLoader extends Namespace.Loader {
 
     defn(core, "<", "Num; is first arg less then second?", (Num.NumPred) (Num::lt));
     defn(core, ">", "Num; is first arg greater then second?", (Num.NumPred) (Num::gt));
-    defn(core, "==", "Num; is first arg greater then second?", (Num.NumPred) (Num::eq));
+    defn(core, "==", "Num; is first arg equal to second?", (Num.NumPred) (Num::eq));
     defn(core, "<=", "Num; is first arg less then or equal to second?", (Num.NumPred) (Num::lteq));
     defn(core, ">=", "Num; is first arg greater then or equal to second?", (Num.NumPred) (Num::gteq));
 
@@ -327,7 +344,7 @@ public class CoreLoader extends Namespace.Loader {
    * this does not define macros; but namespace for working with macros
    */
   private void loadMacro(Namespace macro) {
-    def(macro, Sym.quoteSymC.getNm(), "returns first arg without evaluating it", (c, a) -> a.isNil() ? H.NIL : a.first());
+    def(macro, Sym.quoteSymC.getNm(), "returns first arg without evaluating it", (c, a) -> a.firstOrNil());
     def(macro, Sym.quoteQualifiedSymC.getNm(), //getNm : they are qualified
         "returns first arg without evaluating it; "
         + "recursively looking for unquote, evaluating those "

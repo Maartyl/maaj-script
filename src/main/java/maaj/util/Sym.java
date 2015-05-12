@@ -20,12 +20,14 @@ public class Sym {
   public static final Symbol derefSymCore = H.symbol("#core", "deref");
   public static final Symbol tagSymK = H.symbol(":tag");
   public static final Symbol numSymK = H.symbol(":num");
+  public static final Symbol elseSymK = H.symbol(":else");
   public static final Symbol nameSym = H.symbol("name");
   public static final Symbol varSym = H.symbol("var");
   public static final Symbol patternSym = H.symbol("pattern");
   public static final Symbol doSymC = H.symbol("#", "do");
   public static final Symbol ifSymC = H.symbol("#", "if");
   public static final Symbol condSymCore = H.symbol("#core", "cond");
+  public static final Symbol equalSymCCore = H.symbol("#core", "=#");
   public static final Symbol letSymC = H.symbol("#", "let");
   public static final Symbol defSymC = H.symbol("#", "def");
   public static final Symbol docSymK = H.symbol(":doc");
@@ -39,6 +41,7 @@ public class Sym {
   public static final Symbol unquoteSplicingSymC = H.symbol("#macro", "unquote-splicing");
   public static final Symbol quoteQualifiedSymC = H.symbol("#macro", "quote-qualified");
   public static final Symbol argsSym = H.symbol("$args");
+  public static final Symbol aritySym = H.symbol("$arity");
   public static final Symbol macroseqSymC = H.symbol("#", "macroseq");
   public static final Symbol fnseqSymC = H.symbol("#", "fnseq");
   public static final Symbol fnSymC = H.symbol("#", "fn");
