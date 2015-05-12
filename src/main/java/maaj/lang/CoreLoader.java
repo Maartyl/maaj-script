@@ -61,9 +61,9 @@ public class CoreLoader extends Namespace.Loader {
     def(core, "if", "", (c, a) -> {
       int len = a.boundLength(3);
       if (len == 2)
-        return a.first().isNil() ? H.NIL : a.rest().first().eval(c);
+        return a.first().eval(c).isNil() ? H.NIL : a.rest().first().eval(c);
       if (len == 3)
-        return !a.first().isNil() ? a.rest().first().eval(c) : a.rest().rest().first().eval(c);
+        return !a.first().eval(c).isNil() ? a.rest().first().eval(c) : a.rest().rest().first().eval(c);
       throw new InvalidOperationException("Wrong number of args passed to #/if: " + a.boundLength(30));
     });
     def(core, "def", "(def ^{meta here} name term); meta of symbol becomes meta of var", (c, a) -> {
@@ -94,7 +94,7 @@ public class CoreLoader extends Namespace.Loader {
         throw new InvalidOperationException("#/let: requires bindings");
       if (!(a.first().getContent() instanceof Vec))
         throw new InvalidOperationException("#/let: bindings must be a vector");
-      return H.cons(Sym.doSymC, a.rest()).eval(letReduceBindings(c, (Vec) a.first()));
+      return H.cons(Sym.doSymC, a.rest()).eval(letEvalBindings(c, (Vec) a.first()));
     });
     def(core, "fnseq", "(fnseq body body $args body)", (c, a) -> FnSeq.of(a, c));
     def(core, "macroseq", "(macroseq body body $args body)", (c, a) -> MacroSeq.of(a, c));
@@ -118,7 +118,18 @@ public class CoreLoader extends Namespace.Loader {
     return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
   }
 
-  private Context letReduceBindings(Context cxt, Vec v) {
+  private Term argsBindMacroSimple(Seq a, Symbol fnType) {
+    if (a.isNil())
+      throw new InvalidOperationException("Cannot bind args withut binding form");
+    Term ptrn = a.first();
+    Seq body = a.rest();
+    if (body.isNil())
+      return H.list(fnType); // nothing would use the pattern anyway...
+    Term pb = patternBinder(ptrn).addMeta(H.map(Sym.patternSym, ptrn));
+    return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
+  }
+
+  private Context letEvalBindings(Context cxt, Vec v) {
     if (v.getCountAsInteger() % 2 != 0)
       throw new InvalidOperationException("#/let: binding requires even number of terms");
     
