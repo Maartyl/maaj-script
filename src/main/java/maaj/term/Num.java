@@ -133,7 +133,7 @@ public interface Num extends Ground {
     @Override
     public default Term invokeSeq(Seq args) {
       if (args.boundLength(2) != 2)
-        throw new IllegalArgumentException("core arithmetic operator: requires 2 args; got: " + args.boundLength(30));
+        throw new IllegalArgumentException("core arithmetic predicate: requires 2 args; got: " + args.boundLength(30));
       return H.wrap(op(H.requireNum(args.first()), H.requireNum(args.rest().first())));
     }
 
