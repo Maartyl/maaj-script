@@ -31,6 +31,8 @@ public final class LazySeq implements Seq {
    * @param seqBuilder :: () -> Seq
    */
   public LazySeq(Invocable seqBuilder) {
+    if (seqBuilder == null)
+      throw new IllegalArgumentException("seqBuilder cannot be null");
     this.fn = seqBuilder;
   }
 
