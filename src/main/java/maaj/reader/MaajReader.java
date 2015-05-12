@@ -97,7 +97,7 @@ public class MaajReader {
     case '\\': return readEscape();
     case '`': return H.list(Sym.quoteQualifiedSymC, read0SkipWhitespace());
     case '\'': return H.list(Sym.quoteSymC, read0SkipWhitespace());
-    case '@': return H.list(Sym.derefSymC, read0SkipWhitespace());
+    case '@': return H.list(Sym.derefSymCore, read0SkipWhitespace());
     case ')': return fail("unmatched: )");
     case ']': return fail("unmatched: ]");
     case '}': return fail("unmatched: }");

@@ -136,10 +136,28 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   *
+   * multiple conditional divergences of path : like if with multiple tests
+   * evaluates first body after successful test; not evaluating anything after that
+   * - throw exception if not even number of arguments
+   * i.e. (cond test1 body1 test2 body2 test3 body3)
+   * (cond) returns nil
+   * impl:
+   * (cond test body ^rest^) -> (if test body (cond ^rest^))
+   * <p>
+   * --
+   * this could be defined in the language; sure : but I need it for arity dispatch
+   * and don't want to do it without it
    */
   private Term condMacro(Seq a) {
-
+    switch (a.boundLength(2)) {
+    case 0: return H.END; //also nil; but can be seq
+    case 1: throw new IllegalArgumentException("cond: odd number of terms //: " + a.first().print());
+    default:
+      Term test = a.first();
+      Term body = a.rest().first();
+      Seq rest = a.rest().rest();
+      return H.list(Sym.ifSymC, test, body, H.cons(Sym.condSymCore, rest));
+    }
   }
 
   private Context letEvalBindings(Context cxt, Vec v) {
