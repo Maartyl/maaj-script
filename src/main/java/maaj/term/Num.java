@@ -156,7 +156,7 @@ public interface Num extends Ground {
       //infinite recursion
       throw new InvalidOperationException("applying Num to a Num");
     }
-    return args.first().apply(cxt, H.cons(this, args.rest()));
+    return args.firstOrNil().apply(cxt, H.cons(this, args.restOrNil()));
   }
 
 }
