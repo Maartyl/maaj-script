@@ -167,7 +167,7 @@ public class CoreLoader extends Namespace.Loader {
       throw new InvalidOperationException("#/let: binding requires even number of terms");
     
     for (Seq s = v.seq(); !s.isNil(); s = s.rest().rest()) {
-      Invocable ptrn = patternBinder(s.first().unwrap()); //create patternBinder from first in pair
+      Invocable ptrn = patternBinder(s.first()); //create patternBinder from first in pair
       Term r = s.rest().first().eval(cxt); //evaluate second
       cxt = cxt.addToScope(applyPatternBinder(ptrn, r)); //pattern bind result; add to scope
     }
