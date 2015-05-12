@@ -7,6 +7,7 @@ package maaj.util;
 
 import maaj.term.Map;
 import maaj.term.Symbol;
+import maaj.term.Term;
 
 /**
  *
@@ -44,6 +45,7 @@ public class Sym {
   public static final Symbol macroSymC = H.symbol("#", "macro");
 
   public static final Map macroMapTag = H.map(macroSymK, macroSymK);
+  public static final Term TRUE = Symbol.of("t");
 
 
 }

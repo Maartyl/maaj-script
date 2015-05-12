@@ -272,7 +272,7 @@ public class CoreLoader extends Namespace.Loader {
       return (H.seqFrom(a.first())).restOrNil();
     });
     defmacro(core, "car", "first of seq (head)", a -> H.cons(Sym.firstSym, a));
-    defmacro(core, "cdr", "rest of seq (head)", a -> H.cons(Sym.restSym, a));
+    defmacro(core, "cdr", "rest of seq (tail)", a -> H.cons(Sym.restSym, a));
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
 
@@ -281,7 +281,10 @@ public class CoreLoader extends Namespace.Loader {
       return H.cons(a.first(), H.requireSeqable(a.rest().first()).seq());
     });
 
-    //H.eval("(defn not )", cxt, rcxt);
+//    defn(core, "not", "(if % () 't)", a -> {
+//      arityRequire(1, a, "not");
+//      return  (a.first().isNil()) ? Sym.t
+//    });
 
     defn(core, "reduce", "get meta data of term", a -> {
       arityRequire(3, a, "reduce");

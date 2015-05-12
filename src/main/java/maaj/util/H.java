@@ -39,7 +39,6 @@ public class H {
 
   public static final Nil NIL = Nil.NIL;
   public static final NilSeq END = NilSeq.END;
-  public static final Term TRUE = Symbol.of("t");
   /**
    * this value is to never be actually stored as anything valid.
    * Possibly returned from lookups to signal that given key was not found.
@@ -94,7 +93,7 @@ public class H {
     return Char.of(o);
   }
   public static Term wrap(boolean o) {
-    return o ? TRUE : NIL;
+    return o ? Sym.TRUE : NIL;
   }
   public static Term wrap(String o) {
     return wrapNonNull(o, Str::of);
