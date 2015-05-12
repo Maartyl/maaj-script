@@ -52,14 +52,20 @@ public class Repl {
       Reader r = new InputStreamReader(System.in);
       Writer w = new OutputStreamWriter(System.out);
       run(r, w);
+      throw new EndT();
     } catch (IOException e) {
       System.err.println(e);
     } catch (ReaderException e) {
       System.err.println(e);
+    } catch (EndT e) {
+      break;
     }
   }
 
   public static void main(String[] args) {
     new Repl().runStd();
+  }
+
+  private static class EndT extends Throwable {
   }
 }
