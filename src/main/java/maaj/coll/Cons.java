@@ -38,7 +38,7 @@ public class Cons implements Seq {
   @Override
   public Int count() {
     //Cons shouldn't be used for long structures
-    //if used for long structures: count is known to be O(1) to get computed
+    //if used for long structures: count is known to be O(n) to get computed
     //tail can know it's count, that could help
 
     //this might run ~infinitely! long instead of causing StackOverflow
