@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.Writer;
 import maaj.coll.traits.Functor;
 import maaj.coll.traits.MapLike;
+import maaj.lang.Context;
+import maaj.util.H;
 import maaj.util.MapH;
 import maaj.util.SeqH;
 
@@ -48,6 +50,26 @@ public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
   public default Seq seq() {
     return SeqH.iterable2seq(this);
   }
+
+  /**
+   * Cannot unquote-splicing map : just map over all keys and values separately
+   * return in Tuple1
+   * uses [? .seq() ?].firstOrNil() on recursive unquoteTraverse
+   * <p>
+   * @param c
+   * @return
+   */
+  @Override
+  public default Collection unquoteTraverse(Context c) {
+    MapT m = MapH.emptyTransient();
+    for (KVPair p : this) {
+      Term k = H.seqFrom(p.getKey().unquoteTraverse(c)).firstOrNil();
+      Term v = H.seqFrom(p.getValue().unquoteTraverse(c)).firstOrNil();
+      m.doAssoc(k, v);
+    }
+    return m.asPersistent();
+  }
+
 
   @Override
   public default void show(Writer w) throws IOException {
