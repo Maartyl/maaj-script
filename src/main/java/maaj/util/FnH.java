@@ -35,8 +35,31 @@ public class FnH {
     return ((Invocable) fn).invoke(arg);
   }
 
+  /**
+   * unsafe, only use when I KNOW the return value is safe to use.
+   * <p>
+   * @param <T>
+   * @param <U>
+   * @param <V>
+   * @param fn
+   * @return casted result of fn
+   */
   @SuppressWarnings("unchecked")
   public static <T, U, V> Invocable2 liftTypeUncheched2(BiFunction<T, U, V> fn) {
+    return (t, u) -> (Term) (fn.apply((T) t, (U) u));
+  }
+
+  /**
+   * Promotes function of 2 args of any type into Invocable
+   * checks and wraps return type
+   * @param <T>
+   * @param <U>
+   * @param <V>
+   * @param fn
+   * @return wrapped (if needed) result of fn
+   */
+  @SuppressWarnings("unchecked")
+  public static <T, U, V> Invocable2 liftTypeWrapping2(BiFunction<T, U, V> fn) {
     return (t, u) -> H.wrap(fn.apply((T) t, (U) u));
   }
 }
