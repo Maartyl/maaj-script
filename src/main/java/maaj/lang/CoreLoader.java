@@ -118,6 +118,12 @@ public class CoreLoader extends Namespace.Loader {
     return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
   }
 
+  /**
+   * fn and macro core transformations:
+   * (fn binding body1 body2) -> (fnseq (let [binding $args] body1 body2))
+   * //macro only creates macroseq
+   * binding gets 'compiled' using @patternBinder
+   */
   private Term argsBindMacroSimple(Seq a, Symbol fnType) {
     if (a.isNil())
       throw new InvalidOperationException("Cannot bind args withut binding form");
@@ -127,6 +133,13 @@ public class CoreLoader extends Namespace.Loader {
       return H.list(fnType); // nothing would use the pattern anyway...
     Term pb = patternBinder(ptrn).addMeta(H.map(Sym.patternSym, ptrn));
     return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
+  }
+
+  /**
+   *
+   */
+  private Term condMacro(Seq a) {
+
   }
 
   private Context letEvalBindings(Context cxt, Vec v) {
