@@ -183,6 +183,10 @@ public class CoreLoader extends Namespace.Loader {
     }
   }
 
+  /**
+   * gets vector of binding from let;
+   * modifies context to include bound evaluated expressions
+   */
   private Context letEvalBindings(Context cxt, Vec v) {
     if (v.getCountAsInteger() % 2 != 0)
       throw new InvalidOperationException("#/let: binding requires even number of terms");
@@ -338,8 +342,8 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "<=", "Num; is first arg less then or equal to second?", (Num.NumPred) (Num::lteq));
     defn(core, ">=", "Num; is first arg greater then or equal to second?", (Num.NumPred) (Num::gteq));
 
-    H.eval("(def + (fnseq (reduce +# 0 $args)))", cxt, rcxt);
-    H.eval("(def * (fnseq (reduce *# 1 $args)))", cxt, rcxt);
+    H.eval("(defn + [] (reduce +# 0 $args))", cxt, rcxt);
+    H.eval("(defn * [] (reduce *# 1 $args))", cxt, rcxt);
     //H.eval("(def min (fnseq (reduce min# 1 $args)))", cxt, rcxt);
     //H.eval("(def max (fnseq (reduce max# 1 $args)))", cxt, rcxt);
 
