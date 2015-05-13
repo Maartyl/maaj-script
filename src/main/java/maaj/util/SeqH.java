@@ -95,6 +95,11 @@ public class SeqH {
     return H.lazy(() -> mapLazyInner(coll, mapper));
   }
 
+  public static Seq mapLazy(Seq coll, Invocable1 mapper) {
+    return mapLazy(coll, (Invocable) mapper);
+  }
+
+
   private static Seq mapLazyInner(Seq coll, Invocable mapper) {
     if (coll.isNil()) return H.END;
     return H.lazy(coll.first().transform(mapper), () -> mapLazyInner(coll.rest(), mapper));
@@ -121,16 +126,76 @@ public class SeqH {
     return H.lazy(coll.first().transform(m1), () -> mapAlternateInner(coll.rest(), m2, m1));
   }
 
+  /**
+   * like map, but traverses 2 seqs at once. with takes 2 args : one from each
+   * <p>
+   * @param with :: a -> b -> c :: Invocable2
+   * @param l    :: [a]
+   * @param r    :: [b]
+   * @return :: [c]
+   */
   public static Seq zip(Invocable with, Seq l, Seq r) {
     if (l.isNil() || r.isNil())
       return H.END;
     return H.lazy(with.invoke(l.first(), r.first()), () -> zip(with, l.rest(), r.rest()));
   }
 
+  /**
+   * like map, but traverses 3 seqs at once. with takes 3 args : one from each
+   * <p>
+   * @param with :: a -> b -> c -> d :: Invocable3
+   * @param l    :: [a]
+   * @param m    :: [b]
+   * @param r    :: [c]
+   * @return :: [d]
+   */
   public static Seq zip(Invocable with, Seq l, Seq m, Seq r) {
     if (l.isNil() || m.isNil() || r.isNil())
       return H.END;
     return H.lazy(with.invoke(l.first(), m.first(), r.first()), () -> zip(with, l.rest(), m.rest(), r.rest()));
+  }
+
+  /**
+   * like zip, but if right seq ends first, will be extended with Nils to match legth of left
+   */
+  public static Seq zipl(Invocable with, Seq l, Seq r) {
+    if (l.isNil()) return H.END;
+    if (r.isNil()) return mapLazy(l, x -> with.invoke(x, H.NIL));
+    return H.lazy(with.invoke(l.first(), r.first()), () -> zipl(with, l.rest(), r.rest()));
+  }
+
+  /**
+   * like zip, but if left seq ends first, will be extended with Nils to match legth of right
+   */
+  public static Seq zipr(Invocable with, Seq l, Seq r) {
+    if (r.isNil()) return H.END;
+    if (l.isNil()) return mapLazy(l, x -> with.invoke(H.NIL, x));
+    return H.lazy(with.invoke(l.first(), r.first()), () -> zipr(with, l.rest(), r.rest()));
+  }
+
+  /**
+   * takes seq and appends it's last element.
+   * Last element must be a seq.
+   * - not checked until needed
+   * [] -> []
+   * [a] -> a
+   * [a,b] -> a : b
+   * [a,b,c] -> a : b : c
+   * [a,b,[1,2,3]] -> [a,b,1,2,3]
+   * //obviously wouldn't work in a type safe sequence
+   * //not lazy in head of s
+   * <p>
+   * @param s seq to extend; last element must be a seq
+   * @return s.withoutLast().append(s.last()) //implementation is different
+   */
+  public static Seq extend(Seq s) {
+    if (s.isNil()) return s;
+    return extendInner(s.first(), s.rest());
+  }
+
+  private static Seq extendInner(Term last, Seq s) {
+    if (s.isNil()) return H.seqFrom(last);
+    return H.lazy(last, () -> extendInner(s.first(), s.rest()));
   }
 
   public static Seq take(int n, Seq s) {
