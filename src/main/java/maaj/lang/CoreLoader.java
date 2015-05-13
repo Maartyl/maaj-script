@@ -31,7 +31,8 @@ import maaj.util.SeqH;
 import maaj.util.Sym;
 
 /**
- *
+ * loader that does not use file, instead: loads core special forms, macros and functions
+ * <p>
  * @author maartyl
  */
 public class CoreLoader extends Namespace.Loader {
@@ -56,6 +57,9 @@ public class CoreLoader extends Namespace.Loader {
   }
   /**
    * special forms
+   * called as very first
+   * cannot depend on anything else
+   * Context doesn't work yet
    */
   private void loadSf(Namespace core) {
     def(core, "if", "", (c, a) -> {
@@ -89,7 +93,7 @@ public class CoreLoader extends Namespace.Loader {
       }
       return a.first().eval(c);
     });
-    def(core, "let", "(let [v exp] (... v ... v ...)); ", (c, a) -> {
+    def(core, "let", "(let [v exp v2 exp3] ( ... v2 )(... v ... v ...))", (c, a) -> {
       if (a.isNil())
         throw new InvalidOperationException("#/let: requires bindings");
       if (!(a.first().getContent() instanceof Vec))
@@ -108,14 +112,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private Term argsBindMacro(Seq a, Symbol fnType) {
-    if (a.isNil())
-      throw new InvalidOperationException("Cannot bind args withut binding form");
-    Term ptrn = a.first();
-    Seq body = a.rest();
-    if (body.isNil())
-      return H.list(fnType); // nothing would use the pattern anyway...
-    Term pb = patternBinder(ptrn).addMeta(H.map(Sym.patternSym, ptrn));
-    return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
+    return argsBindMacroSimple(a, fnType);
   }
 
   /**
@@ -166,7 +163,7 @@ public class CoreLoader extends Namespace.Loader {
    * like Java switch: evaluates expression once and then matches it with options
    * _ is equal to default, but need not to be last ... everything afterwards is ignored, though
    * (case (eval-exp) 1 body1 2 body2 45 body3)
-   * is defined in terms of cond and .equals
+   * is defined in terms of cond and .equals()
    * - no matching: returns nil
    * (case exp t1 b1 t2 b2) -> (let [g## exp] (cond (= g t1) b1 (= g t2) b2))
    */
@@ -199,7 +196,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * throws on on any problem; only returns if nu is valid Symbol
+   * throws on any problem; only returns if nu is valid Symbol
    * returns if ((Sym)nu).isQualified
    */
   private boolean defCheckAndRetIfQualified(Term nu, Symbol curNs) {
@@ -221,6 +218,7 @@ public class CoreLoader extends Namespace.Loader {
    * produces function that takes 1 arg.
    * it destructures the argument into subparts that are named in term by structure in term
    * returns map from these names to subvalues of arg
+   * i.e.: (let [[a [ba bb] c & rest] (some-expression-generating-seq)] (i-can-use a ba etc.-in-here))
    */
   private Invocable patternBinder(Term t) {
     // I only have limited breaker for now : vector : firss and rest of seq
@@ -229,18 +227,19 @@ public class CoreLoader extends Namespace.Loader {
     if (tptrn instanceof Symbol) { //fast path
       Symbol s = (Symbol) tptrn;
       if (!s.isSimple())
-        throw new IllegalArgumentException("Cannot create pattern binder from qualified symbol: " + s);
+        throw new IllegalArgumentException("Cannot create pattern binder from qualified symbol or keyword: " + s);
       if (s.equals(Sym.ignoreSym))
         return (Invocable1) x -> MapH.emptyPersistent();
       return (Invocable1) x -> H.map(s, x);
     }
     if (tptrn instanceof Vec) {
       /*
+       works with seqables
        how it works:
-       I recursively map ptrnBinder over the vector aof patterns I get
+       I recursively map ptrnBinder over the vector of patterns I get
        then, with vector of functions: I zip it with args, applying it -> seq of maps
        I then join these maps (MapH.update)
-       - if next to last is '&
+       - if next to last is '& : the last binder after that binds the rest of seq in arg
        -- I make the vector 2 shorter, do the same on it as before
        -- I get the last thing and append the map as last,
        --- invoking it's binder on (drop <v2 captured cnt> args)
@@ -250,8 +249,8 @@ public class CoreLoader extends Namespace.Loader {
         if (v.nth(v.cnt() - 2).equals(Sym.ampSym)) {
           //has rest capture:
           Vec v2 = v.pop().pop();
-          int size = v2.cnt() - 1; //I essentially want index
-          Vec vptrn = v2.fmap((Invocable1) this::patternBinder);
+          int size = v2.cnt() - 1; //I essentially want last index
+          Vec vptrn = v2.fmap((Invocable1) this::patternBinder); //recursively, eagerly create pattern binders
           Invocable restPtrn = patternBinder(v.peek());
           return (Invocable1) a
                   -> MapH.update(applyVectorPatternBinder(a, vptrn),
@@ -268,6 +267,11 @@ public class CoreLoader extends Namespace.Loader {
     throw new IllegalArgumentException("Cannot create pattern binder from: " + tptrn.getType().getName() + " : " + tptrn.print());
   }
 
+  /**
+   * zips vector pattern with args seq using function: invoke first on second
+   * - producing seq of maps
+   * then reduces the entire thing into 1 map of resulting (symbol -> "matched")
+   */
   private Map applyVectorPatternBinder(Term term, Vec ptrn) {
     return (Map) SeqH.zip(FnH.invoke1(), ptrn.seq(), H.seqFrom(term))
             .reduce(MapH.emptyPersistent(), FnH.<Map, Map, Map>liftTypeUncheched2(MapH::update));
@@ -318,9 +322,9 @@ public class CoreLoader extends Namespace.Loader {
     });
 
     defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
-    defn(core, "-#", "subtracts 2 args", (Num.Num2Op) Num::sub);
+    defn(core, "-#", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
     defn(core, "*#", "multiplies 2 args", (Num.Num2Op) Num::mul);
-    defn(core, "div#", "divides 2 args", (Num.Num2Op) Num::div);
+    defn(core, "div#", "divides arg1 by arg0", (Num.Num2Op) Num::div);
     defn(core, "min#", "(if (< l r) l r)", (Num.Num2Op) Num::min);
     defn(core, "max#", "(if (> l r) l r)", (Num.Num2Op) Num::max);
 
@@ -346,7 +350,7 @@ public class CoreLoader extends Namespace.Loader {
    */
   private void loadMacro(Namespace macro) {
     def(macro, Sym.quoteSymC.getNm(), "returns first arg without evaluating it", (c, a) -> a.firstOrNil());
-    def(macro, Sym.quoteQualifiedSymC.getNm(), //getNm : they are qualified
+    def(macro, Sym.quoteQualifiedSymC.getNm(), //getNm : names are qualified
         "returns first arg without evaluating it; "
         + "recursively looking for unquote, evaluating those "
         + "and returning them in their original place in the structure",
