@@ -77,6 +77,11 @@ public class Tuple1 implements Vec {
   }
 
   @Override
+  public Vec fmap(Invocable mapper) {
+    return H.tuple(t0.transform(mapper));
+  }
+
+  @Override
   public VecT asTransient() {
     return VecH.emptyTransient().doConj(t0);
   }

@@ -6,7 +6,6 @@
 package maaj.coll;
 
 import maaj.coll.traits.VecLike;
-import maaj.coll.wrap.VecTWrap;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
@@ -72,6 +71,11 @@ public class Tuple0 implements Vec {
   @Override
   public Term reduce(Term start, Invocable reducer) {
     return start;
+  }
+
+  @Override
+  public Vec fmap(Invocable mapper) {
+    return H.tuple();
   }
 
   @Override

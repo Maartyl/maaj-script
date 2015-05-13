@@ -9,6 +9,7 @@ import maaj.coll.traits.VecLike;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
+import maaj.term.Invocable;
 import maaj.term.Seq;
 import maaj.term.Term;
 import maaj.term.Vec;
@@ -79,15 +80,22 @@ public class Tuple3 implements Vec {
   }
 
   @Override
+  public Vec fmap(Invocable mapper) {
+    return H.tuple(t0.transform(mapper), t1.transform(mapper), t2.transform(mapper));
+  }
+
+  @Override
   public VecT asTransient() {
     return VecH.emptyTransient().doConj(t0).doConj(t1).doConj(t2);
   }
 
   @Override
   public boolean equals(Object obj) {
-    //TODO: if wrapper? (meta)
-    if ((obj instanceof VecLike)) {
-      VecLike other = (VecLike) obj;
+    if (!(obj instanceof Term))
+      return false;
+    Term o = ((Term) obj).unwrap();
+    if ((o instanceof VecLike)) {
+      VecLike other = (VecLike) o;
       return getCountAsInteger() == other.getCountAsInteger()
              && t0.equals(other.nth(0))
              && t1.equals(other.nth(1))

@@ -10,6 +10,7 @@ import maaj.coll.traits.VecLike;
 import maaj.exceptions.IndexOutOfBoundsExceptionInfo;
 import maaj.util.H;
 import maaj.term.Int;
+import maaj.term.Invocable;
 import maaj.term.KVPair;
 import maaj.term.Seq;
 import maaj.term.Term;
@@ -74,6 +75,11 @@ public class Tuple2 implements Vec, KVPair {
   @Override
   public Seq seq() {
     return H.list(t0, t1);
+  }
+
+  @Override
+  public Vec fmap(Invocable mapper) {
+    return H.tuple(t0.transform(mapper), t1.transform(mapper));
   }
 
   @Override
