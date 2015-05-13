@@ -110,5 +110,10 @@ public class Tuple3 implements Vec {
     return VecH.computeHash(this);
   }
 
+  @Override
+  public String toString() {
+    return print();
+  }
+
   private static final int TUPLE_SIZE = 3;
 }
