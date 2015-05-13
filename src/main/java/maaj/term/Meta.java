@@ -71,4 +71,21 @@ public class Meta implements Mimic {
     return new Meta(val == null ? H.NIL : val, meta);
   }
 
+  @Override
+  public int hashCode() {
+    return unwrap().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return unwrap().equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return unwrap().toString();
+  }
+
+
+
 }
