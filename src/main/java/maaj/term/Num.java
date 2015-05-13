@@ -5,15 +5,17 @@
  */
 package maaj.term;
 
+import maaj.coll.traits.AssocGet;
 import maaj.coll.traits.Indexed;
-import maaj.exceptions.InvalidOperationException;
+import maaj.coll.traits.Lookup;
 import maaj.lang.Context;
 import maaj.util.Generators;
 import maaj.util.H;
 import maaj.util.SeqH;
 
 /**
- *
+ * interface representing all numbers in MaajScript
+ * <p>
  * @author maartyl
  */
 public interface Num extends Ground {
@@ -46,7 +48,7 @@ public interface Num extends Ground {
 
   Num sub(Num other);
 
-  Num minusR(Num other);
+  Num subR(Num other);
 
   Num mul(Num other);
 
@@ -154,8 +156,17 @@ public interface Num extends Ground {
   @Override
   public default Term apply(Context cxt, Seq args) {
     args = SeqH.mapEval(args, cxt);
-    if (args.firstOrNil().unwrap() instanceof Indexed) {
-      return args.firstOrNil().apply(cxt, H.cons(this, args.restOrNil()));
+    Term firstOrNil = args.firstOrNil().unwrap();
+    //apply would reevaluate arguments
+    if (firstOrNil instanceof Lookup) {
+      switch (args.boundLength(2)) {
+      case 1: return ((Lookup) firstOrNil).valAt(this);
+      case 2: return ((Lookup) firstOrNil).valAt(this, args.rest().first());
+      default:
+      }
+    }
+    if (firstOrNil instanceof Invocable) {
+      return ((Invocable) firstOrNil).invokeSeq(H.cons(this, args.restOrNil()));
     }
     switch (args.boundLength(3)) {
     case 0: return Generators.range(asInteger());
