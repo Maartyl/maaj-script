@@ -41,7 +41,12 @@ public class Unquote implements Term {
 
   @Override
   public Term evalMacros(Context c) {
-    throw new InvalidOperationException("#macro/unquote outside quotation context");
+    //possibly make variant that traverses and expands macros in unquotes...
+    //essentially: I only need some tag in context, that would be cheked in Unquote.unquoteTraverse
+    //wait... I'm already here...
+    //I could just return (unquote (expand body)) ...
+    //TODO: expand unquote ^
+    return this;
   }
 
   @Override

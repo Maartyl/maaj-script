@@ -139,11 +139,13 @@ public class Symbol implements Term {
 
   @Override
   public Term applyMacro(Context cxt, Seq args) {
-    //TODO: determine if represents macro, if so: eval().applyMacro; otherwise default impl
+    //this must be here, not in evalMacro : why?
+    //I only want to get macros if in context of application of 1
+    //if just (defn m [a] (inc 5)), m is macro : I don't wan't m to get evaluated into the #/macroseq
     Term rslt = cxt.valAt(this, this);
     //if (rslt == this) return this;
     if (MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return rslt.applyMacro(cxt, args); //only "inline" what claims to be a macro
-    // return rslt.e
+    // Term.super: sfmaps evalMacro on args
     return Term.super.applyMacro(cxt, args);
   }
 
