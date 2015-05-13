@@ -37,8 +37,12 @@ public class VecH {
   }
 
   public static int computeHash(Vec v) {
-    //TODO: compose hash for tuples: has to work the same as clj vecs
-    throw new UnsupportedOperationException("not yet");
+    //copied from : clj.krukow.APersistentVector.hashCode()
+    //shortened a little...
+    int hash = 1;
+    for (Object obj : v)
+      hash = 31 * hash + (obj == null ? 0 : obj.hashCode());
+    return hash;
   }
 
   public static Vec preferTuple(Vec v) {
@@ -55,7 +59,7 @@ public class VecH {
     return Tuple0.EMPTY_VEC;
   }
   public static VecT emptyTransient() {
-    //return emptyPersistent().asTransient(); //doesn't work: requires this
+    //return emptyPersistent().asTransient(); //doesn't work: it requires this
     return VecTWrap.ofNil(emptyPersistentClj());
   }
 
