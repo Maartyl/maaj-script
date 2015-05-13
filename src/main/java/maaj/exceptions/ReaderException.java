@@ -50,7 +50,7 @@ public class ReaderException extends UnsupportedOperationException {
   }
 
   private static String composeMessage(int row, int col, ReaderContext cxt, String msg) {
-    return "[" + row + ":" + col + "] " + msg;
+    return "[" + cxt.getFileName() + ":" + row + "," + col + "] " + msg;
   }
 
 }
