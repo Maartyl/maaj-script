@@ -15,7 +15,9 @@ import maaj.util.MapH;
 import maaj.util.SeqH;
 
 /**
- *
+ * main interface for associative map data structure used throughout Maaj
+ * - immutable
+ * <p>
  * @author maartyl
  */
 public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {

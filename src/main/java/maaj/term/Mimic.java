@@ -88,8 +88,8 @@ public interface Mimic extends Term {
   }
 
   @Override
-  public default Term applyMacros(Context cxt, Seq args) {
-    return unwrap().applyMacros(cxt, args);
+  public default Term applyMacro(Context cxt, Seq args) {
+    return unwrap().applyMacro(cxt, args);
   }
 
   @Override

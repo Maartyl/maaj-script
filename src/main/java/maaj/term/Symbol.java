@@ -118,10 +118,12 @@ public class Symbol implements Term {
   public Term evalMacros(Context c) {
     //TODO: 2 variants: only return macros; "compile" <- everything, espacially native methods
     // yes, that is needed; unless otherwise specified in context in future
-    Term rslt = c.valAt(this, this);
-    if (rslt == this) return this;
-    if (!MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return this; //only "inline" what claims to be a macro
-    return rslt.evalMacros(c);
+    // ...
+//    Term rslt = c.valAt(this, this);
+//    if (rslt == this) return this;
+//    if (!MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return this; //only "inline" what claims to be a macro
+//    return rslt.evalMacros(c);
+    return this;
   }
 
   @Override
@@ -136,9 +138,13 @@ public class Symbol implements Term {
   }
 
   @Override
-  public Term applyMacros(Context cxt, Seq args) {
-    //TODO: determine if represents macro, if so: eval().applyMacros; otherwise default impl
-    return Term.super.applyMacros(cxt, args);
+  public Term applyMacro(Context cxt, Seq args) {
+    //TODO: determine if represents macro, if so: eval().applyMacro; otherwise default impl
+    Term rslt = cxt.valAt(this, this);
+    //if (rslt == this) return this;
+    if (MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return rslt.applyMacro(cxt, args); //only "inline" what claims to be a macro
+    // return rslt.e
+    return Term.super.applyMacro(cxt, args);
   }
 
   @Override

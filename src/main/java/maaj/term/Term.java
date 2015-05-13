@@ -56,7 +56,7 @@ public interface Term extends Quotable {
    */
   Term apply(Context cxt, Seq args);
 
-  default Term applyMacros(Context cxt, Seq args) {
+  default Term applyMacro(Context cxt, Seq args) {
     //when applying to symbol: must ask if represents macro or something... - addressed in symbol.evalMacro
     //macros will reimplement
     //it's ok to call on things that cannot be applied ... probably makes little sense, but won't break anything

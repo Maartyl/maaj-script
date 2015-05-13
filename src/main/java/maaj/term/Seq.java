@@ -48,7 +48,7 @@ public interface Seq extends Monad, SeqLike {
 
   @Override
   public default Term evalMacros(Context c) {
-    return first().evalMacros(c).applyMacros(c, rest());
+    return first().evalMacros(c).applyMacro(c, rest());
   }
 
   @Override

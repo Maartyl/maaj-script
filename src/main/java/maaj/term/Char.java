@@ -66,11 +66,11 @@ public final class Char implements Num {
 
   @Override
   public Num sub(Num other) {
-    return Num.arithmetic(this, other, x -> of(value - x.asLong()), other::minusR);
+    return Num.arithmetic(this, other, x -> of(value - x.asLong()), other::subR);
   }
 
   @Override
-  public Num minusR(Num other) {
+  public Num subR(Num other) {
     return Num.arithmetic(this, other, x -> of(x.asLong() - value), other::sub);
   }
 
