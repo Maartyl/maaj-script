@@ -8,7 +8,9 @@ package maaj.lang;
 import maaj.term.Symbol;
 
 /**
- *
+ * This loader is used for creating namespaces on the fly
+ * because: every namespace must be created using some explicit loader
+ * <p>
  * @author maartyl
  */
 public class EmptyLoader extends Namespace.Loader {
