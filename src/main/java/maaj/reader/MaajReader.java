@@ -81,7 +81,10 @@ public class MaajReader {
   private Term read0Cur() {
     return read0(cur());
   }
-
+  /**
+   * read top level term (can be neseted inside others, but also can exist by itself)
+   * starts at @c@ position : can be gotten to differently based on previous content (i.e. : a(5 2) vs. (1 2) (5 2))
+   */
   private Term read0(int c) {
     switch (c) {
     case '(': return readList();
@@ -110,7 +113,9 @@ public class MaajReader {
 
     return fail("read0: " + (char) c + " /:" + c);
   }
-
+  /**
+   * called after '#' symbol : extends dispatch table
+   */
   private Term readHash() {
     int c = nextSkipWhitespace();
     switch (c) {
@@ -141,7 +146,12 @@ public class MaajReader {
 
     return fail("readHash: " + (char) cur() + " /:" + cur());
   }
-
+  /**
+   * used if readHash reads symbol, i.e.:
+   * #test ~> read0 # -> readHash test -> readHashSymbol(test)
+   * most of these variants are not decided on meaning yet
+   * if symbol is qualified, prepends '#' to namespace of it and returns
+   */
   private Term readHashSymbol(Symbol s) {
     if (s.isQualified()) {
       //core functions with namespaces
@@ -176,12 +186,17 @@ public class MaajReader {
 
     return fail("readHashSymbol: " + (char) cur() + " /:" + cur());
   }
-
+  /**
+   * used for commenting out terms: (func asd #_ not-good-but-keep good-instead ...)
+   */
   private Term readIgnoreOne() {
     read0SkipWhitespace();
     return read0SkipWhitespace();
   }
-
+  /**
+   * / is a valid symbol name: for division
+   * also used for namespace separation, so (for now) no other symbol starting with / is allowed
+   */
   private Term readSlash() {
     if (!isSymbolic(peek()))
       return H.symbol("/");
@@ -189,27 +204,37 @@ public class MaajReader {
     //clojure: just returns, never extending... unless 3... ?
     return fail("symbol cannot start with '/'");
   }
-
+  /**
+   * ^ :hello term
+   * ^ {:meta-key meta-value} term
+   */
   private Term readMeta() {
     Map meta = normalizeMeta(read0SkipWhitespace());
     return read0SkipWhitespace().addMeta(meta);
   }
-
+  /**
+   * variants of meta, that can be read; meta syntax is always a term itself
+   * if there is meta on meta, and is not map; keeps it + adds it to the entire meta map
+   */
   private Map normalizeMeta(Term m) {
     Map metaOnMeta = m.getMeta();
     Term mu = m.unwrap();
     if (mu instanceof Map)
       return MapH.update(metaOnMeta, (Map) mu);
     if (mu instanceof Keyword)
-      return MapH.update(metaOnMeta, H.map(mu, mu));
+      return MapH.update(metaOnMeta, H.map(m, m));
     if (mu instanceof Symbol || mu instanceof Str)
-      return MapH.update(metaOnMeta, H.map(Sym.tagSymK, mu));
+      return MapH.update(metaOnMeta, H.map(Sym.tagSymK, m));
     if (mu instanceof Num)
-      return MapH.update(metaOnMeta, H.map(Sym.numSymK, mu));
+      return MapH.update(metaOnMeta, H.map(Sym.numSymK, m));
 
     return fail("unexpected meta term type: " + mu.getType().getName());
   }
-
+  /**
+   * either returns next char from reader only wrapped or attempts to read complex characters:
+   * like: \\_newline, \\u74A0 ...
+   * //can't do these yet... (not that important : I might do it in future)
+   */
   private Char readEscape() {
     if (isMulticharEscape(next())) 
       return readMulticharEscape();
@@ -300,7 +325,7 @@ public class MaajReader {
     boolean metDot = false;
     StringBuilder sb = new StringBuilder();
     do {
-      if (cur() == '.') //is never called when cur() is .
+      if (cur() == '.') //readNum is never called when cur() is '.'
         metDot = true;
       sb.append((char) cur());
     } while (isNumeric(next()));
@@ -380,7 +405,13 @@ public class MaajReader {
   private static boolean isSymbolic(int c) {
     return c == '/' || c == '#' || c == '\'' || isSymbolicStart(c) || Character.isDigit(c);
   }
-
+  /**
+   * main reader entry point
+   * @param r   Reader to read terms from
+   * @param cxt Contains what could be potentailly needed when reading : file name, namespace, ...
+   * @return sequence of read terms - ends with reader
+   * @throws ReaderException + any call to rest() throws too
+   */
   public static Seq read(Reader r, ReaderContext cxt) {
     return H.lazy(() -> new MaajReader(new PosReader(r), cxt).readAll());
   }
