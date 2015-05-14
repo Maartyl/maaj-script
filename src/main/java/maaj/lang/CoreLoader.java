@@ -552,6 +552,11 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "lazy'", "creates seq thunk from an invocable argument: must return a seq", a
          -> H.lazy(H.requireInvocable(arityRequire(1, a, "lazy'").first())));
 
+    defn(core, "take", "takes first n elements of a seq", a -> {
+      arityRequire(2, a, "take");
+      return SeqH.take(H.requireNum(a.first()).asInteger(), H.seqFrom(a.rest().first()));
+    });
+
     defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
     defn(core, "-#", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
     defn(core, "*#", "multiplies 2 args", (Num.Num2Op) Num::mul);
