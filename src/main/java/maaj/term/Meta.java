@@ -16,7 +16,7 @@ import maaj.util.MapH;
 public class Meta implements Mimic {
 
   private final Term val;
-  private Map meta;
+  private final Map meta;
 
   private Meta(Term val, Map meta) {
     this.val = val.unwrap();
@@ -29,9 +29,8 @@ public class Meta implements Mimic {
   }
 
   @Override
-  public synchronized Term addMeta(Map meta) {
-    this.meta = MapH.update(this.meta, meta);
-    return this;
+  public Term addMeta(Map meta) {
+    return val.addMeta(MapH.update(this.meta, meta));
   }
 
   @Override
@@ -45,31 +44,20 @@ public class Meta implements Mimic {
     Term t = u.transform(transformer);
     if (u == t)
       return this;
-    return of(t, meta);
+    return t.addMeta(meta);
   }
 
   @Override
   public Term evalMacros(Context c) {
-    return of(Mimic.super.evalMacros(c), meta);
+    return Mimic.super.evalMacros(c).addMeta(meta);
   }
 
   @Override
   public Term eval(Context c) {
     Term t = Mimic.super.eval(c);
-    return of(t, meta);
+    return t.addMeta(meta);
   }
 
-
-  public static Meta of(Term val) {
-    //they generally shouldn't have any meta
-    //this /ctor probably shouldn't be ever called...
-    return of(val.unwrap(), val.getMeta());
-  }
-
-  public static Meta of(Term val, Map meta) {
-    //called from default: withMeta
-    return new Meta(val == null ? H.NIL : val, meta);
-  }
 
   @Override
   public int hashCode() {
@@ -84,6 +72,17 @@ public class Meta implements Mimic {
   @Override
   public String toString() {
     return unwrap().toString();
+  }
+
+  public static Meta of(Term val) {
+    //they generally shouldn't have any meta
+    //this /ctor probably shouldn't be ever called...
+    return of(val.unwrap(), val.getMeta());
+  }
+
+  public static Meta of(Term val, Map meta) {
+    //called from default: withMeta
+    return new Meta(val == null ? H.NIL : val, meta);
   }
 
 
