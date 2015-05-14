@@ -198,6 +198,16 @@ public class SeqH {
     return H.lazy(last, () -> extendInner(s.first(), s.rest()));
   }
 
+  public static Seq filter(Seq s, Invocable pred) {
+    if (s.isNil()) return H.END;
+    Seq rest = H.lazy(() -> filter(s.rest(), pred));
+    return s.first().transform(pred).isNil() ? rest : H.cons(s.first(), rest);
+  }
+
+  public static Seq filter(Seq s, Invocable1 pred) {
+    return filter(s, (Invocable) pred);
+  }
+
   public static Seq take(int n, Seq s) {
     if (n <= 0 || s.isNil()) return H.END;
     return H.lazy(s.first(), () -> take(n - 1, s.rest()));
