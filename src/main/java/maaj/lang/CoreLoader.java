@@ -406,6 +406,13 @@ public class CoreLoader extends Namespace.Loader {
 
     defmacro(core, "cond", "Takes pairs of - test body; evaluates only body after first successful test", this::condMacro);
     defmacro(core, "case", "Takes expr pairs (match body); works like cond with =#; evaluates expr once", this::caseMacro);
+    defn(core, "gensym", "returns ~unique symbol", a -> {
+      switch (a.boundLength(1)) {
+      case 0: return H.uniqueSymbol();
+      case 1: return H.uniqueSymbol(a.first().print());
+      default: throw new IllegalArgumentException("gensym requires arity: 0 | 1 but got: " + a.boundLength(30));
+      }
+    });
 
 
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
@@ -442,12 +449,12 @@ public class CoreLoader extends Namespace.Loader {
       Term start = a.rest().first();
       Reducible coll = H.requireReducible(a.rest().rest().first());
       return coll.reduce(start, fn);
-    });
+      });
 
     defn(core, Sym.equalSymCCore.getNm(), "equals?", a -> {
       arityRequire(2, a, "=#");
       return H.wrap(a.first().equals(a.rest().first()));
-    });
+      });
 
     defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
     defn(core, "-#", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
@@ -477,6 +484,14 @@ public class CoreLoader extends Namespace.Loader {
     H.eval("(defn max ([x] x) "
            + "        ([x & a] (reduce max# x a)))", cxt, rcxt);
 
+    H.eval("(defmacro and ([]'t)([x] x) ([x & y] (let [a (gensym)] "
+           + "        `(let [~a ~x] (if ~a (~and ~@y) ~a))    )))", cxt, rcxt);
+    H.eval("(defmacro or ([]())([x] x) ([x & y] (let [a (gensym)] "
+           + "        `(let [~a ~x] (if ~a ~a (~or ~@y)))    )))", cxt, rcxt);
+
+    H.eval("(defn = ([x] x) ([x y] (=# x y))"
+           + "      ([x y & a] (and (= x y) (apply = y a))))", cxt, rcxt);
+
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                               + "(throw-arity $args \"message\")",
          a -> {
@@ -484,7 +499,6 @@ public class CoreLoader extends Namespace.Loader {
            throw new IllegalArgumentException("Wrong number of args: " + argC
                                               + "; " + a.rest().first() + " //args: " + a.first());
          });
-
   }
 
   /**
