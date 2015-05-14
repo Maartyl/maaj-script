@@ -45,6 +45,10 @@ public interface Term extends Quotable {
     return Meta.of(this, meta);
   }
 
+  default Term getMeta(Term key) {
+    return getMeta().valAt(key);
+  }
+
   /**
    * application of function on arguments:
    * (fn a b c) -> fn.apply(a,b,c)
