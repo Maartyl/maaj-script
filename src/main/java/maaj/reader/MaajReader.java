@@ -223,8 +223,10 @@ public class MaajReader {
       return MapH.update(metaOnMeta, (Map) mu);
     if (mu instanceof Keyword)
       return MapH.update(metaOnMeta, H.map(m, m));
-    if (mu instanceof Symbol || mu instanceof Str)
+    if (mu instanceof Symbol)
       return MapH.update(metaOnMeta, H.map(Sym.tagSymK, m));
+    if (mu instanceof Str)
+      return MapH.update(metaOnMeta, H.map(Sym.infoSymK, m));
     if (mu instanceof Num)
       return MapH.update(metaOnMeta, H.map(Sym.numSymK, m));
 
