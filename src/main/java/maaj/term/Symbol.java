@@ -197,6 +197,7 @@ public class Symbol implements Term {
   }
 
   protected static int findNsEnd(String str) {
+    if ("/".equals(str)) return -1; //special case
     int slash = str.lastIndexOf('/');
     if (slash == -1) return -1;
     if (slash == str.length() - 1) {

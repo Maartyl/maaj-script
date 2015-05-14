@@ -228,9 +228,9 @@ public class CoreLoader extends Namespace.Loader {
    * //macro only creates macroseq
    * binding gets 'compiled' using @patternBinder
    */
-  private Seq argsBindMacroSimple(Seq a, Symbol fnType) {
-    return H.cons(fnType, argsBindMacroLet(a));
-  }
+//  private Seq argsBindMacroSimple(Seq a, Symbol fnType) {
+//    return H.cons(fnType, argsBindMacroLet(a));
+//  }
 
   private Seq argsBindMacroLet(Seq a) {
     if (a.isNil())
@@ -311,6 +311,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
+   * for 'def special form : checks validity of ~most cases and:
    * throws on any problem; only returns if nu is valid Symbol
    * returns if ((Sym)nu).isQualified
    */
@@ -386,6 +387,7 @@ public class CoreLoader extends Namespace.Loader {
    * zips vector pattern with args seq using function: invoke first on second
    * - producing seq of maps
    * then reduces the entire thing into 1 map of resulting (symbol -> "matched")
+   * if seq of args is too short : is extended with Nil-s
    */
   private Map applyVectorPatternBinder(Term term, Vec ptrn) {
     return (Map) SeqH.zipl(FnH.invoke1(), ptrn.seq(), H.seqFrom(term))
@@ -466,8 +468,14 @@ public class CoreLoader extends Namespace.Loader {
 
     H.eval("(defn + a (reduce +# 0 a))", cxt, rcxt);
     H.eval("(defn * a (reduce *# 1 a))", cxt, rcxt);
-    //H.eval("(def min (fnseq (reduce min# 1 $args)))", cxt, rcxt);
-    //H.eval("(def max (fnseq (reduce max# 1 $args)))", cxt, rcxt);
+    H.eval("(defn - ([x] (neg x)) "
+           + "      ([x & a] (reduce -# x a)))", cxt, rcxt);
+    H.eval("(defn / ([x] (/ 1 x)) "
+           + "      ([x & a] (reduce div# x a)))", cxt, rcxt);
+    H.eval("(defn min ([x] x) "
+           + "        ([x & a] (reduce min# x a)))", cxt, rcxt);
+    H.eval("(defn max ([x] x) "
+           + "        ([x & a] (reduce max# x a)))", cxt, rcxt);
 
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                               + "(throw-arity $args \"message\")",
