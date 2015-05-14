@@ -5,11 +5,14 @@
  */
 package maaj.lang;
 
+import maaj.coll.traits.Counted;
 import maaj.coll.traits.Reducible;
+import maaj.coll.traits.SeqLike;
 import maaj.exceptions.InvalidOperationException;
 import maaj.reader.ReaderContext;
 import maaj.term.Fn;
 import maaj.term.FnSeq;
+import maaj.term.Int;
 import maaj.term.Invocable;
 import maaj.term.Invocable1;
 import maaj.term.Keyword;
@@ -106,9 +109,107 @@ public class CoreLoader extends Namespace.Loader {
       arityRequire(1, a, "eval");
       return a.first().eval(c).eval(c);
     });
+    def(core, "apply", "applies first argument on [last argumet (seq) with other arguments prepended]; "
+                       + "(apply + 7 8 [4 5 6]) -> (+ 7 8 4 5 6)",
+        (c, a) -> a.isNil() ? H.NIL : SeqH.extend(SeqH.mapEval(a, c)).eval(c));
 
     defmacro(core, "fn", "creates function that binds args", a -> argsBindMacro(a, Sym.fnseqSymC));
     defmacro(core, "macro", "creates macro that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
+    defmacro(core, "fn2", "creates function that binds args", a -> argsBindMacro2(a, Sym.fnseqSymC));
+  }
+
+  private Term argsBindMacro2(Seq a, Symbol fnType) {
+    if (a.isNil())
+      throw new IllegalArgumentException("Cannot bind args withut binding form");
+    if (!(a.first().unwrap() instanceof Seq)) //if simple body without overloads: make it 1 overload
+      return argsBindMacro(H.list(a.addMeta(a.first().getMeta())), fnType);
+    //map "create overload" over args, affregate and summary, compose into case
+    Seq data = a.fmap((Invocable1) x -> argsBindOverloadData(x));
+    Map aritys = (Map) data.reduce(H.map(Sym.maxSymK, Int.of(Integer.MIN_VALUE)), FnH.<Map, Seq, Map>liftTypeUncheched2((m, s) -> {
+      Num arity = (Num) s.first();
+      if (m.containsKey(arity))
+        throw new IllegalArgumentException("Arity overload clash: " + arity + ": " + s.rest() + " and " + m.valAt(arity));
+      if (arity.asInteger() < 0) { // variadic arity; can only contain 1
+        if (m.containsKey(Sym.variadicSymK))
+          throw new IllegalArgumentException("Multiple variadic overloads (" + arity.neg().dec() + "+): "
+                                             + s.rest() + " and " + m.valAt(Sym.variadicSymK));
+        else //variadic set, meta: arity
+          return m.assoc(Sym.variadicSymK, s.rest().addMeta(H.map(Sym.aritySymK, arity.neg().dec())));
+      }
+      Num maxOld = (Num) m.valAt(Sym.maxSymK); // I will need to know maximal arity
+      return H.map(arity, s.rest(), Sym.maxSymK, maxOld.max(arity));
+    }));
+    Num maxArity = ((Num) aritys.valAt(Sym.maxSymK));
+
+    if (maxArity.asInteger() == Integer.MIN_VALUE) {
+      //either : no overloads or only variadic
+      //there must be at least 1 overload : can only be 1 variadic function
+      //this is : simple function with 1 variadic overload
+      assert aritys.containsKey(Sym.variadicSymK) : "expected 1 variadic overload but not present: " + a + ", " + aritys;
+      Term body = aritys.valAt(Sym.variadicSymK);
+      return H.list(fnType, argsBindArityDispatchVariadic(body, a));
+    }
+    Seq posData = SeqH.filter(data, x -> H.wrap(((Num) ((SeqLike) x).first()).asInteger() >= 0));
+    Seq notMatched = aritys.containsKey(Sym.variadicSymK) ?
+             argsBindArityDispatchVariadic(aritys.valAt(Sym.variadicSymK), a) :
+                     H.list(Sym.throwAritySymCore, Sym.argsSym, a);
+    Seq els = H.list(Sym.ignoreSym, notMatched);
+    Seq allCases = SeqH.concatLazy(H.list(SeqH.concatLazy(posData), els));
+    Seq allWithCase = H.cons(Sym.caseSymCore, H.list(Sym.countPrimeSymCore, maxArity, Sym.argsSym), allCases);
+    return H.cons(fnType, allWithCase);
+  }
+
+  private Seq argsBindArityDispatchVariadic(Term body, Term origData) {
+    Num minArity = (Num) body.getMeta().valAt(Sym.aritySymK);
+    if (minArity.asInteger() == 0) {
+      return argsBindMacroLet(H.seqFrom(body));
+    }
+    // `(~fnType (if (< (count' ~minArity $args) ~minArity) (throw-arity $args ~a) ~@(argsBindMacroLet (seq body)))
+    return (SeqH.extend(H.list(Sym.ifSymC,
+                                     H.list(Sym.LTSymCore,
+                                            H.list(Sym.countPrimeSymCore, minArity, Sym.argsSym),
+                                            minArity),
+                                     H.list(Sym.throwAritySymCore, Sym.argsSym, origData),
+                                     argsBindMacroLet(H.seqFrom(body)))));
+  }
+
+  private Seq argsBindOverloadData(Term t) {
+    if (!(t.unwrap() instanceof Seq))
+      throw new InvalidOperationException("Overload is not a seq: " + t);
+    Seq s = (Seq) t;
+    if (s.isNil())
+      throw new IllegalArgumentException("Cannot bind args withut binding form");
+    int arity = argsBindPatternArity(s.first());
+    //{:arity arity :body (argsBindLet s)}
+    //return H.map(Sym.aritySymK, H.wrap(arity), Sym.bodySymK, argsBindMacroLet(s));
+    //this creates ~sort of 'case cases right away (some might my negative and stuff though...)
+    return H.cons(H.wrap(arity), argsBindMacroLet(s));
+  }
+
+  /**
+   * negative means variadic arity
+   * - the number means : "at least"
+   * -- but -1: otherwise : I would get 0 for: [& r]
+   * -- that returns -1
+   * -- [ a b c & r ] -> -4
+   * - probably not important, but why not...
+   * determines arity from pattern binding
+   */
+  private int argsBindPatternArity(Term ptrn) {
+    if (ptrn.unwrap() instanceof Symbol) {
+      Symbol s = (Symbol) ptrn;
+      if (s.isSimple())
+        return -1; // simple symbol captures all args : variadic
+    }
+    if (!(ptrn.unwrap() instanceof Vec))
+      throw new IllegalArgumentException("Cannot create args binding pattern from: " + ptrn);
+    Vec v = (Vec) ptrn;
+    if (v.cnt() < 2)
+      return v.cnt();
+    if (v.nth(v.cnt() - 2).equals(Sym.ampSym)) // [... & rest] : variadic
+      return -(v.cnt() - 2) - 1; // [a b c & r] : returns negated : number of needed args -1
+    return v.cnt(); //not variadic : this is how many args it takes ; [a b c]
+    //[] is a valid args bind meaning: this takes 0 arguments
   }
 
   private Term argsBindMacro(Seq a, Symbol fnType) {
@@ -121,15 +222,19 @@ public class CoreLoader extends Namespace.Loader {
    * //macro only creates macroseq
    * binding gets 'compiled' using @patternBinder
    */
-  private Term argsBindMacroSimple(Seq a, Symbol fnType) {
+  private Seq argsBindMacroSimple(Seq a, Symbol fnType) {
+    return H.cons(fnType, argsBindMacroLet(a));
+  }
+
+  private Seq argsBindMacroLet(Seq a) {
     if (a.isNil())
-      throw new InvalidOperationException("Cannot bind args withut binding form");
+      throw new IllegalArgumentException("Cannot bind args withut binding form");
     Term ptrn = a.first();
     Seq body = a.rest();
     if (body.isNil())
-      return H.list(fnType); // nothing would use the pattern anyway...
-    Term pb = patternBinder(ptrn).addMeta(H.map(Sym.patternSym, ptrn));
-    return H.list(fnType, H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
+      return H.list(); // nothing would use the pattern anyway...
+    Term pb = patternBinder(ptrn).addMeta(ptrn.getMeta()).addMeta(H.map(Sym.patternSym, ptrn));
+    return H.list(H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
   }
 
   /**
@@ -277,7 +382,7 @@ public class CoreLoader extends Namespace.Loader {
    * then reduces the entire thing into 1 map of resulting (symbol -> "matched")
    */
   private Map applyVectorPatternBinder(Term term, Vec ptrn) {
-    return (Map) SeqH.zip(FnH.invoke1(), ptrn.seq(), H.seqFrom(term))
+    return (Map) SeqH.zipl(FnH.invoke1(), ptrn.seq(), H.seqFrom(term))
             .reduce(MapH.emptyPersistent(), FnH.<Map, Map, Map>liftTypeUncheched2(MapH::update));
   }
 
@@ -294,6 +399,7 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "cond", "Takes pairs of - test body; evaluates only body after first successful test", this::condMacro);
     defmacro(core, "case", "Takes expr pairs (match body); works like cond with =#; evaluates expr once", this::caseMacro);
 
+
     defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
     defn(core, Sym.firstSym.getNm(), "first of seq (head)", a -> H.seqFrom(arityRequire(1, a, "first").first()).firstOrNil());
     defn(core, Sym.restSym.getNm(), "rest of seq (tail)", a -> H.seqFrom(arityRequire(1, a, "rest").first()).restOrNil());
@@ -304,6 +410,16 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "seq", "seq from collection", a -> H.seqFrom(arityRequire(1, a, "seq").first()));
     defn(core, "count", "number of elements in collection; possibly O(N)", a
          -> H.requireNumerable(arityRequire(1, a, "count")).count());
+    defn(core, "count'", "number of elements in ^2 collection; O(1) possibly incorrect; "
+                         + "if counts, returns maximally ^1 specified value"
+                         + "(count' 5 (100)) -> Int.MaxValue", a -> {
+      arityRequire(2, a, "count'");
+      Term coll = a.rest().first().unwrap();
+      if (coll instanceof Counted)
+        return ((Counted) coll).getCount();
+      Num max = H.requireNum(a.first());
+      return H.wrap(H.seqFrom(coll).boundLength(max.asInteger()));
+            });
 
     defn(core, "cons", "prepends to list; O(1)", a -> {
       arityRequire(2, a, "cons");
@@ -342,10 +458,18 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "<=", "Num; is first arg less then or equal to second?", (Num.NumPred) (Num::lteq));
     defn(core, ">=", "Num; is first arg greater then or equal to second?", (Num.NumPred) (Num::gteq));
 
-    H.eval("(defn + [] (reduce +# 0 $args))", cxt, rcxt);
-    H.eval("(defn * [] (reduce *# 1 $args))", cxt, rcxt);
+    H.eval("(defn + a (reduce +# 0 a))", cxt, rcxt);
+    H.eval("(defn * a (reduce *# 1 a))", cxt, rcxt);
     //H.eval("(def min (fnseq (reduce min# 1 $args)))", cxt, rcxt);
     //H.eval("(def max (fnseq (reduce max# 1 $args)))", cxt, rcxt);
+
+    defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
+                                              + "(throw-arity $args \"message\")",
+         a -> {
+           int argC = H.seqFrom(arityRequire(2, a, Sym.throwAritySymCore.getNm()).first()).boundLength(30);
+           throw new IllegalArgumentException("Wrong number of args: " + argC
+                                              + "; " + a.rest().first() + " //args: " + a.first());
+         });
 
   }
 
