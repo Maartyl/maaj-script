@@ -115,14 +115,14 @@ public class CoreLoader extends Namespace.Loader {
 
     defmacro(core, "fn", "creates function that binds args", a -> argsBindMacro(a, Sym.fnseqSymC));
     defmacro(core, "macro", "creates macro that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
-    defmacro(core, "fn2", "creates function that binds args", a -> argsBindMacro2(a, Sym.fnseqSymC));
+    //defmacro(core, "fn2", "creates function that binds args", a -> argsBindMacro2(a, Sym.fnseqSymC));
   }
 
-  private Term argsBindMacro2(Seq a, Symbol fnType) {
+  private Term argsBindMacro(Seq a, Symbol fnType) {
     if (a.isNil())
       throw new IllegalArgumentException("Cannot bind args withut binding form");
     if (!(a.first().unwrap() instanceof Seq)) //if simple body without overloads: make it 1 overload
-      return argsBindMacro2(H.list(a.addMeta(a.first().getMeta())), fnType);
+      return argsBindMacro(H.list(a.addMeta(a.first().getMeta())), fnType);
     //map "create overload" over args, affregate and summary, compose into case
     Seq data = a.fmap((Invocable1) x -> argsBindOverloadData(x));
     Map aritys = (Map) data.reduce(H.map(Sym.maxSymK, Int.of(Integer.MIN_VALUE)), FnH.<Map, Seq, Map>liftTypeUncheched2((m, s) -> {
@@ -169,16 +169,18 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   private Seq argsBindArityDispatchVariadic(Term body, Term origData) {
+    //body is already expanded into let : doing it again only "deletes" it
     Num minArity = (Num) body.getMeta().valAt(Sym.aritySymK);
     if (minArity.asInteger() == 0) {
-      return argsBindMacroLet(H.seqFrom(body));
+      return /*argsBindMacroLet*/ SeqH.extend(H.seqFrom(body));
     }
     // `(~fnType (if (< (count' ~minArity $args) ~minArity) (throw-arity $args ~a) ~@(argsBindMacroLet (seq body)))
     return (SeqH.extend(H.list(Sym.ifSymC,
                                      H.list(Sym.LTSymCore,
                                             H.list(Sym.countPrimeSymCore, minArity, Sym.argsSym),
                                             minArity),
-                               H.list(Sym.throwAritySymCore, Sym.argsSym, H.list(Sym.quoteSymC, origData)),                                     argsBindMacroLet(H.seqFrom(body)))));
+                               H.list(Sym.throwAritySymCore, Sym.argsSym, H.list(Sym.quoteSymC, origData)),
+                               /*argsBindMacroLet*/ (H.seqFrom(body)))));
   }
 
   private Seq argsBindOverloadData(Term t) {
@@ -218,10 +220,6 @@ public class CoreLoader extends Namespace.Loader {
       return -(v.cnt() - 2) - 1; // [a b c & r] : returns negated : number of needed args -1
     return v.cnt(); //not variadic : this is how many args it takes ; [a b c]
     //[] is a valid args bind meaning: this takes 0 arguments
-  }
-
-  private Term argsBindMacro(Seq a, Symbol fnType) {
-    return argsBindMacroSimple(a, fnType);
   }
 
   /**
