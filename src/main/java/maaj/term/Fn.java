@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
+import maaj.util.H;
 import maaj.util.SeqH;
 
 /**
@@ -17,7 +18,10 @@ public interface Fn extends Invocable {
 
   @Override
   public default Term apply(Context cxt, Seq args) {
-    return invokeSeq(SeqH.mapEval(args, cxt));
+    Term rslt = invokeSeq(SeqH.mapEval(H.ret1(args, args = null), cxt));
+    while (rslt.isRecur())
+      rslt = invokeSeq(((Recur) rslt).getArgs());
+    return rslt;
   }
 
   @Override

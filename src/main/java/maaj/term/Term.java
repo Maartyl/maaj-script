@@ -109,10 +109,11 @@ public interface Term extends Quotable {
   }
 
   /**
-   * Recur is a special construct (Term) that brings tail call optimization.
+   * Recur is a special construct (Term) that allows tail call optimization.
    * It costs creating an object for each iteration but prevents StackOverflow
    * - If I were to compile or properly analyze and rebuild my AST that could be ommited.
-   * - I'm trying to not overcomplicate the evaluation model. This lang would is slow anyway.
+   * - I'm trying to not overcomplicate the evaluation model. This implementation is slow anyway.
+   * <p>
    * @return
    */
   default boolean isRecur() {

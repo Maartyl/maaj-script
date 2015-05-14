@@ -100,6 +100,8 @@ public class CoreLoader extends Namespace.Loader {
     def(core, "apply", "applies first argument on [last argumet (seq) with other arguments prepended]; "
                        + "(apply + 7 8 [4 5 6]) -> (+ 7 8 4 5 6)",
         (c, a) -> a.isNil() ? H.NIL : SeqH.extend(SeqH.mapEval(a, c)).eval(c));
+    def(core, "recur", "repeat function with new arguments : tail recursion optimized;"
+                       + " cannot be used in any other context", (c, a) -> Recur.ofArgs(SeqH.mapEval(a, c)));
 
     def(core, "require'", "takes symbol with namespace name; then options:\n"
                           + ":* - import all vars from namespace directly\n"
