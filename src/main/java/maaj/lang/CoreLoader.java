@@ -23,6 +23,9 @@ public class CoreLoader extends Namespace.Loader {
    * can load 3 basic namespaces,
    * # : required by everything, contains most basic special forms
    * normal namespace don't start with '#'
+   * @param nsName name of namespace to load: #, #core, #macro
+   * @param cxt    global context (might not be complete for ns '#')
+   * @return some core namespace based on nsName
    */
   @Override
   public Namespace loadNamespaceFor(Symbol nsName, Context cxt) {
@@ -388,6 +391,34 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
+   * extends def for: defn, defmacro
+   * - manages metadata used in defining functions and defining their vars
+   */
+  private Seq defComposeMacro(Seq a, Symbol fnType) {
+    assert fnType.equals(Sym.fnSymCore) || fnType.equals(Sym.macroSymCore);
+    String defName = fnType.equals(Sym.fnSymCore) ? "defn" : "defmacro";
+    if (a.isNil())
+      throw new IllegalArgumentException(defName + " requires name and bindng forms; got: no arguments");
+    if (a.rest().isNil())
+      throw new IllegalArgumentException(defName + " requires name and bindng forms; got: " + a);
+    Term fst = a.first();
+    Term snd = a.rest().first();
+    //I need meta for : getting name inside the function; writing documentation, ...
+    Term name = fst.addMeta(snd.getMeta()).addMeta(fst.getMeta());// I need both to have all meta, if have any clashing keys
+    Term fnStart = snd.addMeta(fst.getMeta()).addMeta(snd.getMeta()); // then I want theirs to be preffered
+    //meta data on name will be procesed by def
+    //-"- on fnStart -"- by fn / macro
+    if (fnType.equals(Sym.macroSymCore)) //var should know it holds macro, not 'normal' value
+      name = name.addMeta(Sym.macroMapTag);
+    fnStart = fnStart.addMeta(Sym.nameSym, name);
+    Term aMeta = a.addMeta(fnStart.getMeta()).addMeta(Sym.typeSymK, fnType);
+    fnStart = fnStart.addMeta(Sym.srcSymK, aMeta);
+    name = name.addMeta(Sym.srcSymK, aMeta);
+
+    return H.list(Sym.defSymC, name, H.cons(fnType, fnStart, a.rest().rest()));
+  }
+
+  /**
    * loads the #core namespace : functions and macros tied with the language; "imported" into every namespace
    */
   private void loadCore(Context cxt, Namespace core, ReaderContext rcxt) {
@@ -395,9 +426,9 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "macro", "creates macro that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
 
     defmacro(core, "defn", "creates and defs a function; combines def and fn", a
-             -> H.list(Sym.defSymC, a.first(), H.cons(Sym.fnSymCore, a.rest())));
-    defmacro(core, "defmacro", "creates and defs a function; combines def and macro", a
-             -> H.list(Sym.defSymC, a.first().addMeta(Sym.macroMapTag), H.cons(Sym.macroSymCore, a.rest())));
+             -> defComposeMacro(a, Sym.fnSymCore));
+    defmacro(core, "defmacro", "creates and defs a macro; combines def and macro", a
+             -> defComposeMacro(a, Sym.macroSymCore));
 
     defmacro(core, "cond", "Takes pairs of: (test body); evaluates only body after first successful test;\n"
                            + "example: (cond (0 < v) :pos (0 > v) :neg :else :zero", this::condMacro);
@@ -410,8 +441,10 @@ public class CoreLoader extends Namespace.Loader {
       }
     });
 
-
-    defn(core, "meta", "get meta data of term", a -> a.isNil() ? H.NIL.getMeta() : a.first().getMeta());
+    defn(core, "meta", "get meta data of term; (meta term) ->{...}; (meta :key term) ~= (:key (meta term))", a
+         -> a.isNil() ? H.NIL.getMeta() :
+            (a.rest().isNil() ? a.first().getMeta() :
+             a.rest().first().getMeta(a.first().unwrap())));
     defn(core, Sym.firstSym.getNm(), "first of seq (head)", a -> H.seqFrom(arityRequire(1, a, "first").first()).firstOrNil());
     defn(core, Sym.restSym.getNm(), "rest of seq (tail)", a -> H.seqFrom(arityRequire(1, a, "rest").first()).restOrNil());
     defmacro(core, "car", "first of seq (head)", a -> H.cons(Sym.firstSym, a));
@@ -421,16 +454,17 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "seq", "seq from collection", a -> H.seqFrom(arityRequire(1, a, "seq").first()));
     defn(core, "count", "number of elements in collection; possibly O(N)", a
          -> H.requireNumerable(arityRequire(1, a, "count")).count());
-    defn(core, "count'", "number of elements in ^2 collection; O(1), possibly incorrect; "
-                         + "if counts, returns maximally ^1 specified value"
-                         + "(count' 5 (100)) -> Int.MaxValue", a -> {
+    defn(core, "count'", "number of elements in [2nd arg] collection; O(1), possibly incorrect; "
+                         + "if counts, returns maximally [1st arg] specified value"
+                         + "(count' 5 (100)) -> Int.MaxValue;"
+                         + "(count' 2 [7 8 9 7]) -> 4", a -> {
       arityRequire(2, a, "count'");
       Term coll = a.rest().first().unwrap();
       if (coll instanceof Counted)
         return ((Counted) coll).getCount();
       Num max = H.requireNum(a.first());
       return H.wrap(H.seqFrom(coll).boundLength(max.asInteger()));
-            });
+    });
 
     defn(core, "cons", "prepends to list; O(1)", a -> {
       arityRequire(2, a, "cons");
@@ -470,8 +504,8 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "<=", "Num; is first arg less then or equal to second?", (Num.NumPred) (Num::lteq));
     defn(core, ">=", "Num; is first arg greater then or equal to second?", (Num.NumPred) (Num::gteq));
 
-    H.eval("(defn + a (reduce +# 0 a))", cxt, rcxt);
-    H.eval("(defn * a (reduce *# 1 a))", cxt, rcxt);
+    H.eval("(defn ^\"sums numeric arguments; (+) -> 0\"       + a (reduce +# 0 a))", cxt, rcxt);
+    H.eval("(defn ^\"product of numeric arguments; (*) -> 1\" * a (reduce *# 1 a))", cxt, rcxt);
     H.eval("(defn - ([x] (neg x)) "
            + "      ([x & a] (reduce -# x a)))", cxt, rcxt);
     H.eval("(defn / ([x] (/ 1 x)) "

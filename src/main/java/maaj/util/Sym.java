@@ -23,6 +23,8 @@ public class Sym {
   public static final Symbol numSymK = H.symbol(":num");
   public static final Symbol elseSymK = H.symbol(":else");
   public static final Symbol maxSymK = H.symbol(":max");
+  public static final Symbol srcSymK = H.symbol(":src");
+  public static final Symbol typeSymK = H.symbol(":type");
   public static final Symbol variadicSymK = H.symbol(":variadic");
   public static final Symbol throwAritySymCore = H.symbol("#core", "throw-arity");
   public static final Symbol nameSym = H.symbol("name");
