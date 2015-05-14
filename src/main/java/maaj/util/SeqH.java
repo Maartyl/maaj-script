@@ -63,6 +63,10 @@ public class SeqH {
     return sexp(coll.first().transform(mapper), mapSexp(coll.rest(), mapper));
   }
 
+  public static Seq mapSexp(Seq coll, Invocable1 mapper) {
+    return mapSexp(coll, (Invocable) mapper);
+  }
+
   //--lazy variants
   /**
    * lazy

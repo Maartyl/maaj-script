@@ -5,8 +5,6 @@
  */
 package maaj.term;
 
-import maaj.coll.traits.AssocGet;
-import maaj.coll.traits.Indexed;
 import maaj.coll.traits.Lookup;
 import maaj.lang.Context;
 import maaj.util.Generators;

@@ -31,7 +31,7 @@ public class Glob {
   }
 
 
-  public Namespace require(Symbol s) {
+  public Namespace loadNamespace(Symbol s) {
     return store.getNamespaceFor(s, defaultLoader, loaderContext);
   }
 

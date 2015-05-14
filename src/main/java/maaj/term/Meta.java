@@ -19,7 +19,7 @@ public class Meta implements Mimic {
   private Map meta;
 
   private Meta(Term val, Map meta) {
-    this.val = val; //TODO: decide : unwrap?
+    this.val = val.unwrap();
     this.meta = MapH.update(val.getMeta(), meta);
   }
 

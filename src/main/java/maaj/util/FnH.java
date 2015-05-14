@@ -28,11 +28,12 @@ public class FnH {
    * @return
    */
   public static Invocable2 invoke1() {
-    return (fn, arg) -> ((Invocable) fn).invoke(arg);
+
+    return (fn, arg) -> H.requireInvocable(fn).invoke(arg);
   }
 
   public static Term invoke1l(Term fn, Term arg) {
-    return ((Invocable) fn).invoke(arg);
+    return H.requireInvocable(fn).invoke(arg);
   }
 
   /**

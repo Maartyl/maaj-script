@@ -81,11 +81,8 @@ public class MaajReader {
   private Term read0Cur() {
     return read0(cur());
   }
-  /**
-   * read top level term (can be neseted inside others, but also can exist by itself)
-   * starts at @c@ position : can be gotten to differently based on previous content (i.e. : a(5 2) vs. (1 2) (5 2))
-   */
-  private Term read0(int c) {
+
+  private Term read0Inner(int c) {
     switch (c) {
     case '(': return readList();
     case '[': return readVec();
@@ -106,12 +103,20 @@ public class MaajReader {
     case '}': return fail("unmatched: }");
     }
     if (c < 0) return fail("unexpected EOF");
-    if (isNumericStart(c)) 
+    if (isNumericStart(c))
       return readNum();
-    if (isSymbolicStart(c)) 
+    if (isSymbolicStart(c))
       return readSymbol();
 
     return fail("read0: " + (char) c + " /:" + c);
+  }
+  /**
+   * read top level term (can be neseted inside others, but also can exist by itself)
+   * starts at @c@ position : can be gotten to differently based on previous content (i.e. : a(5 2) vs. (1 2) (5 2))
+   */
+  private Term read0(int c) {
+    Map m = H.map(Sym.fileRowSymK, H.wrap(reader.getRow()), Sym.fileColSymK, H.wrap(reader.getColumn()));
+    return read0Inner(c).addMeta(m);
   }
   /**
    * called after '#' symbol : extends dispatch table

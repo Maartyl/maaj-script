@@ -99,7 +99,7 @@ public class Context implements Lookup {
   }
 
   public Namespace require(Symbol s) {
-    return glob.require(s);
+    return glob.loadNamespace(s);
   }
 
   public Var getVar(Symbol s) {

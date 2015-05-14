@@ -33,11 +33,12 @@ public class Repl {
   }
 
   public void run(Reader r, Writer w) throws IOException {
+    w.append(">");
+    w.flush();
     for (Term t : H.read(r, new ReaderContext(ns, "<?>")))
       try {
-        //t.show(w);
         t.eval(cxt).show(w);
-        w.append('\n');
+        w.append("\n>");
         w.flush();
       } catch (Exception e) {
         System.err.println(e);
@@ -53,9 +54,7 @@ public class Repl {
       Writer w = new OutputStreamWriter(System.out);
       run(r, w);
       throw new EndT();
-    } catch (IOException e) {
-      System.err.println(e);
-    } catch (ReaderException e) {
+    } catch (IOException | ReaderException e) {
       System.err.println(e);
     } catch (EndT e) {
       break;

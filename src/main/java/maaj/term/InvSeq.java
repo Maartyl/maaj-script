@@ -21,16 +21,19 @@ public abstract class InvSeq implements InvocableSeq {
   protected final Context closure;
 
   protected InvSeq(Seq fn, Context closure) {
-//    Term t = fn.fmap((Invocable1) x -> x.evalMacros(closure)).evalMacros(closure);
-    Seq fn1; // I loose meta
-//    if (t.unwrap() instanceof Seq)
-//      fn1 = H.cons(doSym, (Seq) t.unwrap());
-//    else
-//      fn1 = H.list(doSym, t.unwrap());
-
-    fn1 = H.cons(Sym.doSymC, fn);//.fmap((Invocable1) x -> x.evalMacros(closure));
-    System.err.println(fn.firstOrNil().getMeta());
-    this.fn = fn1;
+    //.fmap((Invocable1) x -> x.evalMacros(closure)); //unnecessary
+    if (fn.isNil()) {
+      this.fn = H.list(Sym.doSymC);
+      this.closure = closure;
+      return;
+    } 
+    Term fst = fn.first();
+    Map meta = fst.getMeta();
+    this.fn = H.cons(Sym.doSymC, fst.unwrap(), fn.rest());
+    Term selfName = meta.valAt(Sym.nameSym);
+    if (!selfName.isNil())
+      closure = closure.addToScope(selfName, this);
+    //System.err.println(fn.firstOrNil().getMeta());
     this.closure = closure;
   }
 

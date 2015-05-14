@@ -17,6 +17,13 @@ public class Sym {
 
   private Sym() {
   }
+  /*
+   SymK : keyword (:...)
+   SymC : #/...
+   SymCore: #core/...
+   SymCCore: #core/...#
+   aaaAaa : aaa-aaa
+   */
   public static final Symbol derefSymCore = H.symbol("#core", "deref");
   public static final Symbol tagSymK = H.symbol(":tag");
   public static final Symbol infoSymK = H.symbol(":info");
@@ -24,6 +31,11 @@ public class Sym {
   public static final Symbol elseSymK = H.symbol(":else");
   public static final Symbol maxSymK = H.symbol(":max");
   public static final Symbol srcSymK = H.symbol(":src");
+  public static final Symbol asSymK = H.symbol(":as");
+  public static final Symbol asteriskSymK = H.symbol(":*");
+  public static final Symbol fileRowSymK = H.symbol(":file-row");
+  public static final Symbol fileColSymK = H.symbol(":file-col");
+  public static final Symbol fileNameSymK = H.symbol(":file-name");
   public static final Symbol typeSymK = H.symbol(":type");
   public static final Symbol variadicSymK = H.symbol(":variadic");
   public static final Symbol throwAritySymCore = H.symbol("#core", "throw-arity");
@@ -55,6 +67,7 @@ public class Sym {
   public static final Symbol argsSymSpecial = H.symbol("$args");
   public static final Symbol macroseqSymC = H.symbol("#", "macroseq");
   public static final Symbol fnseqSymC = H.symbol("#", "fnseq");
+  public static final Symbol requirePrimeSymC = H.symbol("#", "require'");
   public static final Symbol fnSymCore = H.symbol("#core", "fn");
   public static final Symbol macroSymCore = H.symbol("#core", "macro");
 

@@ -8,6 +8,7 @@ package maaj.lang;
 import maaj.coll.traits.Counted;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.SeqLike;
+import maaj.coll.traits.Seqable;
 import maaj.exceptions.InvalidOperationException;
 import maaj.reader.ReaderContext;
 import maaj.term.*;
@@ -100,6 +101,35 @@ public class CoreLoader extends Namespace.Loader {
                        + "(apply + 7 8 [4 5 6]) -> (+ 7 8 4 5 6)",
         (c, a) -> a.isNil() ? H.NIL : SeqH.extend(SeqH.mapEval(a, c)).eval(c));
 
+    def(core, "require'", "takes symbol with namespace name; then options:\n"
+                          + ":* - import all vars from namespace directly\n"
+                          + ":as <unqualified symbol> - will be accessible through this instead only original namespace name"
+                          + "nothing - imports qualified\n"
+                          + "var names - not qualified, reqt qualified, not implemented yet;\n"
+                          + "//everything is always import as qualified also", (c, a) -> {
+      if (a.isNil()) return H.NIL;
+      Symbol nsName = H.requireSymbol(a.first());
+      Namespace ns = c.require(nsName);
+      if (a.rest().isNil()) {
+        c.importFullyQualified(ns);
+        return H.NIL;
+      }
+      Term type = a.rest().first();
+      if (type.equals(Sym.asteriskSymK)) {
+        c.importNotQualified(ns);
+        return H.NIL;
+      }
+      if (type.equals(Sym.asSymK)) {
+        if (a.rest().rest().isNil())
+          throw new IllegalArgumentException("require': no symbol after :as clause; //:" + a);
+        Symbol asName = H.requireSymbol(a.rest().rest().first());
+        if (!asName.isSimple())
+          throw new IllegalArgumentException("require': cannot qualify namespace with:" + asName + "; requires: unqualified symbol");
+        c.importQualified(ns, asName);
+        return H.NIL;
+      }
+      throw new IllegalArgumentException("require': invalid clause: " + a);
+    });
     
   }
 
@@ -110,14 +140,13 @@ public class CoreLoader extends Namespace.Loader {
    * ... : see argsBindMacroDispatch
    */
   private Term argsBindMacro(Seq a, Symbol fnType) {
+    assert fnType.equals(Sym.fnseqSymC) || fnType.equals(Sym.macroseqSymC);
     if (a.isNil())
       throw new IllegalArgumentException("Cannot bind args withut binding form");
     if (!(a.first().unwrap() instanceof Seq)) //if simple body without overloads: make it 1 overload
       return argsBindMacro(H.list(a.addMeta(a.first().getMeta())), fnType);
     Map fnMeta = a.first().getMeta();
-    //System.err.println(fnMeta);
-    System.err.println(fnMeta.valAt(Sym.srcSymK).getMeta());
-//passes meta to fnseq / meta seq (InvSeq)
+    //passes meta to fnseq / metaseq (InvSeq)
     return H.list(fnType, argsBindMacroDispatch(a).addMeta(fnMeta));
   }
   /**
@@ -326,8 +355,9 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * for 'def special form : checks validity of ~most cases and:
-   * throws on any problem; only returns if nu is valid Symbol;
+   * (used in 'def special form :) checks validity of ~most cases and
+   * throws on any problem; only returns if nu is a valid Symbol;
+   * <p>
    * @returns ((Symbol)nu).isQualified
    */
   private boolean defCheckAndRetIfQualified(Term nu, Symbol curNs) {
@@ -402,7 +432,7 @@ public class CoreLoader extends Namespace.Loader {
    * zips vector pattern with args seq using function: invoke first on second<br/>
    * - producing seq of maps<br/>
    * then reduces the entire thing into 1 map of resulting (symbol -> "matched")<br/>
-   * if seq of args is too short : is extended with Nil-s
+   * if seq of args is too short : is extended with Nil-s (so all symbols in pattern are in context defined)
    */
   private Map applyVectorPatternBinder(Term term, Vec ptrn) {
     return (Map) SeqH.zipl(FnH.invoke1(), ptrn.seq(), H.seqFrom(term))
@@ -456,13 +486,20 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "cond", "Takes pairs of: (test body); evaluates only body after first successful test;\n"
                            + "example: (cond (0 < v) :pos (0 > v) :neg :else :zero", this::condMacro);
     defmacro(core, "case", "Takes expr pairs (match body); works like cond with =#; evaluates expr once", this::caseMacro);
-    defn(core, "gensym", "returns unique symbol (in one run of program)", a -> {
+    defn(core, "gensym", "returns unique* symbol (* in one run of program)", a -> {
       switch (a.boundLength(1)) {
       case 0: return H.uniqueSymbol();
-      case 1: return H.uniqueSymbol(a.first().print());
+      case 1: return H.uniqueSymbol(H.requireSymbol(a.first()));
       default: throw new IllegalArgumentException("gensym requires arity: 0 | 1 but got: " + a.boundLength(30));
       }
     });
+
+    //I would format it normally but NetBeans won't let me...
+    defmacro(core, "require", "imports namespaces", a
+             -> H.cons(Sym.doSymC, SeqH.mapSexp(a, x
+                                                -> x.unwrap() instanceof Seqable ?
+                                                   H.cons(Sym.requirePrimeSymC, H.seqFrom(x)) :
+                                                   H.list(Sym.requirePrimeSymC, x))));
 
     defn(core, "meta", "get meta data of term; (meta term) ->{...}; (meta :key term) ~= (:key (meta term))", a
          -> a.isNil() ? H.NIL.getMeta() :
@@ -510,6 +547,9 @@ public class CoreLoader extends Namespace.Loader {
       return H.wrap(a.first().equals(a.rest().first()));
     });
 
+    defn(core, "lazy'", "creates seq thunk from an invocable argument: must return a seq", a
+         -> H.lazy(H.requireInvocable(arityRequire(1, a, "lazy'").first())));
+
     defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
     defn(core, "-#", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
     defn(core, "*#", "multiplies 2 args", (Num.Num2Op) Num::mul);
@@ -545,6 +585,10 @@ public class CoreLoader extends Namespace.Loader {
 
     H.eval("(defn = ^\"true iff all arguments are equal\"([x y] (=# x y)) ([x] x) "
            + "      ([x y & a] (and (= x y) (apply = y a))))", cxt, rcxt);
+
+    H.eval("(defmacro lazy ^\"postpones evaluation of argument and returns seq thunk; body must evaluate into seq; "
+           + "if 2 arguments given ~= (cons fst-arg (lazy snd-arg))\""
+           + "([x] `(lazy' (#/fnseq ~x))) ([h t] `(cons ~h (lazy ~t)) )  )", cxt, rcxt);
 
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                               + "(throw-arity $args \"message\")",
