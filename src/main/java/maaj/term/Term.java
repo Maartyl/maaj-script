@@ -40,14 +40,20 @@ public interface Term extends Quotable {
     return MapH.emptyPersistent();
   }
 
+  default Term getMeta(Term key) {
+    return getMeta().valAt(key);
+  }
+
   default Term addMeta(Map meta) {
     if (meta.isEmpty()) return this;
     return Meta.of(this, meta);
   }
 
-  default Term getMeta(Term key) {
-    return getMeta().valAt(key);
+  default Term addMeta(Term key, Term val) {
+    return addMeta(H.map(key, val));
   }
+
+
 
   /**
    * application of function on arguments:
