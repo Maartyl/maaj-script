@@ -409,6 +409,15 @@ public class H {
     throw new IllegalArgumentException("Requires Num, got: " + t.getClass().getName());
   }
 
+  public static Symbol requireSymbol(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Symbol)
+      return (Symbol) t;
+
+    throw new IllegalArgumentException("Requires Symbol, got: " + t.getClass().getName());
+  }
+
+
   public static Numerable requireNumerable(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Numerable)
