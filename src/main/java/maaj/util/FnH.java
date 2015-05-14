@@ -14,6 +14,9 @@ import maaj.term.*;
  * @author maartyl
  */
 public class FnH {
+  private FnH() {
+  }
+
   public static Invocable compose(Term fn1, Term fn2) {
 //    if (fn1 instanceof Invocable)
 //      if (fn2 instanceof Invocable)
