@@ -104,7 +104,12 @@ public class Symbol implements Term {
 
   @Override
   public Collection unquoteTraverse(Context c) {
-    return H.tuple(this);
+    if (isQualified() || isKeyword())
+      return H.tuple(this);
+    Var v = c.getVar(this);
+    if (v == null)
+      return H.tuple(withNamespace(c.getCurNs().getName()));
+    return H.tuple(withNamespace(H.requireSymbol(v.getMeta(Sym.namespaceSym))));
   }
 
   @Override
