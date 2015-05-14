@@ -28,7 +28,8 @@ public abstract class InvSeq implements InvocableSeq {
 //    else
 //      fn1 = H.list(doSym, t.unwrap());
 
-    fn1 = H.cons(Sym.doSymC, fn).fmap((Invocable1) x -> x.evalMacros(closure));
+    fn1 = H.cons(Sym.doSymC, fn);//.fmap((Invocable1) x -> x.evalMacros(closure));
+    System.err.println(fn.firstOrNil().getMeta());
     this.fn = fn1;
     this.closure = closure;
   }
