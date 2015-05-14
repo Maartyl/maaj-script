@@ -10,28 +10,8 @@ import maaj.coll.traits.Reducible;
 import maaj.coll.traits.SeqLike;
 import maaj.exceptions.InvalidOperationException;
 import maaj.reader.ReaderContext;
-import maaj.term.Fn;
-import maaj.term.FnSeq;
-import maaj.term.Int;
-import maaj.term.Invocable;
-import maaj.term.Invocable1;
-import maaj.term.Keyword;
-import maaj.term.Macro;
-import maaj.term.MacroSeq;
-import maaj.term.Map;
-import maaj.term.Num;
-import maaj.term.Seq;
-import maaj.term.Sf;
-import maaj.term.Str;
-import maaj.term.Symbol;
-import maaj.term.Term;
-import maaj.term.Var;
-import maaj.term.Vec;
-import maaj.util.FnH;
-import maaj.util.H;
-import maaj.util.MapH;
-import maaj.util.SeqH;
-import maaj.util.Sym;
+import maaj.term.*;
+import maaj.util.*;
 
 /**
  * loader that does not use file, instead: loads core special forms, macros and functions
@@ -39,7 +19,11 @@ import maaj.util.Sym;
  * @author maartyl
  */
 public class CoreLoader extends Namespace.Loader {
-
+  /**
+   * can load 3 basic namespaces,
+   * # : required by everything, contains most basic special forms
+   * normal namespace don't start with '#'
+   */
   @Override
   public Namespace loadNamespaceFor(Symbol nsName, Context cxt) {
     if (!nsName.isSimple())
@@ -51,17 +35,15 @@ public class CoreLoader extends Namespace.Loader {
       break;
     case "#core": loadCore(c, ns, new ReaderContext(nsName, "<?>"));
       break;
-    case "#macro": loadMacro(ns);
-      break;
-    default:
-      throw new IllegalArgumentException("no core namespace with name: " + nsName.print());
+    case "#macro": loadMacro(ns);break;
+    default: throw new IllegalArgumentException("no core namespace with name: " + nsName.print());
     }
     return ns;
   }
   /**
-   * special forms
-   * called as very first
-   * cannot depend on anything else
+   * special forms<br/>
+   * called as very first<br/>
+   * cannot depend on anything else<br/>
    * Context doesn't work yet
    */
   private void loadSf(Namespace core) {
@@ -73,7 +55,9 @@ public class CoreLoader extends Namespace.Loader {
         return !a.first().eval(c).isNil() ? a.rest().first().eval(c) : a.rest().rest().first().eval(c);
       throw new InvalidOperationException("Wrong number of args passed to #/if: " + a.boundLength(30));
     });
-    def(core, "def", "(def ^{meta here} name term); meta of symbol becomes meta of var", (c, a) -> {
+    def(core, "def", "(def ^{meta here} name term); create global Var with name 'name and value 'term;"
+                     + "the Var is created in current namespace, if already exists, can be changed, but only from current namespace"
+                     + "; meta of symbol becomes meta of var", (c, a) -> {
       if (a.boundLength(2) != 2) //TODO: add option to only create without value
         throw new InvalidOperationException("Wrong number of args passed to #/def: " + a.boundLength(30));
       Term name = a.first();
@@ -113,31 +97,39 @@ public class CoreLoader extends Namespace.Loader {
                        + "(apply + 7 8 [4 5 6]) -> (+ 7 8 4 5 6)",
         (c, a) -> a.isNil() ? H.NIL : SeqH.extend(SeqH.mapEval(a, c)).eval(c));
 
-    defmacro(core, "fn", "creates function that binds args", a -> argsBindMacro(a, Sym.fnseqSymC));
-    defmacro(core, "macro", "creates macro that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
-    //defmacro(core, "fn2", "creates function that binds args", a -> argsBindMacro2(a, Sym.fnseqSymC));
+    
   }
 
+  /**
+   * transforms function definition with multiple arity overloads into a function that:<br/>
+   * counts arguments (at most maximal non-variadic arity)<br/>
+   * - creates case statement that branches the function into individual arity bodies<br/>
+   * - in else clause of case : generates (with test on minimal length, if needed) variadic overload, if provided<br/>
+   * - current implementation: non-variadic options are always tested first
+   */
   private Term argsBindMacro(Seq a, Symbol fnType) {
     if (a.isNil())
       throw new IllegalArgumentException("Cannot bind args withut binding form");
     if (!(a.first().unwrap() instanceof Seq)) //if simple body without overloads: make it 1 overload
       return argsBindMacro(H.list(a.addMeta(a.first().getMeta())), fnType);
     //map "create overload" over args, affregate and summary, compose into case
-    Seq data = a.fmap((Invocable1) x -> argsBindOverloadData(x));
+    Seq data = a.fmap((Invocable1) x -> argsBindOverloadData(x)); //generate overload body, cons arity
+    //reduce data((arity . body) ...) into {arity body} ++ :maxArity ++ :variadic
+    //it looks terrifying, but without the exception messages it's quite short...
+    //large part is just passing around meta for exception information etc.
     Map aritys = (Map) data.reduce(H.map(Sym.maxSymK, Int.of(Integer.MIN_VALUE)), FnH.<Map, Seq, Map>liftTypeUncheched2((m, s) -> {
       Term ar = s.first();
       Num arity = (Num) ar.unwrap();
       if (m.containsKey(arity))
         throw new IllegalArgumentException(
-                "Arity overload clash: " + arity + ": " + ar.getMeta().valAt(Sym.patternSym) + s.rest()
-                + " and " + m.valAt(arity).getMeta().valAt(Sym.patternSym) + m.valAt(arity));
-      if (arity.asInteger() < 0) { // variadic arity; can only contain 1
-        if (m.containsKey(Sym.variadicSymK))
+                "Arity overload clash: " + arity + ": " + ar.getMeta(Sym.patternSym) + s.rest()
+                + " and " + m.valAt(arity).getMeta(Sym.patternSym) + m.valAt(arity));
+      if (arity.asInteger() < 0) { // variadic arity
+        if (m.containsKey(Sym.variadicSymK)) //can only contain 1
           throw new IllegalArgumentException(
                   "Multiple variadic overloads (" + arity.neg().dec() + "+): "
-                  + ar.getMeta().valAt(Sym.patternSym) + s.rest() + " and "
-                  + m.valAt(Sym.variadicSymK).getMeta().valAt(Sym.patternSym) + m.valAt(Sym.variadicSymK));
+                  + ar.getMeta(Sym.patternSym) + s.rest() + " and "
+                  + m.valAt(Sym.variadicSymK).getMeta(Sym.patternSym) + m.valAt(Sym.variadicSymK));
         else //variadic set, meta: arity
           return m.assoc(Sym.variadicSymK, s.rest()
                          .addMeta(ar.getMeta())
@@ -161,10 +153,10 @@ public class CoreLoader extends Namespace.Loader {
     Seq posData = SeqH.filter(data, x -> H.wrap(((Num) ((SeqLike) x).first().unwrap()).asInteger() >= 0));
     Seq notMatched = aritys.containsKey(Sym.variadicSymK) ?
              argsBindArityDispatchVariadic(aritys.valAt(Sym.variadicSymK), a) :
-                     H.list(Sym.throwAritySymCore, Sym.argsSym, H.list(Sym.quoteSymC, a));
+                     H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, H.list(Sym.quoteSymC, a));
     Seq els = H.list(Sym.ignoreSym, notMatched);
     Seq allCases = SeqH.concatLazy(H.list(SeqH.concatLazy(posData), els));
-    Seq allWithCase = H.cons(Sym.caseSymCore, H.list(Sym.countPrimeSymCore, maxArity, Sym.argsSym), allCases);
+    Seq allWithCase = H.cons(Sym.caseSymCore, H.list(Sym.countPrimeSymCore, maxArity, Sym.argsSymSpecial), allCases);
     return H.list(fnType, allWithCase);
   }
 
@@ -177,9 +169,8 @@ public class CoreLoader extends Namespace.Loader {
     // `(~fnType (if (< (count' ~minArity $args) ~minArity) (throw-arity $args ~a) ~@(argsBindMacroLet (seq body)))
     return (SeqH.extend(H.list(Sym.ifSymC,
                                      H.list(Sym.LTSymCore,
-                                            H.list(Sym.countPrimeSymCore, minArity, Sym.argsSym),
-                                            minArity),
-                               H.list(Sym.throwAritySymCore, Sym.argsSym, H.list(Sym.quoteSymC, origData)),
+                                      H.list(Sym.countPrimeSymCore, minArity, Sym.argsSymSpecial),                                            minArity),
+                               H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, H.list(Sym.quoteSymC, origData)),
                                /*argsBindMacroLet*/ (H.seqFrom(body)))));
   }
 
@@ -197,12 +188,12 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * negative means variadic arity
-   * - the number means : "at least"
-   * -- but -1: otherwise : I would get 0 for: [& r]
-   * -- that returns -1
-   * -- [ a b c & r ] -> -4
-   * - probably not important, but why not...
+   * negative means variadic arity<br/>
+   * - the number means : "at least"<br/>
+   * -- but -1: otherwise : I would get 0 for: [& r]<br/>
+   * -- that returns -1<br/>
+   * -- [ a b c & r ] -> -4<br/>
+   * - probably not important, but why not...<br/>
    * determines arity from pattern binding
    */
   private int argsBindPatternArity(Term ptrn) {
@@ -223,10 +214,10 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * fn and macro core transformations:
-   * (fn binding body1 body2) -> (fnseq (let [binding $args] body1 body2))
-   * //macro only creates macroseq
-   * binding gets 'compiled' using @patternBinder
+   * fn and macro core transformations:<br/>
+   * (fn binding body1 body2) -> (fnseq (let [binding $args] body1 body2))<br/>
+   * //macro only creates macroseq; otherwise the same<br/>
+   * binding gets 'compiled' using @patternBinder<br/>
    */
 //  private Seq argsBindMacroSimple(Seq a, Symbol fnType) {
 //    return H.cons(fnType, argsBindMacroLet(a));
@@ -240,22 +231,20 @@ public class CoreLoader extends Namespace.Loader {
     if (body.isNil())
       return H.list(); // nothing would use the pattern anyway...
     Term pb = patternBinder(ptrn).addMeta(ptrn.getMeta()).addMeta(H.map(Sym.patternSym, ptrn));
-    return H.list(H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSym), body)));
+    return H.list(H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSymSpecial), body)));
   }
 
   /**
-   * multiple conditional divergences of path : like if with multiple tests
-   * evaluates first body after successful test; not evaluating anything after that
-   * - throw exception if not even number of arguments
-   * i.e. (cond test1 body1 test2 body2 test3 body3)
-   * (cond) returns nil
-   * impl:
-   * (cond test body ^rest^) -> (if test body (cond ^rest^))
+   * multiple conditional divergences of path : like if with multiple tests<br/>
+   * evaluates first body after successful test; not evaluating anything after that<br/>
+   * - throw exception if not even number of arguments<br/>
+   * i.e. (cond test1 body1 test2 body2 test3 body3)<br/>
+   * (cond) returns nil<br/>
+   * impl: (cond test body ^rest^) -> (if test body (cond ^rest^))
    * <p>
-   * --
-   * this could be defined in the language; sure : but I need it for arity dispatch
-   * and prefer not to do it without it
-   * - but more importantly: it requires me to throw IllegalArgument ... can't do that yet
+   * this could be defined in the language; sure : but I need it for arity dispatch<br/>
+   * and prefer not to do it without it<br/>
+   * - but more importantly: it requires me to throw IllegalArgument ... can't do that yet<br/>
    * - maybe rewrite as normal macro at some point later...
    */
   private Term condMacro(Seq a) {
@@ -271,11 +260,11 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * like Java switch: evaluates expression once and then matches it with options
-   * _ is equal to default, but need not to be last ... everything afterwards is ignored, though
-   * (case (eval-exp) 1 body1 2 body2 45 body3)
-   * is defined in terms of cond and .equals()
-   * - no matching: returns nil
+   * like Java switch: evaluates expression once and then matches it with options<br/>
+   * _ is equal to default, but need not to be last ... everything afterwards is ignored, though<br/>
+   * (case (eval-exp) 1 body1 2 body2 45 body3)<br/>
+   * is defined in terms of cond and .equals()<br/>
+   * - no matching: returns nil<br/>
    * (case exp t1 b1 t2 b2) -> (let [g## exp] (cond (= g t1) b1 (= g t2) b2))
    */
   private Term caseMacro(Seq a) {
@@ -312,8 +301,8 @@ public class CoreLoader extends Namespace.Loader {
 
   /**
    * for 'def special form : checks validity of ~most cases and:
-   * throws on any problem; only returns if nu is valid Symbol
-   * returns if ((Sym)nu).isQualified
+   * throws on any problem; only returns if nu is valid Symbol;
+   * @returns ((Symbol)nu).isQualified
    */
   private boolean defCheckAndRetIfQualified(Term nu, Symbol curNs) {
     if (nu instanceof Keyword)
@@ -330,10 +319,10 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * Creates pattern binder
-   * produces function that takes 1 arg.
-   * it destructures the argument into subparts that are named in term by structure in term
-   * returns map from these names to subvalues of arg
+   * Creates pattern binder;
+   * produces function that takes 1 arg.<br/>
+   * it destructures the argument into subparts that are named in term by structure in term;
+   * returns map from these names to subvalues of arg;
    * i.e.: (let [[a [ba bb] c & rest] (some-expression-generating-seq)] (i-can-use a ba etc.-in-here))
    */
   private Invocable patternBinder(Term t) {
@@ -384,9 +373,9 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * zips vector pattern with args seq using function: invoke first on second
-   * - producing seq of maps
-   * then reduces the entire thing into 1 map of resulting (symbol -> "matched")
+   * zips vector pattern with args seq using function: invoke first on second<br/>
+   * - producing seq of maps<br/>
+   * then reduces the entire thing into 1 map of resulting (symbol -> "matched")<br/>
    * if seq of args is too short : is extended with Nil-s
    */
   private Map applyVectorPatternBinder(Term term, Vec ptrn) {
@@ -398,15 +387,22 @@ public class CoreLoader extends Namespace.Loader {
     return (Map) binder.invoke(t);
   }
 
+  /**
+   * loads the #core namespace : functions and macros tied with the language; "imported" into every namespace
+   */
   private void loadCore(Context cxt, Namespace core, ReaderContext rcxt) {
-    defmacro(core, "defn", "creates and defs a function", a
-             -> H.list(Sym.defSymC, a.first(), H.cons(Sym.fnSymC, a.rest())));
-    defmacro(core, "defmacro", "creates and defs a function", a
-             -> H.list(Sym.defSymC, a.first().addMeta(Sym.macroMapTag), H.cons(Sym.macroSymC, a.rest())));
+    defmacro(core, "fn", "creates function that binds args", a -> argsBindMacro(a, Sym.fnseqSymC));
+    defmacro(core, "macro", "creates macro that binds args", a -> argsBindMacro(a, Sym.macroseqSymC));
 
-    defmacro(core, "cond", "Takes pairs of - test body; evaluates only body after first successful test", this::condMacro);
+    defmacro(core, "defn", "creates and defs a function; combines def and fn", a
+             -> H.list(Sym.defSymC, a.first(), H.cons(Sym.fnSymCore, a.rest())));
+    defmacro(core, "defmacro", "creates and defs a function; combines def and macro", a
+             -> H.list(Sym.defSymC, a.first().addMeta(Sym.macroMapTag), H.cons(Sym.macroSymCore, a.rest())));
+
+    defmacro(core, "cond", "Takes pairs of: (test body); evaluates only body after first successful test;\n"
+                           + "example: (cond (0 < v) :pos (0 > v) :neg :else :zero", this::condMacro);
     defmacro(core, "case", "Takes expr pairs (match body); works like cond with =#; evaluates expr once", this::caseMacro);
-    defn(core, "gensym", "returns ~unique symbol", a -> {
+    defn(core, "gensym", "returns unique symbol (in one run of program)", a -> {
       switch (a.boundLength(1)) {
       case 0: return H.uniqueSymbol();
       case 1: return H.uniqueSymbol(a.first().print());
@@ -425,7 +421,7 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, "seq", "seq from collection", a -> H.seqFrom(arityRequire(1, a, "seq").first()));
     defn(core, "count", "number of elements in collection; possibly O(N)", a
          -> H.requireNumerable(arityRequire(1, a, "count")).count());
-    defn(core, "count'", "number of elements in ^2 collection; O(1) possibly incorrect; "
+    defn(core, "count'", "number of elements in ^2 collection; O(1), possibly incorrect; "
                          + "if counts, returns maximally ^1 specified value"
                          + "(count' 5 (100)) -> Int.MaxValue", a -> {
       arityRequire(2, a, "count'");
@@ -443,7 +439,8 @@ public class CoreLoader extends Namespace.Loader {
 
     defn(core, "not", "(if % () 't)", a -> arityRequire(1, a, "not").first().isNil() ? Sym.TRUE : H.NIL);
 
-    defn(core, "reduce", "get meta data of term", a -> {
+    defn(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
+                         + " producing new accumulator, appling on second ...; returns final accumulator", a -> {
       arityRequire(3, a, "reduce");
       Invocable fn = H.requireInvocable(a.first());
       Term start = a.rest().first();
@@ -484,12 +481,12 @@ public class CoreLoader extends Namespace.Loader {
     H.eval("(defn max ([x] x) "
            + "        ([x & a] (reduce max# x a)))", cxt, rcxt);
 
-    H.eval("(defmacro and ([]'t)([x] x) ([x & y] (let [a (gensym)] "
+    H.eval("(defmacro and ([x] x)([]'t) ([x & y] (let [a (gensym)] " //implementation ~taken from clojure
            + "        `(let [~a ~x] (if ~a (~and ~@y) ~a))    )))", cxt, rcxt);
-    H.eval("(defmacro or ([]())([x] x) ([x & y] (let [a (gensym)] "
+    H.eval("(defmacro or  ([x] x)([]()) ([x & y] (let [a (gensym)] "
            + "        `(let [~a ~x] (if ~a ~a (~or ~@y)))    )))", cxt, rcxt);
 
-    H.eval("(defn = ([x] x) ([x y] (=# x y))"
+    H.eval("(defn = ([x y] (=# x y)) ([x] x) "
            + "      ([x y & a] (and (= x y) (apply = y a))))", cxt, rcxt);
 
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
@@ -502,7 +499,7 @@ public class CoreLoader extends Namespace.Loader {
   }
 
   /**
-   * this does not define macros; but namespace for working with macros
+   * this does not define macros; but namespace for working with macros : #macro
    */
   private void loadMacro(Namespace macro) {
     def(macro, Sym.quoteSymC.getNm(), "returns first arg without evaluating it", (c, a) -> a.firstOrNil());

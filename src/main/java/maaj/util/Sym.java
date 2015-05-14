@@ -19,6 +19,7 @@ public class Sym {
   }
   public static final Symbol derefSymCore = H.symbol("#core", "deref");
   public static final Symbol tagSymK = H.symbol(":tag");
+  public static final Symbol infoSymK = H.symbol(":info");
   public static final Symbol numSymK = H.symbol(":num");
   public static final Symbol elseSymK = H.symbol(":else");
   public static final Symbol maxSymK = H.symbol(":max");
@@ -49,12 +50,11 @@ public class Sym {
   public static final Symbol unquoteSymC = H.symbol("#macro", "unquote");
   public static final Symbol unquoteSplicingSymC = H.symbol("#macro", "unquote-splicing");
   public static final Symbol quoteQualifiedSymC = H.symbol("#macro", "quote-qualified");
-  public static final Symbol argsSym = H.symbol("$args");
-  //public static final Symbol aritySym = H.symbol("$arity");
+  public static final Symbol argsSymSpecial = H.symbol("$args");
   public static final Symbol macroseqSymC = H.symbol("#", "macroseq");
   public static final Symbol fnseqSymC = H.symbol("#", "fnseq");
-  public static final Symbol fnSymC = H.symbol("#", "fn");
-  public static final Symbol macroSymC = H.symbol("#", "macro");
+  public static final Symbol fnSymCore = H.symbol("#core", "fn");
+  public static final Symbol macroSymCore = H.symbol("#core", "macro");
 
   public static final Map macroMapTag = H.map(macroSymK, macroSymK);
   public static final Term TRUE = Symbol.of("t");

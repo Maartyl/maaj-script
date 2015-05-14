@@ -35,7 +35,7 @@ public abstract class InvSeq implements InvocableSeq {
 
   @Override
   public Term invokeSeq(Seq args) {
-    return fn.eval(closure.addToScope(H.map(Sym.argsSym, args)));
+    return fn.eval(closure.addToScope(H.map(Sym.argsSymSpecial, args)));
   }
 
   @Override
