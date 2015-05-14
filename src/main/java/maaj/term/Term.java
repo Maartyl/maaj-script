@@ -41,6 +41,7 @@ public interface Term extends Quotable {
   }
 
   default Term addMeta(Map meta) {
+    if (meta.isEmpty()) return this;
     return Meta.of(this, meta);
   }
 

@@ -122,22 +122,31 @@ public class CoreLoader extends Namespace.Loader {
     if (a.isNil())
       throw new IllegalArgumentException("Cannot bind args withut binding form");
     if (!(a.first().unwrap() instanceof Seq)) //if simple body without overloads: make it 1 overload
-      return argsBindMacro(H.list(a.addMeta(a.first().getMeta())), fnType);
+      return argsBindMacro2(H.list(a.addMeta(a.first().getMeta())), fnType);
     //map "create overload" over args, affregate and summary, compose into case
     Seq data = a.fmap((Invocable1) x -> argsBindOverloadData(x));
     Map aritys = (Map) data.reduce(H.map(Sym.maxSymK, Int.of(Integer.MIN_VALUE)), FnH.<Map, Seq, Map>liftTypeUncheched2((m, s) -> {
-      Num arity = (Num) s.first();
+      Term ar = s.first();
+      Num arity = (Num) ar.unwrap();
       if (m.containsKey(arity))
-        throw new IllegalArgumentException("Arity overload clash: " + arity + ": " + s.rest() + " and " + m.valAt(arity));
+        throw new IllegalArgumentException(
+                "Arity overload clash: " + arity + ": " + ar.getMeta().valAt(Sym.patternSym) + s.rest()
+                + " and " + m.valAt(arity).getMeta().valAt(Sym.patternSym) + m.valAt(arity));
       if (arity.asInteger() < 0) { // variadic arity; can only contain 1
         if (m.containsKey(Sym.variadicSymK))
-          throw new IllegalArgumentException("Multiple variadic overloads (" + arity.neg().dec() + "+): "
-                                             + s.rest() + " and " + m.valAt(Sym.variadicSymK));
+          throw new IllegalArgumentException(
+                  "Multiple variadic overloads (" + arity.neg().dec() + "+): "
+                  + ar.getMeta().valAt(Sym.patternSym) + s.rest() + " and "
+                  + m.valAt(Sym.variadicSymK).getMeta().valAt(Sym.patternSym) + m.valAt(Sym.variadicSymK));
         else //variadic set, meta: arity
-          return m.assoc(Sym.variadicSymK, s.rest().addMeta(H.map(Sym.aritySymK, arity.neg().dec())));
+          return m.assoc(Sym.variadicSymK, s.rest()
+                         .addMeta(ar.getMeta())
+                         .addMeta(H.map(Sym.aritySymK,
+                                        arity.neg().dec())));
       }
-      Num maxOld = (Num) m.valAt(Sym.maxSymK); // I will need to know maximal arity
-      return H.map(arity, s.rest(), Sym.maxSymK, maxOld.max(arity));
+      Num maxOld = (Num) m.valAt(Sym.maxSymK).unwrap(); // I will need to know maximal arity
+      return H.map(arity, s.rest().addMeta(ar.getMeta()),
+                   Sym.maxSymK, maxOld.max(arity));
     }));
     Num maxArity = ((Num) aritys.valAt(Sym.maxSymK));
 
@@ -149,14 +158,14 @@ public class CoreLoader extends Namespace.Loader {
       Term body = aritys.valAt(Sym.variadicSymK);
       return H.list(fnType, argsBindArityDispatchVariadic(body, a));
     }
-    Seq posData = SeqH.filter(data, x -> H.wrap(((Num) ((SeqLike) x).first()).asInteger() >= 0));
+    Seq posData = SeqH.filter(data, x -> H.wrap(((Num) ((SeqLike) x).first().unwrap()).asInteger() >= 0));
     Seq notMatched = aritys.containsKey(Sym.variadicSymK) ?
              argsBindArityDispatchVariadic(aritys.valAt(Sym.variadicSymK), a) :
-                     H.list(Sym.throwAritySymCore, Sym.argsSym, a);
+                     H.list(Sym.throwAritySymCore, Sym.argsSym, H.list(Sym.quoteSymC, a));
     Seq els = H.list(Sym.ignoreSym, notMatched);
     Seq allCases = SeqH.concatLazy(H.list(SeqH.concatLazy(posData), els));
     Seq allWithCase = H.cons(Sym.caseSymCore, H.list(Sym.countPrimeSymCore, maxArity, Sym.argsSym), allCases);
-    return H.cons(fnType, allWithCase);
+    return H.list(fnType, allWithCase);
   }
 
   private Seq argsBindArityDispatchVariadic(Term body, Term origData) {
@@ -169,21 +178,20 @@ public class CoreLoader extends Namespace.Loader {
                                      H.list(Sym.LTSymCore,
                                             H.list(Sym.countPrimeSymCore, minArity, Sym.argsSym),
                                             minArity),
-                                     H.list(Sym.throwAritySymCore, Sym.argsSym, origData),
-                                     argsBindMacroLet(H.seqFrom(body)))));
+                               H.list(Sym.throwAritySymCore, Sym.argsSym, H.list(Sym.quoteSymC, origData)),                                     argsBindMacroLet(H.seqFrom(body)))));
   }
 
   private Seq argsBindOverloadData(Term t) {
     if (!(t.unwrap() instanceof Seq))
       throw new InvalidOperationException("Overload is not a seq: " + t);
-    Seq s = (Seq) t;
+    Seq s = (Seq) t.unwrap();
     if (s.isNil())
       throw new IllegalArgumentException("Cannot bind args withut binding form");
     int arity = argsBindPatternArity(s.first());
     //{:arity arity :body (argsBindLet s)}
     //return H.map(Sym.aritySymK, H.wrap(arity), Sym.bodySymK, argsBindMacroLet(s));
     //this creates ~sort of 'case cases right away (some might my negative and stuff though...)
-    return H.cons(H.wrap(arity), argsBindMacroLet(s));
+    return H.cons(H.wrap(arity).addMeta(H.map(Sym.patternSym, s.first())), argsBindMacroLet(s));
   }
 
   /**
@@ -197,13 +205,13 @@ public class CoreLoader extends Namespace.Loader {
    */
   private int argsBindPatternArity(Term ptrn) {
     if (ptrn.unwrap() instanceof Symbol) {
-      Symbol s = (Symbol) ptrn;
+      Symbol s = (Symbol) ptrn.unwrap();
       if (s.isSimple())
         return -1; // simple symbol captures all args : variadic
     }
     if (!(ptrn.unwrap() instanceof Vec))
       throw new IllegalArgumentException("Cannot create args binding pattern from: " + ptrn);
-    Vec v = (Vec) ptrn;
+    Vec v = (Vec) ptrn.unwrap();
     if (v.cnt() < 2)
       return v.cnt();
     if (v.nth(v.cnt() - 2).equals(Sym.ampSym)) // [... & rest] : variadic

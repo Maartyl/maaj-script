@@ -37,6 +37,7 @@ public class FnH {
 
   /**
    * unsafe, only use when I KNOW the return value is safe to use.
+   * unwraps arguments .unwrap()
    * <p>
    * @param <T>
    * @param <U>
@@ -46,12 +47,14 @@ public class FnH {
    */
   @SuppressWarnings("unchecked")
   public static <T, U, V> Invocable2 liftTypeUncheched2(BiFunction<T, U, V> fn) {
-    return (t, u) -> (Term) (fn.apply((T) t, (U) u));
+    return (t, u) -> (Term) (fn.apply((T) t.unwrap(), (U) u.unwrap()));
   }
 
   /**
    * Promotes function of 2 args of any type into Invocable
    * checks and wraps return type
+   * unwraps arguments .unwrap()
+   * <p>
    * @param <T>
    * @param <U>
    * @param <V>
@@ -60,7 +63,7 @@ public class FnH {
    */
   @SuppressWarnings("unchecked")
   public static <T, U, V> Invocable2 liftTypeWrapping2(BiFunction<T, U, V> fn) {
-    return (t, u) -> H.wrap(fn.apply((T) t, (U) u));
+    return (t, u) -> H.wrap(fn.apply((T) t.unwrap(), (U) u.unwrap()));
   }
 
   public static <T> T id(T t) {
