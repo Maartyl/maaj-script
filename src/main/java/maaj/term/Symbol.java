@@ -128,6 +128,12 @@ public class Symbol implements Term {
 //    if (rslt == this) return this;
 //    if (!MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return this; //only "inline" what claims to be a macro
 //    return rslt.evalMacros(c);
+
+    //vars should be stored directly in terms (fn...), but it evaluates into their values...
+    //TODO: fix overinlining (probably calls unwrap: should change Var unwrap? - maybe not a Mimic?)
+//    Var v = c.getVar(this);
+//    if (v != null)
+//      return v;
     return this;
   }
 
