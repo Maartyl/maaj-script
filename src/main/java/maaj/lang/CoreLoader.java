@@ -492,7 +492,7 @@ public class CoreLoader extends Namespace.Loader {
              -> defComposeMacro(a, Sym.macroSymCore));
 
     defmacro(core, "cond", "Takes pairs of: (test body); evaluates only body after first successful test;\n"
-                           + "example: (cond (0 < v) :pos (0 > v) :neg :else :zero", this::condMacro);
+                           + "example: (cond (0 < v) :pos (0 > v) :neg :else :zero)", this::condMacro);
     defmacro(core, "case", "Takes expr pairs (match body); works like cond with =#; evaluates expr once", this::caseMacro);
     defn(core, "gensym", "returns unique* symbol (* in one run of program)", a -> {
       switch (a.boundLength(1)) {
@@ -521,7 +521,7 @@ public class CoreLoader extends Namespace.Loader {
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
     defn(core, "seq", "seq from collection", a -> H.seqFrom(arityRequire(1, a, "seq").first()));
     defn(core, "count", "number of elements in collection; possibly O(N)", a
-         -> H.requireNumerable(arityRequire(1, a, "count")).count());
+         -> H.requireNumerable(arityRequire(1, a, "count").first()).count());
     defn(core, "count'", "number of elements in [2nd arg] collection; O(1), possibly incorrect; "
                          + "if counts, returns maximally [1st arg] specified value"
                          + "(count' 5 (100)) -> Int.MaxValue;"
@@ -601,7 +601,7 @@ public class CoreLoader extends Namespace.Loader {
 
     H.eval("(defmacro lazy ^\"postpones evaluation of argument and returns seq thunk; body must evaluate into seq; "
            + "if 2 arguments given ~= (cons fst-arg (lazy snd-arg))\""
-           + "([x] `(lazy' (#/fnseq ~x))) ([h t] `(cons ~h (lazy ~t)) )  )", cxt, rcxt);
+           + "([x] `(lazy' (#/fnseq ~x))) ([h t] `(cons ~h (lazy ~t))))", cxt, rcxt);
 
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                               + "(throw-arity $args \"message\")",
