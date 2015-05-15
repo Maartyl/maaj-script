@@ -106,7 +106,8 @@ public class MaajReader {
     if (isNumericStart(c))
       return readNum();
     if (isSymbolicStart(c))
-      return readSymbol();
+      //return readSymbol();
+      return readSymbolWithPosition();
 
     return fail("read0: " + (char) c + " /:" + c);
   }
@@ -119,8 +120,8 @@ public class MaajReader {
    * starts at @c@ position : can be gotten to differently based on previous content (i.e. : a(5 2) vs. (1 2) (5 2))
    */
   private Term read0(int c) {
-    Map m = H.map(Sym.fileRowSymK, H.wrap(reader.getRow()), Sym.fileColSymK, H.wrap(reader.getColumn()));
-    return read0Inner(c).addMeta(m);
+    //Map m = H.map(Sym.fileRowSymK, H.wrap(reader.getRow()), Sym.fileColSymK, H.wrap(reader.getColumn()));
+    return read0Inner(c);//.addMeta(m);
   }
   /**
    * called after '#' symbol : extends dispatch table
@@ -356,6 +357,12 @@ public class MaajReader {
     while (isSymbolic(next()));
     unread(); //last read char is not part of symbol
     return qualifyKeywordIfShould(H.symbol(sb.toString()));
+  }
+
+  private Term readSymbolWithPosition() {
+    //I think reading positions of only symbols might work
+    Map m = H.map(Sym.fileRowSymK, H.wrap(reader.getRow()), Sym.fileColSymK, H.wrap(reader.getColumn()));
+    return readSymbol().addMeta(m);
   }
 
   private Symbol qualifyKeywordIfShould(Symbol s) {
