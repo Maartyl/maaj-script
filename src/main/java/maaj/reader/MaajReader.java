@@ -323,7 +323,9 @@ public class MaajReader {
   private int read4Num16Int() {
     StringBuilder sb = new StringBuilder(4);
     for (int i = 0; i < 4; ++i)
-      sb.append((char) next());
+      if (isNumeric16(next()))
+        sb.append((char) cur());
+      else fail("Invalid hexadecimal char: " + cur());
     return Integer.parseInt(sb.toString(), 16);
   }
 
