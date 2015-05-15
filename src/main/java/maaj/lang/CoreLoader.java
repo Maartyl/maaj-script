@@ -114,7 +114,7 @@ public class CoreLoader extends Namespace.Loader {
                           + ":as <unqualified symbol> - will be accessible through this instead only original namespace name"
                           + "nothing - imports qualified\n"
                           + "var names - not qualified, reqt qualified, not implemented yet;\n"
-                          + "//everything is always import as qualified also", (c, a) -> {
+                          + "//everything is always also imported as qualified", (c, a) -> {
       if (a.isNil()) return H.NIL;
       Symbol nsName = H.requireSymbol(a.first());
       Namespace ns = c.require(nsName);
