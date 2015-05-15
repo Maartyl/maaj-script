@@ -90,7 +90,7 @@ public class CoreLoader extends Namespace.Loader {
         throw new InvalidOperationException("#/let: requires bindings");
       if (!(a.first().getContent() instanceof Vec))
         throw new InvalidOperationException("#/let: bindings must be a vector");
-      return H.cons(Sym.doSymC, a.rest()).eval(letEvalBindings(c, (Vec) a.first()));
+      return H.cons(Sym.doSymC, a.rest()).eval(letEvalBindings(c, (Vec) a.first().unwrap()));
     });
     def(core, "fnseq", "(fnseq body body $args body)", (c, a) -> FnSeq.of(a, c));
     def(core, "macroseq", "(macroseq body body $args body)", (c, a) -> MacroSeq.of(a, c));
