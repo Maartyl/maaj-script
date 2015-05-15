@@ -91,7 +91,9 @@ public class Tuple0 implements Vec {
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
-    //TODO: if wrapper? (meta)
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if ((obj instanceof VecLike)) {
       VecLike other = (VecLike) obj;
       return getCountAsInteger() == other.getCountAsInteger();

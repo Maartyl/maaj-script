@@ -143,6 +143,9 @@ public final class Char implements Num {
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if (getClass() != obj.getClass()) return false;
     final Char other = (Char) obj;
     if (this.value != other.value) return false;

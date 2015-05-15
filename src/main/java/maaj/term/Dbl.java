@@ -108,16 +108,20 @@ public final class Dbl implements Num {
 
   @Override
   public int hashCode() {
-    return (int) (Double.doubleToLongBits(this.value) ^ (Double.doubleToLongBits(this.value) >>> 32));
+    return Double.hashCode(value);
+    //long dblBits = Double.doubleToLongBits(value);
+    //return (int) (dblBits ^ (dblBits >>> 32));
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if (getClass() != obj.getClass()) return false;
     final Dbl other = (Dbl) obj;
-    if (Double.doubleToLongBits(this.value) != Double.doubleToLongBits(other.value)) return false;
-    return true;
+    return Double.doubleToLongBits(this.value) == Double.doubleToLongBits(other.value);
   }
 
 
@@ -128,11 +132,6 @@ public final class Dbl implements Num {
   @Override
   public Term evalMacros(Context c) {
     return this;
-  }
-
-  @Override
-  public Term apply(Context cxt, Seq args) {
-    throw new UnsupportedOperationException("Cannot apply to double.");
   }
 
   //-- STATIC

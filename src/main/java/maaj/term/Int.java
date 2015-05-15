@@ -23,28 +23,28 @@ public final class Int implements Num {
 
   @Override
   public Int inc() {
-    return Int.of(value + 1);
+    return of(value + 1);
   }
 
   @Override
   public Int inc(Num diff) {
     //todo: 'add' variant that will add mathematically: Int + Dbl => Dbl
-    return Int.of(value + diff.asLong());
+    return of(value + diff.asLong());
   }
 
   @Override
   public Int neg() {
-    return Num.of(-value);
+    return of(-value);
   }
 
   @Override
   public Int dec() {
-    return Num.of(value - 1);
+    return of(value - 1);
   }
 
   @Override
   public Int dec(Num diff) {
-    return Int.of(value - diff.asLong());
+    return of(value - diff.asLong());
   }
 
   @Override
@@ -125,20 +125,19 @@ public final class Int implements Num {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(value);
+    return Long.hashCode(value);
   }
 
   @Override
   public boolean equals(Object obj) {
-//    if (value <= 256 && value >= -255)
-//      return this == obj;
     if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if (getClass() != obj.getClass()) return false;
     final Int other = (Int) obj;
     return this.value == other.value;
   }
-
-
 
 
   //---- STATIC

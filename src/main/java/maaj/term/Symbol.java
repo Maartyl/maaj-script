@@ -172,10 +172,12 @@ public class Symbol implements Term {
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if (getClass() != obj.getClass()) return false;
     final Symbol other = (Symbol) obj;
-    if (!Objects.equals(this.name, other.name)) return false;
-    return true;
+    return Objects.equals(this.name, other.name);
   }
 
   @Override

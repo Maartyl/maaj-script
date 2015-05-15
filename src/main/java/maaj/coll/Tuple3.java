@@ -91,11 +91,12 @@ public class Tuple3 implements Vec {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Term))
-      return false;
-    Term o = ((Term) obj).unwrap();
-    if ((o instanceof VecLike)) {
-      VecLike other = (VecLike) o;
+    if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
+    if ((obj instanceof VecLike)) {
+      VecLike other = (VecLike) obj;
       return getCountAsInteger() == other.getCountAsInteger()
              && t0.equals(other.nth(0))
              && t1.equals(other.nth(1))

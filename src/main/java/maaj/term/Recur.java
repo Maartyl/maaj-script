@@ -39,8 +39,10 @@ public class Recur implements Term {
   public Term unwrap() {
     //this might get called, because it can get wrapped
     //this is (sadly) necessary, to wrok well with rest of the app
-    return this;
-    //throw new UnsupportedOperationException("Recur outside looping context");
+    //maybe fine ... needs testing or proof; let's kep it thi way: if fails: probelm
+    //- otherwise : correct exception message
+    //return this;
+    throw new UnsupportedOperationException("Recur outside looping context");
   }
 
   @Override

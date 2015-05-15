@@ -105,7 +105,10 @@ public class Tuple2 implements Vec, KVPair {
 
   @Override
   public boolean equals(Object obj) {
-    //TODO: if wrapper? (meta)
+    if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if ((obj instanceof VecLike)) {
       VecLike other = (VecLike) obj;
       return getCountAsInteger() == other.getCountAsInteger() && t0.equals(other.nth(0)) && t1.equals(other.nth(1));
