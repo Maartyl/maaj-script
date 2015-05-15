@@ -62,7 +62,7 @@ public final class Var implements Mimic, RefSet<Var> {
   @Override
   public void show(Writer w) throws IOException {
     if (meta.containsKey(Sym.nameSym))
-      H.list(Sym.varSym, meta.valAt(Sym.nameSym), unwrap()).show(w);
+      H.list(Sym.varSymC, meta.valAt(Sym.nameSym), unwrap()).show(w);
     else Mimic.super.show(w);
   }
 

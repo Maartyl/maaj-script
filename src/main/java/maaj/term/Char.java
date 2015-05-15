@@ -148,8 +148,7 @@ public final class Char implements Num {
     else return false;
     if (getClass() != obj.getClass()) return false;
     final Char other = (Char) obj;
-    if (this.value != other.value) return false;
-    return true;
+    return this.value == other.value;
   }
 
 

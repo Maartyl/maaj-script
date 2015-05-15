@@ -51,7 +51,8 @@ public class CoreLoader extends Namespace.Loader {
    * Context doesn't work yet
    */
   private void loadSf(Namespace core) {
-    def(core, "if", "", (c, a) -> {
+    def(core, "if", "evaluates first argument; if non-nil evaluates and returns second;"
+                    + "if nil: if third argument is present: evaluates and returns it; otherwise nil", (c, a) -> {
       int len = a.boundLength(3);
       if (len == 2)
         return a.first().eval(c).isNil() ? H.NIL : a.rest().first().eval(c);
@@ -102,6 +103,11 @@ public class CoreLoader extends Namespace.Loader {
         (c, a) -> a.isNil() ? H.NIL : SeqH.extend(SeqH.mapEval(a, c)).eval(c));
     def(core, "recur", "repeat function with new arguments : tail recursion optimized;"
                        + " cannot be used in any other context", (c, a) -> Recur.ofArgs(SeqH.mapEval(a, c)));
+
+    def(core, "var", "gets Var itself associated with symbol; not the value in Var", (c,a)->{
+      arityRequire(1, a, "var");
+      return c.getVar(H.requireSymbol(a.first().eval(c)));
+    });
 
     def(core, "require'", "takes symbol with namespace name; then options:\n"
                           + ":* - import all vars from namespace directly\n"

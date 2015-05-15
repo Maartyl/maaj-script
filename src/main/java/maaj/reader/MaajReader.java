@@ -96,7 +96,7 @@ public class MaajReader {
     case '~': return readUnquote();
     case '\\': return readEscape();
     case '`': return H.list(Sym.quoteQualifiedSymC, read0SkipWhitespace());
-    case '\'': return H.list(Sym.quoteSymC, read0SkipWhitespace());
+    case '\'': return readQuote();
     case '@': return H.list(Sym.derefSymCore, read0SkipWhitespace());
     case ')': return fail("unmatched: )");
     case ']': return fail("unmatched: ]");
@@ -109,6 +109,10 @@ public class MaajReader {
       return readSymbol();
 
     return fail("read0: " + (char) c + " /:" + c);
+  }
+
+  private Seq readQuote() {
+    return H.list(Sym.quoteSymC, read0SkipWhitespace());
   }
   /**
    * read top level term (can be neseted inside others, but also can exist by itself)
@@ -135,9 +139,9 @@ public class MaajReader {
     case '/': return readSymbol().withNamespace("#");
     case '^': return fail("not implemented yet: I can pick anything...");
     case '~': return fail("not implemented yet: I can pick anything...");
-    case '\\': return fail("not implemented yet: I can pick anything... (var)");
+    case '\\': return fail("not implemented yet: I can pick anything...");
     case '`': return fail("not implemented yet: I can pick anything...");
-    case '\'': return fail("not implemented yet: I can pick anything...");
+    case '\'': return readVar();
     case '@': return fail("not implemented yet: I can pick anything...");
     case ')': return fail("unmatched: )");
     case ']': return fail("unmatched: ]");
@@ -381,6 +385,10 @@ public class MaajReader {
       return readNum().neg();
     }
     return readSymbol();
+  }
+
+  private Term readVar() {
+    return H.list(Sym.varSymC, readQuote());
   }
 
   private static boolean isWhitespace(int c) {
