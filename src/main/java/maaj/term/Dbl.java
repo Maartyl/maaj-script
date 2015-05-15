@@ -132,7 +132,7 @@ public final class Dbl implements Num {
 
   @Override
   public Term apply(Context cxt, Seq args) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    throw new UnsupportedOperationException("Cannot apply to double.");
   }
 
   //-- STATIC
