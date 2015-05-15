@@ -42,6 +42,7 @@ public class Sym {
   public static final Symbol nameSym = H.symbol("name");
   public static final Symbol namespaceSym = H.symbol("namespace");
   public static final Symbol patternSym = H.symbol("pattern");
+  public static final Symbol qnameSymK = H.symbol(":qname");
   public static final Symbol aritySymK = H.symbol(":arity");
   public static final Symbol bodySymK = H.symbol(":body");
   public static final Symbol doSymC = H.symbol("#", "do");

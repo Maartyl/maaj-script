@@ -40,9 +40,22 @@ public final class Var implements Mimic, RefSet<Var> {
 
   @Override
   public synchronized Var addMeta(Map meta) {
+
     this.meta = MapH.update(this.meta, meta);
     return this;
   }
+
+  @Override
+  public Term addMeta(Term key, Term val) {
+    meta = meta.assoc(key, val);
+    return this;
+  }
+
+  @Override
+  public Term getMeta(Term key) {
+    return meta.valAt(key);
+  }
+
 
   @Override
   public Map getMeta() {
@@ -61,9 +74,23 @@ public final class Var implements Mimic, RefSet<Var> {
 
   @Override
   public void show(Writer w) throws IOException {
-    if (meta.containsKey(Sym.nameSym))
-      H.list(Sym.varSymC, meta.valAt(Sym.nameSym), unwrap()).show(w);
-    else Mimic.super.show(w);
+    if (meta.containsKey(Sym.qnameSymK)) { //I have both: name and namespace : common; already composed
+      w.append("#'");
+      meta.valAt(Sym.qnameSymK).show(w);
+      return;
+    }
+    if (meta.containsKey(Sym.nameSym)) {
+      if (meta.containsKey(Sym.namespaceSym)) { //I have both, but not composed: compose, retry
+        addMeta(Sym.qnameSymK, H.requireSymbol(meta.valAt(Sym.nameSym)) //compose name and namespace
+                               .withNamespace(H.requireSymbol(meta.valAt(Sym.namespaceSym))))
+                .show(w);
+        return;
+      }
+      w.append("#'"); //I have only name; no namespace
+      meta.valAt(Sym.nameSym).show(w);
+      return;
+    }//I don't have anything ... Who am I?
+    w.append("#'<?>");
   }
 
   @Override
