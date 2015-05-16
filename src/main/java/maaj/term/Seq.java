@@ -10,7 +10,7 @@ import maaj.exceptions.InvalidOperationException;
 import maaj.util.SeqH;
 
 /**
- * Represents singleLinked list - base for S-expressions
+ * Represents (potentially lazy) singly linked list - base for S-expressions
  * <p>
  * Default ~Monadic and seq operations implementations are lazy
  * - Sexp overrides them to be eager if list is short
