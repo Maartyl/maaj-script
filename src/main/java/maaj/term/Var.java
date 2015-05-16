@@ -93,6 +93,12 @@ public final class Var implements Term, RefSet<Var> {
   }
 
   @Override
+  public Term applyMacro(Context cxt, Seq args) {
+    return deref().applyMacro(cxt, args);
+  }
+
+
+  @Override
   public Term apply(Context cxt, Seq args) {
     return deref().apply(cxt, args);
   }

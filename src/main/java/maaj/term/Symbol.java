@@ -153,10 +153,10 @@ public class Symbol implements Term {
     //this must be here, not in evalMacro : why?
     //I only want to get macros if in context of application of 1
     //if just (defn m [a] (inc 5)), m is macro : I don't wan't m to get evaluated into the #/macroseq
-    Term rslt = cxt.valAt(this, this);
+    Var v = cxt.getVar(this);
     //if (rslt == this) return this;
-    if (MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return rslt.applyMacro(cxt, args); //only "inline" what claims to be a macro
-    // Term.super: sfmaps evalMacro on args
+    if (v != null && MapH.hasTag(v.getMeta(), Sym.macroSymK)) return v.applyMacro(cxt, args); //only "inline" what claims to be a macro
+    // Term.super: fmaps evalMacro on args
     return Term.super.applyMacro(cxt, args);
   }
 
