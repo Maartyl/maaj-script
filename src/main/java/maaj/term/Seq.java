@@ -53,7 +53,7 @@ public interface Seq extends Monad, SeqLike {
 
   @Override
   public default Term apply(Context cxt, Seq args) {
-    throw new InvalidOperationException("Seq cannot be used as a function."); //TODO: implement
+    throw new InvalidOperationException("Seq cannot be used as a function.");
   }
 
   @Override
