@@ -12,7 +12,8 @@ import maaj.term.Int;
 import maaj.term.Term;
 
 /**
- *
+ * represents a collection with elements accessible by an index
+ * <p>
  * @author maartyl
  */
 public interface Indexed extends Counted, Iterable<Term> {
