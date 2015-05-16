@@ -11,7 +11,8 @@ import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
 
 /**
- *
+ * Empty seq. Used as seq terminator: normal seq segment is [head and rest], last rest must be something special; empty.
+ * <p>
  * @author maartyl
  */
 public interface NilSeq extends Seq {
