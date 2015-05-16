@@ -37,12 +37,15 @@ public class Repl {
     w.flush();
     for (Term t : H.read(r, new ReaderContext(ns, "<?>")))
       try {
-        t.eval(cxt).show(w);
+        //t.eval(cxt).show(w);
+        H.eval(t, cxt).show(w);
         w.append("\n>");
         w.flush();
       } catch (Exception e) {
         System.err.println(e);
         e.printStackTrace(System.err);
+        w.append(">");
+        w.flush();
         //throw e;
       }
       
@@ -53,18 +56,17 @@ public class Repl {
       Reader r = new InputStreamReader(System.in);
       Writer w = new OutputStreamWriter(System.out);
       run(r, w);
-      throw new EndT();
-    } catch (IOException | ReaderException e) {
+      break; //if runs to end fine : exit; otherwise repeat after exception (in reader)
+    } catch (ReaderException e) {
       System.err.println(e);
-    } catch (EndT e) {
+      e.printStackTrace(System.err);
+    } catch (IOException  e) {
+      System.err.println(e);
       break;
     }
   }
 
   public static void main(String[] args) {
     new Repl().runStd();
-  }
-
-  private static class EndT extends Throwable {
   }
 }
