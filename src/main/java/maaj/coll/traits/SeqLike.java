@@ -14,8 +14,9 @@ import maaj.util.H;
 /**
  *
  * @author maartyl
+ * @param <S> self
  */
-public interface SeqLike extends Numerable, Seqable, Reducible, Iterable<Term> {
+public interface SeqLike<S extends SeqLike<S>> extends Numerable, Seqable, Reducible, Iterable<Term>, Growable<S> {
   //--contract:
 
   Term first();

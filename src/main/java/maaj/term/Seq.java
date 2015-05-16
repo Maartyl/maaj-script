@@ -7,6 +7,7 @@ import maaj.coll.Sexp;
 import maaj.coll.traits.SeqLike;
 import maaj.lang.Context;
 import maaj.exceptions.InvalidOperationException;
+import maaj.util.H;
 import maaj.util.SeqH;
 
 /**
@@ -17,11 +18,16 @@ import maaj.util.SeqH;
  *
  * @author maartyl
  */
-public interface Seq extends Monad, SeqLike {
+public interface Seq extends Monad<Seq>, SeqLike<Seq> {
 
   @Override //explicit because: diamon inheritance (same name on purpose)
   default boolean isNil() {
     return false;
+  }
+
+  @Override
+  public default Seq conj(Term t) {
+    return H.cons(t, this);
   }
 
   @Override

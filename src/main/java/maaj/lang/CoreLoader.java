@@ -68,6 +68,16 @@ public class CoreLoader extends Namespace.Loader {
       Term name = a.first();
       Term val = a.rest().first().eval(c);
       Term nu = name.unwrap();
+      if (nu instanceof Var) {
+        Var v = (Var) nu;
+        if (v.getMeta(Sym.namespaceSym).equals(c.getCurNs().getName())) {
+          v.doSet(val);
+          return v;
+        } else {
+          throw new InvalidOperationException("#/def: cannot change a var from a different namespace:" + nu.print());
+          //nu = v.getMeta(Sym.nameSym);
+        }
+      }
       if (defCheckAndRetIfQualified(nu, c.getCurNs().getName())) {
         Var v = c.getVar((Symbol) nu);
         if (v == null) throw new InvalidOperationException("#/def: cannot create qualified var:" + nu.print());
@@ -540,6 +550,17 @@ public class CoreLoader extends Namespace.Loader {
       return H.cons(a.first(), H.seqFrom(a.rest().first()));
     });
 
+    defn(core, "conj#", "ads to cellection; where depends on collection", a -> {
+      arityRequire(2, a, "conj'");
+      return H.requireGrowable(a.first()).conj(a.rest().first());
+    });
+
+    defn(core, "assoc#", "update collection at given key with given value", a -> {
+      arityRequire(3, a, "assoc'");
+      return H.requireAssocUpdate(a.first()).assoc(a.rest().first(), a.rest().rest().first());
+    });
+
+
     defn(core, "not", "(if % () 't)", a -> arityRequire(1, a, "not").first().isNil() ? Sym.TRUE : H.NIL);
 
     defn(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
@@ -603,6 +624,12 @@ public class CoreLoader extends Namespace.Loader {
     H.eval("(defmacro lazy ^\"postpones evaluation of argument and returns seq thunk; body must evaluate into seq; "
            + "if 2 arguments given ~= (cons fst-arg (lazy snd-arg))\""
            + "([x] `(lazy' (#/fnseq ~x))) ([h t] `(cons ~h (lazy ~t))))", cxt, rcxt);
+
+    H.eval("(defn conj ^\"conjoins 1 or more terms to a collection\""
+           + "([coll x] (conj# coll x)) ([coll & r] (reduce conj# coll r)))", cxt, rcxt);
+
+    H.eval("(defn assoc ^\"[map/vec] key val; associate key with val in map; there can be multiple key val pairs\""
+           + "([c k v] (assoc# c k v)) ([c k v & r] (apply recur (assoc# c k v) r)))", cxt, rcxt);
 
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                               + "(throw-arity $args \"message\")",

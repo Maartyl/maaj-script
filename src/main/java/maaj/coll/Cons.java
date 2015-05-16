@@ -5,7 +5,6 @@
  */
 package maaj.coll;
 
-import maaj.coll.traits.Seqable;
 import maaj.lang.Context;
 import maaj.util.H;
 import maaj.term.*;

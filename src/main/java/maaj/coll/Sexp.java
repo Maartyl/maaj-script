@@ -5,6 +5,10 @@
  */
 package maaj.coll;
 
+import maaj.coll.traits.Counted;
+import maaj.coll.traits.Growable;
+import maaj.coll.traits.Reducible;
+import maaj.coll.traits.Seqable;
 import maaj.lang.Context;
 import maaj.util.H;
 import maaj.exceptions.InvalidOperationException;
@@ -15,7 +19,7 @@ import maaj.term.*;
  *
  * @author maartyl
  */
-public class Sexp extends Cons implements Collection {
+public class Sexp extends Cons implements Counted, Growable<Seq>, Seqable, Reducible {
   private final Int size;
 
   public Sexp(Int size, Term head, Seq tail) {

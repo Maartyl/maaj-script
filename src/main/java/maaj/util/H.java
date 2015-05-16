@@ -17,8 +17,10 @@ import maaj.coll.Tuple0;
 import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
+import maaj.coll.traits.AssocUpdate;
 import maaj.coll.traits.Deref;
 import maaj.coll.traits.Functor;
+import maaj.coll.traits.Growable;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.Numerable;
 import maaj.coll.traits.Reducible;
@@ -401,6 +403,24 @@ public class H {
       return (Seqable) t;
 
     throw new IllegalArgumentException("Requires Seqable, got: " + t.getClass().getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & Growable<T>> T requireGrowable(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Growable)
+      return (T) t;
+
+    throw new IllegalArgumentException("Requires Growable, got: " + t.getClass().getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & AssocUpdate<T>> T requireAssocUpdate(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof AssocUpdate)
+      return (T) t;
+
+    throw new IllegalArgumentException("Requires AssocUpdate, got: " + t.getClass().getName());
   }
 
   public static Invocable requireInvocable(Term tt) {
