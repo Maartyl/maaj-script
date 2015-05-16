@@ -94,7 +94,9 @@ public final class Var implements Term, RefSet<Var> {
 
   @Override
   public Term applyMacro(Context cxt, Seq args) {
-    return deref().applyMacro(cxt, args);
+    if (MapH.hasTag(meta, Sym.macroSymK))
+      return deref().applyMacro(cxt, args);
+    else return Term.super.applyMacro(cxt, args);
   }
 
 
@@ -132,6 +134,22 @@ public final class Var implements Term, RefSet<Var> {
     doSet(s);
     return s;
   }
+
+  @Override
+  public String toString() {
+    return print();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
 
   public static Var empty() {
     return new Var(null);

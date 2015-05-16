@@ -17,6 +17,7 @@ import maaj.coll.Tuple0;
 import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
+import maaj.coll.traits.Deref;
 import maaj.coll.traits.Functor;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.Numerable;
@@ -376,6 +377,15 @@ public class H {
 
     throw new IllegalArgumentException("Requires Char, got: " + t.getClass().getName());
   }
+
+  public static Deref requireDeref(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Deref)
+      return (Deref) t;
+
+    throw new IllegalArgumentException("Requires Deref, got: " + t.getClass().getName());
+  }
+
 
   public static Seq requireSeq(Term tt) {
     Term t = tt.unwrap();
