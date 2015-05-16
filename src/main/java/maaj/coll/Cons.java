@@ -58,7 +58,6 @@ public class Cons implements Seq {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) return true;
     if (obj instanceof Term)
       obj = ((Term) obj).unwrap();
     else return false;
@@ -69,6 +68,7 @@ public class Cons implements Seq {
     for (; !st.isNil(); st = st.rest(), so = so.rest())
       if (so.isNil() || !st.first().equals(so.first()))
         return false;
+      else if (st == so) return true; //share the same tail, at same offset; until now the same
     return so.isNil();
   }
 
