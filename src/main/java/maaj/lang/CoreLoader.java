@@ -617,12 +617,12 @@ public class CoreLoader extends Namespace.Loader {
    * this does not define macros; but namespace for working with macros : #macro
    */
   private void loadMacro(Namespace macro) {
-    def(macro, Sym.quoteSymC.getNm(), "returns first arg without evaluating it", (c, a) -> a.firstOrNil());
-    def(macro, Sym.quoteQualifiedSymC.getNm(), //getNm : names are qualified
-        "returns first arg without evaluating it; "
-        + "recursively looking for unquote, evaluating those "
-        + "and returning them in their original place in the structure",
-        (c, a) -> a.isNil() ? H.NIL : H.seqFrom(a.first().unquoteTraverse(c)).firstOrNil());
+    defq(macro, Sym.quoteSymC.getNm(), "returns first arg without evaluating it", SfQuoting.SfQuote);
+    defq(macro, Sym.quoteQualifiedSymC.getNm(), //getNm : names are qualified
+         "returns first arg without evaluating it; "
+         + "recursively looking for unquote, evaluating those "
+         + "and returning them in their original place in the structure",
+         SfQuoting.SfQuoteQualified);
     def(macro, "expand", "expand macro without evaluating it", (c, a) -> a.firstOrNil().evalMacros(c));
   }
 
@@ -638,6 +638,14 @@ public class CoreLoader extends Namespace.Loader {
 
   private static void def(Namespace ns, Symbol name, String doc, Sf sf) {
     ns.def(name, sf, H.map(Sym.docSymK, Str.of(doc)));
+  }
+
+  private static void defq(Namespace ns, String name, String doc, SfQuoting sf) {
+    defq(ns, H.symbol(name), doc, sf);
+  }
+
+  private static void defq(Namespace ns, Symbol name, String doc, SfQuoting sf) {
+    ns.def(name, sf, H.map(Sym.docSymK, Str.of(doc), Sym.macroSymK, Sym.macroSymK));
   }
 
   private static void defn(Namespace ns, String name, String doc, Fn fn) {
