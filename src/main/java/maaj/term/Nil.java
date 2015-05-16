@@ -10,14 +10,15 @@ import java.io.Writer;
 import maaj.lang.Context;
 
 /**
- *
+ * Singleton representing null; null is not allowed in MaajScript and is always wrapped* in a Nil.
+ * (* replaced with)
+ * <p>
  * @author maartyl
  */
 public interface Nil extends Ground {
 
   @Override
   default Term eval(Context c) {
-    //TODO: or throw exception? - null in evaluation chain?
     return this;
   }
 
@@ -43,7 +44,7 @@ public interface Nil extends Ground {
 
   @Override
   default Object getContent() {
-    return null;
+    return this;
   }
 
   @Override
