@@ -5,12 +5,12 @@
  */
 package maaj.coll.traits;
 
-import maaj.term.KVPair;
 import maaj.term.Term;
 import maaj.util.H;
 
 /**
- *
+ * represents part of associative collection, that provides retrieval of contents
+ * <p>
  * @author maartyl
  */
 public interface AssocGet extends Lookup {
@@ -18,13 +18,14 @@ public interface AssocGet extends Lookup {
     return valAt(key, H.notFoundNil) != H.notFoundNil;
   }
 
-  public default KVPair entryAt(Term key) {
-    Term val = valAt(key, H.notFoundNil);
-    //TODO: think through (Nil / Ex / (Key, Nil) / ??)
-//    if (val == H.notFoundNil)
-//      throw new notfound;
-    //This is wrong: shows notFoundNil - that probably shouldn't be happening...
-    //KVEntry must become Term anyway, to be useable - Nil is probably best
-    return H.buildAssocEntry(key, val == H.notFoundNil ? H.NIL : val);
-  }
+  //generally weird concept, that turned out to be unnecessary
+//  public default KVPair entryAt(Term key) {
+//    Term val = valAt(key, H.notFoundNil);
+//    //TODO: think through (Nil / Ex / (Key, Nil) / ??)
+////    if (val == H.notFoundNil)
+////      throw new notfound;
+//    //This is wrong: shows notFoundNil - that probably shouldn't be happening...
+//    //KVEntry must become Term anyway, to be useable - Nil is probably best
+//    return H.buildAssocEntry(key, val == H.notFoundNil ? H.NIL : val);
+//  }
 }
