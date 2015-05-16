@@ -507,7 +507,8 @@ public class CoreLoader extends Namespace.Loader {
              -> H.cons(Sym.doSymC, SeqH.mapSexp(a, x
                                                 -> x.unwrap() instanceof Seqable ?
                                                    H.cons(Sym.requirePrimeSymC, H.seqFrom(x)) :
-                                                   H.list(Sym.requirePrimeSymC, x))));
+                                                        H.list(Sym.requirePrimeSymC, x))));
+    defn(core, "deref", "dereferences argument (for cells and boxes)", a -> H.requireDeref(arityRequire(1, a, "deref").first()).deref());
 
     defn(core, "meta", "get meta data of term; (meta term) ->{...}; (meta :key term) ~= (:key (meta term))", a
          -> a.isNil() ? H.NIL.getMeta() :
