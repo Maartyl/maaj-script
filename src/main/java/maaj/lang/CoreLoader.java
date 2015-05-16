@@ -189,8 +189,8 @@ public class CoreLoader extends Namespace.Loader {
                    Sym.maxSymK, maxOld.max(arity));
     }));
     Num maxArity = ((Num) aritys.valAt(Sym.maxSymK)); //extract computed max arity from aritys map
-    //I just realized ... I'm only using aritys for getting variadic and max (+ checks...)
-    //-(WRONG>>) it deson't even need to store the arities and bodies... (it needs for the checks ... at least arities)
+    /////I just realized ... I'm only using aritys for getting variadic and max (+ checks...)
+    /////it deson't even need to store the arities and bodies...-(WRONG>>) (it needs for the checks ... at least arities)
 
     if (maxArity.asInteger() == Integer.MIN_VALUE) {
       //either : no overloads or only variadic
@@ -227,7 +227,7 @@ public class CoreLoader extends Namespace.Loader {
             + " and " + m.valAt(arity).getMeta(Sym.patternSym) + m.valAt(arity));
   }
 
-  private Seq argsBindArityDispatchVariadic(Term body, Term origData) {
+  private Seq argsBindArityDispatchVariadic(Term body, Term artiyErrMsg) {
     //body is already expanded into let : doing it again only "deletes" it
     /*argsBindMacroLet : already done when computing meta*/
     Num minArity = (Num) body.getMeta().valAt(Sym.aritySymK);
@@ -237,7 +237,7 @@ public class CoreLoader extends Namespace.Loader {
     return (SeqH.extend(H.list(Sym.ifSymC,
                                      H.list(Sym.LTSymCore,
                                       H.list(Sym.countPrimeSymCore, minArity, Sym.argsSymSpecial),                                            minArity),
-                               H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, H.list(Sym.quoteSymC, origData)),
+                               H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, H.list(Sym.quoteSymC, artiyErrMsg)),
                                H.seqFrom(body))));
   }
 
