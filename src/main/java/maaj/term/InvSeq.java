@@ -12,7 +12,10 @@ import maaj.util.H;
 import maaj.util.Sym;
 
 /**
- *
+ * Base for FnSeq and MacroSeq.<br/>
+ * This class becomes a function, from storing an an evaluable seq and closure.
+ * Invocing essentially injects arguments and evaluates the saved seq.
+ * <p>
  * @author maartyl
  */
 public abstract class InvSeq implements InvocableSeq {
@@ -39,7 +42,7 @@ public abstract class InvSeq implements InvocableSeq {
 
   @Override
   public Term invokeSeq(Seq args) {
-    return fn.eval(closure.addToScope(H.map(Sym.argsSymSpecial, args)));
+    return fn.eval(closure.addToScope(Sym.argsSymSpecial, args));
   }
 
   @Override

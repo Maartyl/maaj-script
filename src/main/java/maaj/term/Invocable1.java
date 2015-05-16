@@ -5,7 +5,6 @@
  */
 package maaj.term;
 
-import maaj.util.H;
 import maaj.util.SeqH;
 
 /**

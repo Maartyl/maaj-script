@@ -6,7 +6,10 @@
 package maaj.term;
 
 /**
- *
+  * Invocable0..5,Seq : allows me to use these as lambda functions -- functionalInterface
+ * These are not meant to be used for arg type checking: Invokable will mostly be implemented using Fn, not lambdas
+ * - Could be useful to prevent invoke(T) vs. invokeSeq lambda mistakes etc...
+ * <p>
  * @author maartyl
  */
 public interface InvocableSeq extends Invocable {
