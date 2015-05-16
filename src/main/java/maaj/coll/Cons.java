@@ -5,6 +5,7 @@
  */
 package maaj.coll;
 
+import maaj.coll.traits.Seqable;
 import maaj.lang.Context;
 import maaj.util.H;
 import maaj.term.*;
@@ -57,12 +58,26 @@ public class Cons implements Seq {
 
   @Override
   public boolean equals(Object obj) {
-    throw new UnsupportedOperationException("TODO"); //DODO: equals
+    if (obj == this) return true;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
+    if (!(obj instanceof Seq))
+      return false;
+    Seq st = this;
+    Seq so = (Seq) obj;
+    for (; !st.isNil(); st = st.rest(), so = so.rest())
+      if (so.isNil() || !st.first().equals(so.first()))
+        return false;
+    return so.isNil();
   }
 
   @Override
   public int hashCode() {
-    throw new UnsupportedOperationException("TODO"); //DODO: hash
+    int hash = 1;
+    for (Term t : this)
+      hash = hash * 31 + t.hashCode();
+    return hash;
   }
 
   @Override

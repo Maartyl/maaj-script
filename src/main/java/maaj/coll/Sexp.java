@@ -85,17 +85,17 @@ public class Sexp extends Cons implements Collection {
 
   @Override //required: diamond inheritance (unrelated defaults)
   public Term reduce(Term start, Invocable reducer) {
-    return super.reduce(start, reducer);
+    return super.reduce(H.ret1(start, start = null), H.ret1(reducer, reducer = null));
   }
 
   @Override //required: diamond inheritance (unrelated defaults)
   public Term eval(Context c) {
-    return super.eval(c);
+    return super.eval(H.ret1(c, c = null));
   }
 
   @Override //required: diamond inheritance (unrelated defaults)
   public Term evalMacros(Context c) {
-    return super.evalMacros(c);
+    return super.evalMacros(H.ret1(c, c = null));
   }
 
 
