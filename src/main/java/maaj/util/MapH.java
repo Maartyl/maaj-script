@@ -17,7 +17,8 @@ import maaj.term.Seq;
 import maaj.term.Term;
 
 /**
- *
+ * Map helpers - operations on maps
+ * <p>
  * @author maartyl
  */
 public class MapH {

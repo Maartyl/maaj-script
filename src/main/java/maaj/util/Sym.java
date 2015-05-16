@@ -10,7 +10,8 @@ import maaj.term.Symbol;
 import maaj.term.Term;
 
 /**
- *
+ * Contains symbols that are used in multiple places or multiple times, so they don't have to be created multiple times.
+ * <p>
  * @author maartyl
  */
 public class Sym {
@@ -73,7 +74,6 @@ public class Sym {
   public static final Symbol macroSymCore = H.symbol("#core", "macro");
 
   public static final Map macroMapTag = H.map(macroSymK, macroSymK);
-  public static final Term TRUE = Symbol.of("t");
-
+  public static final Term TRUE = H.symbol("t");
 
 }
