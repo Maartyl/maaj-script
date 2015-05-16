@@ -22,9 +22,9 @@ public interface AssocGet extends Lookup {
     Term val = valAt(key, H.notFoundNil);
     //TODO: think through (Nil / Ex / (Key, Nil) / ??)
 //    if (val == H.notFoundNil)
-//      return H.NIL;
+//      throw new notfound;
     //This is wrong: shows notFoundNil - that probably shouldn't be happening...
     //KVEntry must become Term anyway, to be useable - Nil is probably best
-    return H.buildAssocEntry(key, val);
+    return H.buildAssocEntry(key, val == H.notFoundNil ? H.NIL : val);
   }
 }
