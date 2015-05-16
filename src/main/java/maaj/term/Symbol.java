@@ -121,16 +121,6 @@ public class Symbol implements Term {
 
   @Override
   public Term evalMacros(Context c) {
-    //TODO: 2 variants: only return macros; "compile" <- everything, espacially native methods
-    // yes, that is needed; unless otherwise specified in context in future
-    // ...
-//    Term rslt = c.valAt(this, this);
-//    if (rslt == this) return this;
-//    if (!MapH.hasTag(rslt.getMeta(), Sym.macroSymK)) return this; //only "inline" what claims to be a macro
-//    return rslt.evalMacros(c);
-
-    //vars should be stored directly in terms (fn...), but it evaluates into their values...
-    //TODO: fix overinlining (probably calls unwrap: should change Var unwrap? - maybe not a Mimic?)
     Var v = c.getVar(this);
     if (v != null)
       return v;
@@ -148,20 +138,21 @@ public class Symbol implements Term {
     return args.first().apply(cxt, H.cons(this, args.rest()));
   }
 
-  @Override
-  public Term applyMacro(Context cxt, Seq args) {
-    //System.err.println("symbol.ApplyMacro: " + this);
-    //this must be here, not in evalMacro : why?
-    //I only want to get macros if in context of application of 1
-    //if just (defn m [a] (inc 5)), m is macro : I don't wan't m to get evaluated into the #/macroseq
-    //Var v = cxt.getVar(this);
-    //if (rslt == this) return this;
-    //if (v != null && !MapH.hasTag(v.getMeta(), Sym.macroSymK)) return v.applyMacro(cxt, args); //only "inline" what claims to be a macro
-    // Term.super: fmaps evalMacro on args
-    //System.err.println("symbol.ApplyMacro: " + v);
-    //!!! - should have been done INSIDE VAR from the beginning
-    return Term.super.applyMacro(cxt, args);
-  }
+//  @Override
+//  public Term applyMacro(Context cxt, Seq args) {
+//    //System.err.println("symbol.ApplyMacro: " + this);
+//    //this must be here, not in evalMacro : why?
+//    //I only want to get macros if in context of application of 1
+//    //if just (defn m [a] (inc 5)), m is macro : I don't wan't m to get evaluated into the #/macroseq
+//    //Var v = cxt.getVar(this);
+//    //if (rslt == this) return this;
+//    //if (v != null && !MapH.hasTag(v.getMeta(), Sym.macroSymK)) return v.applyMacro(cxt, args); //only "inline" what claims to be a macro
+//    // Term.super: fmaps evalMacro on args
+//    //System.err.println("symbol.ApplyMacro: " + v);
+//    //!!! - should have been done INSIDE VAR from the beginning
+//    //so, here can be checks for special "cases" ... not good practice
+//    return Term.super.applyMacro(cxt, args);
+//  }
 
   @Override
   public void serialize(java.io.Writer w) throws IOException {
