@@ -16,22 +16,11 @@ import maaj.util.Sym;
  *
  * @author maartyl
  */
-public class Unquote implements Term {
+public abstract class Unquote implements Term {
+  protected final Term body;
 
-  private final boolean isSplicing;
-  private final Term body;
-
-  private Unquote(boolean isSplicing, Term body) {
-    this.isSplicing = isSplicing;
+  private Unquote(Term body) {
     this.body = body;
-  }
-
-  @Override
-  public Monad unquoteTraverse(Context c) {
-    if (isSplicing) 
-      return H.requireMonad(body.eval(c));
-    else 
-      return H.tuple(body.eval(c));
   }
 
   @Override
@@ -44,6 +33,7 @@ public class Unquote implements Term {
     //possibly make variant that traverses and expands macros in unquotes...
     //essentially: I only need some tag in context, that would be cheked in Unquote.unquoteTraverse
     //wait... I'm already here...
+    ///edit: I'm not : I wouldn't get here, because inside quotation. But essentailly posible.
     //I could just return (unquote (expand body)) ...
     //TODO: expand unquote ^
     return this;
@@ -54,17 +44,45 @@ public class Unquote implements Term {
     throw new InvalidOperationException("#macro/unquote outside quotation context");
   }
 
-
-  @Override
-  public void show(Writer w) throws IOException {
-    H.list(isSplicing ? Sym.unquoteSplicingSymC : Sym.unquoteSymC, body).show(w);
-  }
-
   public static Unquote createSimple(Term content) {
-    return new Unquote(false, content);
+    return new UnquoteSimple(content);
   }
 
   public static Unquote createSplicing(Term content) {
-    return new Unquote(true, content);
+    return new UnquoteSplicing(content);
+  }
+
+  private static class UnquoteSimple extends Unquote {
+
+    public UnquoteSimple( Term body) {
+      super(body);
+    }
+
+    @Override
+    public Monad unquoteTraverse(Context c) {
+        return H.tuple(body.eval(c));
+    }
+
+    @Override
+    public void show(Writer w) throws IOException {
+      H.list(Sym.unquoteSymC, body).show(w);
+    }
+  }
+
+  private static class UnquoteSplicing extends Unquote {
+
+    public UnquoteSplicing(Term body) {
+      super(body);
+    }
+
+    @Override
+    public Monad unquoteTraverse(Context c) {
+      return H.requireMonad(body.eval(c));
+    }
+
+    @Override
+    public void show(Writer w) throws IOException {
+      H.list(Sym.unquoteSplicingSymC, body).show(w);
+    }
   }
 }
