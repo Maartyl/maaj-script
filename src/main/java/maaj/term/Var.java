@@ -15,10 +15,11 @@ import maaj.util.MapH;
 import maaj.util.Sym;
 
 /**
- *
+ * A mutable cell.
+ * <p>
  * @author maartyl
  */
-public final class Var implements Mimic, RefSet<Var> {
+public final class Var implements Term, RefSet<Var> {
   private volatile Map meta;
   private volatile Term value;
 
@@ -29,13 +30,6 @@ public final class Var implements Mimic, RefSet<Var> {
 
   private Var(Term value) {
     this(MapH.emptyPersistent(), value);
-  }
-
-  @Override
-  public Term unwrap() {
-    if (value == null)
-      throw new InvalidOperationException("unwrap unbound var");
-    return value;
   }
 
   @Override
@@ -69,7 +63,7 @@ public final class Var implements Mimic, RefSet<Var> {
     //... returning new var is fairly nonsensical...
     //meta belongs to var, not the underlying term
     // // btw. terms in vars loose their metadata
-    return unwrap().transform(transformer); // in the end, the most logical is this
+    return deref().transform(transformer); // in the end, the most logical is this
   }
 
   @Override
@@ -95,13 +89,17 @@ public final class Var implements Mimic, RefSet<Var> {
 
   @Override
   public Term evalMacros(Context c) {
-    //needs this : Mimic could do something else...
     return this;
   }
 
   @Override
+  public Term apply(Context cxt, Seq args) {
+    return deref().apply(cxt, args);
+  }
+
+  @Override
   public Term eval(Context c) {
-    return unwrap().eval(c);
+    return deref().eval(c);
   }
 
   @Override
@@ -117,7 +115,9 @@ public final class Var implements Mimic, RefSet<Var> {
 
   @Override
   public Term deref() {
-    return unwrap();
+    if (value == null)
+      throw new InvalidOperationException("unwrap unbound var");
+    return value;
   }
 
   @Override
