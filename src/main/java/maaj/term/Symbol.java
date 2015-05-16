@@ -131,9 +131,9 @@ public class Symbol implements Term {
 
     //vars should be stored directly in terms (fn...), but it evaluates into their values...
     //TODO: fix overinlining (probably calls unwrap: should change Var unwrap? - maybe not a Mimic?)
-//    Var v = c.getVar(this);
-//    if (v != null)
-//      return v;
+    Var v = c.getVar(this);
+    if (v != null)
+      return v;
     return this;
   }
 

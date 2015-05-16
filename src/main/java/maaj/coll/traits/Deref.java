@@ -8,7 +8,7 @@ package maaj.coll.traits;
 import maaj.term.Term;
 
 /**
- * represents dereferencible entity
+ * represents dereferenceable entity
  * <p>
  * @author maartyl
  */

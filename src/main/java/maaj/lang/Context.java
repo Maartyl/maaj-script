@@ -112,10 +112,13 @@ public class Context implements Lookup {
   }
 
   private Term valAtOrNull(Symbol key) {
-    Term t = scope.valAt(key, scope);
+    Term t = scope.valAt(key, scope); // scope: only to check if found
     if (t != scope)
       return t;
-    return glob.getVar(key, curNs);
+    Var v = glob.getVar(key, curNs);
+    if (v == null)
+      return null;
+    return v.deref();
   }
 
   public Term valAt(Symbol key) {
