@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MaajScriptOverview.md</title>
+<link rel="stylesheet" href="https://stackedit.io/res-min/themes/base.css" />
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body><div class="container"><h1 id="maaj-script">Maaj Script</h1>
+
+<p>Maaj Script is a dynamic interpreted language based on Clojure running on JVM with interpret written in Java.</p>
+
+
+
+<h2 id="overview">Overview</h2>
+
+<p>Maaj Script is a functional, dynamic scripting language with Lisp syntax. Prefers immutability and, as is now, does not allow mutable local variables. It supports tail recursion, macro expansion, lazy lists, module importing… Is easy to use from Java. Jar with all dependencies (mainly Clojure data structures) is “only” ~400 KiB.</p>
+
+<p>There are many constructs familiar to people who used lisp, especially Clojure, like: </p>
+
+<ul>
+<li><code>def</code>,<code>defn</code>,<code>defmacro</code>,<code>fn</code></li>
+<li><code>cons</code>, <code>first</code>,<code>rest</code>,<code>car</code>,<code>cdr</code>,<code>cadr</code> </li>
+<li><code>do</code>,<code>let</code>,<code>recur</code>,<code>eval</code>,<code>apply</code></li>
+<li>…</li>
+</ul>
+
+
+
+<h3 id="application">Application</h3>
+
+<p>Some ideas are:</p>
+
+<ul>
+<li>Loading settings <br>
+<ul><li>This can be potentially unsafe.</li></ul></li>
+<li>Dynamic testing of rest of the system.</li>
+<li>not yet: <br>
+<ul><li>Dnamic testing without requiring special namespace loader</li>
+<li>Direct Java interop (boxed)</li>
+<li>Reloading of scripts from files (for changing settings / …) <br>
+<ul><li>Only reloading is missing, rest is ready.</li></ul></li></ul></li>
+<li>General purpose scripting language.</li>
+</ul>
+
+
+
+<h3 id="name">Name</h3>
+
+<p>Coming up with good names is hard…</p>
+
+<ul>
+<li>maa :  from Maartyl</li>
+<li>j :   JVM, Java</li>
+<li>script :  …</li>
+</ul>
+
+<p>So essentially, a script by Maartyl for JVM / in Java…</p>
+
+
+
+<h3 id="why">Why?</h3>
+
+<p>I am writing MaajScript as a school project for Java class. I chose an interpreter because I always wanted to write one and because I like Clojure, of which I wanted to learn more in the process. Not to mention, every programmer has written their own lisp… </p>
+
+
+
+<h3 id="requirements-dependencies">Requirements / Dependencies</h3>
+
+<ul>
+<li>Java 8</li>
+<li><a href="https://github.com/krukow/clj-ds">https://github.com/krukow/clj-ds</a> <br>
+<ul><li>This library is currently copied into project for the sake of development (fast goToSource etc.)</li>
+<li>It will be made into a normal dependency at some later phase.</li></ul></li>
+</ul>
+
+
+
+<h3 id="coming">Coming</h3>
+
+<ul>
+<li>Java interop (through seamless reflection)</li>
+<li>Bean accessors</li>
+<li>Integration with Java Scripting API</li>
+<li>Possibly some synchronization primitives.</li>
+</ul>
+
+<h2 id="repl">Repl</h2>
+
+<p>Interactive read-evaluate-print loop. <br>
+run: <code>maaj.Repl</code>. <br>
+What it does: It will:</p>
+
+<ul>
+<li>Read a term. </li>
+<li>Evaluate it. </li>
+<li>Print what it’s become. </li>
+<li>Repeat this in a loop, until the reader encounters EOF.</li>
+</ul>
+
+<p>You can also look at implementation of this class (it’s very short) on how Maaj Script can be used from Java. <br>
+I did not provide any special API because I plan to use Java Scripting API, when I get to do it.</p></div></body>
+</html>
