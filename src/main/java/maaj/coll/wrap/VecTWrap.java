@@ -16,7 +16,8 @@ import maaj.util.H;
 import maaj.util.VecH;
 
 /**
- *
+* wraps functionality of ~Clojure ITransientVector&lt;Term&gt;, making it a term.
+ * <p>
  * @author maartyl
  */
 public final class VecTWrap implements VecT {

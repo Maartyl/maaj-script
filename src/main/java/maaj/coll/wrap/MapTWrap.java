@@ -18,7 +18,8 @@ import maaj.term.Term;
 import maaj.util.MapH;
 
 /**
- *
+ * wraps functionality of ~Clojure ITransientMap&lt;Term, Term&gt;, making it a term.
+ * <p>
  * @author maartyl
  */
 public final class MapTWrap implements MapT {

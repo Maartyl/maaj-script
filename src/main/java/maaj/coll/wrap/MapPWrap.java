@@ -17,7 +17,9 @@ import maaj.util.H;
 import maaj.util.MapH;
 
 /**
- *
+ * wraps functionality of ~Clojure IPersistentMap&lt;Term, Term&gt;, making it a term.
+ * (Essentially: ArrayMap up to 8 terms, then HashMap)
+ * <p>
  * @author maartyl
  */
 public final class MapPWrap implements Map {

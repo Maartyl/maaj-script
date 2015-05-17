@@ -8,7 +8,9 @@ package maaj.exceptions;
 import maaj.reader.ReaderContext;
 
 /**
- *
+ * captures row, col and file*
+ * (* context, actually)
+ * <p>
  * @author maartyl
  */
 public class ReaderException extends UnsupportedOperationException {

@@ -15,7 +15,9 @@ import maaj.util.H;
 import maaj.util.VecH;
 
 /**
- *
+ * wraps functionality of ~Clojure IPersistentVector&lt;Term&gt;, making it a term.
+ * - for small vectors, I use maaj.coll.Tuple0-3
+ * <p>
  * @author maartyl
  */
 public final class VecPWrap implements Vec {
