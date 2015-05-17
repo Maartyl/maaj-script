@@ -68,16 +68,16 @@ public class CoreLoader extends Namespace.Loader {
       Term name = a.first();
       Term val = a.rest().first().eval(c);
       Term nu = name.unwrap();
-      if (nu instanceof Var) {
-        Var v = (Var) nu;
-        if (v.getMeta(Sym.namespaceSym).equals(c.getCurNs().getName())) {
-          v.doSet(val);
-          return v;
-        } else {
-          throw new InvalidOperationException("#/def: cannot change a var from a different namespace:" + nu.print());
-          //nu = v.getMeta(Sym.nameSym);
-        }
-      }
+//      if (nu instanceof Var) {
+//        Var v = (Var) nu;
+//        if (v.getMeta(Sym.namespaceSym).equals(c.getCurNs().getName())) {
+//          v.doSet(val);
+//          return v;
+//        } else {
+//          throw new InvalidOperationException("#/def: cannot change a var from a different namespace:" + nu.print());
+//          //nu = v.getMeta(Sym.nameSym);
+//        }
+//      }
       if (defCheckAndRetIfQualified(nu, c.getCurNs().getName())) {
         Var v = c.getVar((Symbol) nu);
         if (v == null) throw new InvalidOperationException("#/def: cannot create qualified var:" + nu.print());

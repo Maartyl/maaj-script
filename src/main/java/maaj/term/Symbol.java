@@ -121,9 +121,12 @@ public class Symbol implements Term {
 
   @Override
   public Term evalMacros(Context c) {
-    Var v = c.getVar(this);
-    if (v != null)
-      return v;
+    //TODO: this is still wrong; macro expansion is only macro expansion, not inlineing
+    // - I need another construct (like ... inlineVars or something) that will be run only in functions
+    // - this breaks correctness of macros
+//    Var v = c.getVar(this);
+//    if (v != null)
+//      return v;
     return this;
   }
 
