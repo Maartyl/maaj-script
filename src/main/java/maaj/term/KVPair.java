@@ -8,7 +8,9 @@ package maaj.term;
 import maaj.coll.traits.KVEntry;
 
 /**
- *
+ * Map entry, that is a term. - Essentailly (key-value) pair.
+ * Is otherwise understood as vector of 2 terms.
+ * <p>
  * @author maartyl
  */
 public interface KVPair extends KVEntry, Vec {
