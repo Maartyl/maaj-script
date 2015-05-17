@@ -24,11 +24,6 @@ public final class Char implements Num {
   }
 
   @Override
-  public Term apply(Context cxt, Seq args) {
-    throw new UnsupportedOperationException("Won't be ever supported."); //TODO: implement
-  }
-
-  @Override
   public Char inc() {
     return Char.of((char) (value + 1));
   }
