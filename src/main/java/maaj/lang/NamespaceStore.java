@@ -10,7 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import maaj.term.Symbol;
 
 /**
- *
+ * This class manages loaded namespaces, so they are not loaded multiple times.
+ * <p>
  * @author maartyl
  */
 public class NamespaceStore {

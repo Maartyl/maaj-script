@@ -15,7 +15,13 @@ import maaj.term.Term;
 import maaj.util.H;
 
 /**
- *
+ * This loader loads namespaces from files, which names are computed from the namespace name.
+ * Namespace name transformation into file:
+ * - replace '.' with '/' and add ".maaj"
+ * - so: foo.bar -> foo/bar.maaj
+ * -- which essentailly means: /foo/bar.maaj
+ * - files are searched for on CLASSPATH
+ * <p>
  * @author maartyl
  */
 public class PathLoader extends Namespace.Loader {
@@ -34,9 +40,8 @@ public class PathLoader extends Namespace.Loader {
   private void load(URL file, Context cxt, Symbol nsName) {
     ReaderContext rc = new ReaderContext(nsName, file.getPath());
     try (Reader r = new InputStreamReader(file.openStream(), "UTF8")) {
-      for (Term t : H.read(r, rc)) {
+      for (Term t : H.read(r, rc)) 
         t.eval(cxt);
-      }
     } catch (Exception e) {
       throw H.sneakyThrow(e);
     }

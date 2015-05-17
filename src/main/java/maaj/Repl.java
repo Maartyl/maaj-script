@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package maaj.lang;
+package maaj;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +11,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import maaj.exceptions.ReaderException;
+import maaj.lang.Context;
+import maaj.lang.Glob;
 import maaj.reader.ReaderContext;
 import maaj.term.Symbol;
 import maaj.term.Term;
