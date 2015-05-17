@@ -109,8 +109,8 @@ public class CoreLoader extends Namespace.Loader {
       return a.first().eval(c).eval(c);
     });
     def(core, "apply", "applies first argument on [last argumet (seq) with other arguments prepended]; "
-                       + "(apply + 7 8 [4 5 6]) -> (+ 7 8 4 5 6)", //actually: still incorrect: I might need to obtain the last arg...
-        (c, a) -> a.isNil() ? H.NIL : SeqH.extend(a).eval(c));
+                       + "(apply + 7 8 [4 5 6]) -> (+ 7 8 4 5 6)",
+        (c, a) -> a.isNil() ? H.NIL : SeqH.extend(SeqH.mapEval(a, c)).eval(c));
     def(core, "recur", "repeat function with new arguments : tail recursion optimized;"
                        + " cannot be used in any other context", (c, a) -> Recur.ofArgs(SeqH.mapEval(a, c)));
 
@@ -634,9 +634,9 @@ public class CoreLoader extends Namespace.Loader {
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                               + "(throw-arity $args \"message\")",
          a -> {
-           int argC = H.seqFrom(arityRequire(2, a, Sym.throwAritySymCore.getNm()).first()).boundLength(30);
+           int argC = H.seqFrom(arityRequire(2, a, Sym.throwAritySymCore.getNm()).first()).boundLength(50);
            throw new IllegalArgumentException("Wrong number of args: " + argC
-                                              + "; " + a.rest().first() + " //args: " + a.first());
+                                              + "; " + a.rest().first() + " //args: " + SeqH.take(50, H.seqFrom(a.first())));
          });
   }
 
