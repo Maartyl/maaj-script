@@ -5,7 +5,7 @@ Maaj Script is a dynamic interpreted language based on Clojure running on JVM wi
 
 ## Overview
 
-Maaj Script is a functional, dynamic scripting language with Lisp syntax. Prefers immutability, and, as is now, does not allow mutable local variables. It supports tail recursion, macro expansion, lazy lists, module importing
+Maaj Script is a functional, dynamic scripting language with Lisp syntax. Prefers immutability and, as is now, does not allow mutable local variables. It supports tail recursion, macro expansion, lazy lists, module importing... Is easy to use from Java. Jar with all dependencies (mainly Clojure data structures) is "only" ~400 KiB.
 
 There are many constructs familiar to people who used lisp, especially Clojure, like: 
 
@@ -39,7 +39,14 @@ Some ideas are:
 So essentially, a script by Maartyl for JVM / in Java...
 
 ### Why?
-I am writing MaajScript as a school project for Java class. I chose an interpreter because I always wanted to write one and because I like Clojure, of which I wanted to learn more in the process. Not to mention, every programmer has written their own lisp. 
+I am writing MaajScript as a school project for Java class. I chose an interpreter because I always wanted to write one and because I like Clojure, of which I wanted to learn more in the process. Not to mention, every programmer has written their own lisp... 
+
+### Requirements / Dependencies
+
+- Java 8
+- https://github.com/krukow/clj-ds
+    - This library is currently copied into project for the sake of development (fast goToSource etc.)
+    - It will be made into a normal dependency at some later phase.
 
 ### Coming
 - Java interop (through seamless reflection)
@@ -66,7 +73,7 @@ Default loader assumes files to be in UTF-8 format.
 ### Basic syntax examples
 
 
-```lisp
+```Clojure
 ; this is a comment
 ,,,,,,,;commas are considered whitespace and ignored
 
@@ -223,11 +230,11 @@ Example: `(apply + [1 2 3])` - the same as `(+ 1 2 3)`.
 `(apply + -15 128 (100))` - sums numbers 0 to 99 and -15 and 128
 
 ### `recur`
-Allows tail recursion. Every Fn* tests it's result in being a recur. If it is, it repeats itself with arguments captured in recur. - Recur itself is just a lightweight box for arguments. This special form can be used anywhere, but invoking virtually any other method then getArgs() results in "Recur outside looping context" exception.
+Allows tail recursion. Every Fn* tests it's result for being a recur. If it is, it repeats itself with arguments captured in the recur. - Recur itself is just a lightweight box for arguments. This special form can be used anywhere, but invoking virtually any other method then getArgs() results in "Recur outside looping context" exception.
 This implies that it can only be used in a tail position and only inside Fn.
 Syntax: `(recur arg1 arg2 ...)`
 Example:  A function that will reverse a list.
-```lisp
+```Clojure
 (fn ([l] (recur () l))
     ([acc l] (if l 
                 (recur (cons (first l) acc) (rest l)) 
@@ -415,7 +422,7 @@ access meta data of a term
 
 -----
 
-... Some other functions are: `take`
+... Some other functions are: `take, conj, assoc`...
 
 - Informations about them can be found thorough `(meta :doc #'fn-name)`. Insead of `:doc` could be `:info`.
 
@@ -425,14 +432,17 @@ There is no IO yet. It will be implemented together with other Java interop. - I
 Thanks to Repl, it's easy to explore and can be used from Java...
 
 ## Repl
-Read-evaluate-print loop.
-run: `maaj.lang.Repl`.
+Interactive read-evaluate-print loop.
+run: `maaj.Repl`.
 What it does: It will:
 
 - Read a term. 
 - Evaluate it. 
 - Print what it's become. 
 - Repeat this in a loop, until the reader encounters EOF.
+
+You can also look at implementation of this class (it's very short) on how Maaj Script can be used from Java.
+I did not provide any special API because I plan to use Java Scripting API, when I get to do it.
 
 ## Implemetation concepts
 

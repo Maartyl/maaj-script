@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MaajScriptDoc.md</title>
+<link rel="stylesheet" href="https://stackedit.io/res-min/themes/base.css" />
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body><div class="container"><h1 id="maaj-script">Maaj Script</h1>
+
+<p>Maaj Script is a dynamic interpreted language based on Clojure running on JVM with interpret written in Java.</p>
+
+
+
+<h2 id="overview">Overview</h2>
+
+<p>Maaj Script is a functional, dynamic scripting language with Lisp syntax. Prefers immutability and, as is now, does not allow mutable local variables. It supports tail recursion, macro expansion, lazy lists, module importing… Is easy to use from Java. Jar with all dependencies (mainly Clojure data structures) is “only” ~400 KiB.</p>
+
+<p>There are many constructs familiar to people who used lisp, especially Clojure, like: </p>
+
+<ul>
+<li><code>def</code>,<code>defn</code>,<code>defmacro</code>,<code>fn</code></li>
+<li><code>cons</code>, <code>first</code>,<code>rest</code>,<code>car</code>,<code>cdr</code>,<code>cadr</code> </li>
+<li><code>do</code>,<code>let</code>,<code>recur</code>,<code>eval</code>,<code>apply</code></li>
+<li>…</li>
+</ul>
+
+<h3 id="application">Application</h3>
+
+<p>Some ideas are:</p>
+
+<ul>
+<li>Loading settings <br>
+<ul><li>This can be potentially unsafe.</li></ul></li>
+<li>Dynamic testing of rest of the system.</li>
+<li>not yet: <br>
+<ul><li>Dnamic testing without requiring special namespace loader</li>
+<li>Direct Java interop (boxed)</li>
+<li>Reloading of scripts from files (for changing settings / …) <br>
+<ul><li>Only reloading is missing, rest is ready.</li></ul></li></ul></li>
+<li>General purpose scripting language.</li>
+</ul>
+
+
+
+<h3 id="name">Name</h3>
+
+<p>Coming up with good names is hard…</p>
+
+<ul>
+<li>maa :  from Maartyl</li>
+<li>j :   JVM, Java</li>
+<li>script :  …</li>
+</ul>
+
+<p>So essentially, a script by Maartyl for JVM / in Java…</p>
+
+
+
+<h3 id="why">Why?</h3>
+
+<p>I am writing MaajScript as a school project for Java class. I chose an interpreter because I always wanted to write one and because I like Clojure, of which I wanted to learn more in the process. Not to mention, every programmer has written their own lisp… </p>
+
+<h3 id="requirements-dependencies">Requirements / Dependencies</h3>
+
+<ul>
+<li>Java 8</li>
+<li><a href="https://github.com/krukow/clj-ds">https://github.com/krukow/clj-ds</a> <br>
+<ul><li>This library is currently copied into project for the sake of development (fast goToSource etc.)</li>
+<li>It will be made into a normal dependency at some later phase.</li></ul></li>
+</ul>
+
+<h3 id="coming">Coming</h3>
+
+<ul>
+<li>Java interop (through seamless reflection)</li>
+<li>Bean accessors</li>
+<li>Integration with Java Scripting API</li>
+<li>Possibly some synchronization primitives.</li>
+</ul>
+
+<hr>
+
+
+
+<h2 id="syntax">Syntax</h2>
+
+<p>Maaj Script is a Lisp with extended syntax for vectors and maps. Very similar to Clojure, syntactically.  <br>
+There is a good chance that if a feature from Clojure is implemented, it has the same or similar syntax.</p>
+
+
+
+<h3 id="character-encoding">Character Encoding</h3>
+
+<p>Maaj Script is fully Unicode compliant up to char 65535. (as far as reading characters goes) <br>
+Which means all common Unicode strings are valid strings in MaajScript, and if they meet requirements* for identifiers (no parenthesis, …) they are valid identifiers. <br>
+Example of valid symbols: <code>čeřící</code>, <code>葛城</code>, <code>Ꙭൽↈⴱ</code> <br>
+For requirements see <code>maaj.reader.MaajReader#isSymbolic(int)</code>. <br>
+Default loader assumes files to be in UTF-8 format.</p>
+
+
+
+<h3 id="basic-syntax-examples">Basic syntax examples</h3>
+
+
+
+<pre class="prettyprint prettyprinted"><code class="language-Clojure"><span class="pun">;</span><span class="pln"> </span><span class="kwd">this</span><span class="pln"> </span><span class="kwd">is</span><span class="pln"> a comment
+</span><span class="pun">,,,,,,,;</span><span class="pln">commas are considered whitespace </span><span class="kwd">and</span><span class="pln"> ignored
+
+</span><span class="pun">;</span><span class="pln"> </span><span class="kwd">this</span><span class="pln"> invokes foo </span><span class="kwd">with</span><span class="pln"> arguments </span><span class="kwd">in</span><span class="pln"> variables</span><span class="pun">*</span><span class="pln"> bar a baz
+</span><span class="pun">;</span><span class="pln"> </span><span class="pun">(*</span><span class="pln"> all normal variables are immutable</span><span class="pun">)</span><span class="pln">
+</span><span class="pun">(</span><span class="pln">foo bar baz</span><span class="pun">)</span><span class="pln"> 
+
+</span><span class="pun">;</span><span class="pln"> </span><span class="kwd">lambda</span><span class="pln"> creation
+</span><span class="pun">(</span><span class="pln">fn args</span><span class="pun">-</span><span class="pln">bind body</span><span class="pun">-</span><span class="pln">here</span><span class="pun">)</span><span class="pln">
+</span><span class="pun">(</span><span class="pln">fn </span><span class="pun">[]</span><span class="pln"> </span><span class="lit">5</span><span class="pun">)</span><span class="pln"> </span><span class="pun">;</span><span class="pln"> takes </span><span class="kwd">no</span><span class="pln"> arguments </span><span class="kwd">and</span><span class="pln"> always returns </span><span class="lit">5</span><span class="pln">
+
+</span><span class="pun">;</span><span class="pln"> </span><span class="kwd">this</span><span class="pln"> </span><span class="kwd">function</span><span class="pln"> returns a </span><span class="kwd">function</span><span class="pln"> that returns the argument passed to the outer </span><span class="kwd">function</span><span class="pln">
+</span><span class="pun">(</span><span class="pln">fn </span><span class="pun">[</span><span class="pln">x</span><span class="pun">]</span><span class="pln"> </span><span class="pun">(</span><span class="pln">fn </span><span class="pun">[]</span><span class="pln"> x</span><span class="pun">))</span><span class="pln"> 
+</span><span class="pun">(((</span><span class="pln">fn </span><span class="pun">[</span><span class="pln">x</span><span class="pun">]</span><span class="pln"> </span><span class="pun">(</span><span class="pln">fn </span><span class="pun">[]</span><span class="pln"> x</span><span class="pun">))</span><span class="pln"> </span><span class="lit">5</span><span class="pun">))</span><span class="pln"> </span><span class="pun">;=&gt;</span><span class="pln"> </span><span class="lit">5</span></code></pre>
+
+<p>See <a href="#let">let</a> for details on argument binding. <br>
+Body can be multiple terms, evaluated in an implicit <a href="#do">do</a> block.</p>
+
+<pre class="prettyprint prettyprinted"><code class="language-lisp"><span class="pun">;</span><span class="pln"> named functions
+</span><span class="pun">(</span><span class="pln">defn name</span><span class="pun">-</span><span class="pln">of</span><span class="pun">-</span><span class="pln">fn args</span><span class="pun">-</span><span class="pln">bind body</span><span class="pun">-</span><span class="pln">here</span><span class="pun">)</span><span class="pln">
+</span><span class="pun">(</span><span class="pln">defn add </span><span class="pun">[</span><span class="pln">a b</span><span class="pun">]</span><span class="pln"> </span><span class="pun">(+</span><span class="pln"> a b</span><span class="pun">))</span><span class="pln"> </span><span class="pun">;</span><span class="pln"> adds </span><span class="lit">2</span><span class="pln"> numeric arguments</span></code></pre>
+
+
+
+<h2 id="terms">Terms</h2>
+
+<p>Any expression in Maaj Script is a term. Some terms can nest other terms, creating expression trees.</p>
+
+
+
+<h3 id="symbol">Symbol</h3>
+
+<p><small>~Classical Lisp symbol.</small> <br>
+Used as identifier.  <br>
+Essentially any number of characters that don’t start with number, colon or other special character (whitespace, parenthesis…) <br>
+Examples: <code>do</code> ,<code>count'</code>, <code>-&gt;</code>,<code>_auto_#45</code>, <code>.1</code> <br>
+Evaluated as value lookup.</p>
+
+<p>Symbols and keywords can have a namespace: it is separated from name by a <code>/</code>, becoming:  <code>namespace/name</code> - Symbols cannot begin with <code>/</code>. (Special case is <code>/</code> only : it is a valid name) <br>
+Examples: <code>#core/reduce</code>, <code>some.namespace/foo</code>, <code>#core//</code></p>
+
+
+
+<h3 id="keyword">Keyword</h3>
+
+<p>Special variant of symbol that evaluates to itself. Starts with a colon. <br>
+Used for keys / tags… <br>
+Examples: <code>:col</code>, <code>:height</code>, <code>:*</code></p>
+
+
+
+<h3 id="number">Number</h3>
+
+<p>2 variants of numbers are supported:  <br>
+Evaluates to itself.</p>
+
+<ul>
+<li>int : wrapper over java.lang.Long <br>
+<ul><li><code>5</code>, <code>-74567</code></li></ul></li>
+<li>double : <br>
+<ul><li><code>0.5</code>, <code>32.</code>, <code>752.1563</code></li></ul></li>
+</ul>
+
+
+
+<h4 id="char">Char</h4>
+
+<p>Also a numeric term, but not a number. Can be used in numerical operations. <br>
+Is written as escape character. Some characters have* special literals like <code>\newline</code>. <br>
+Another way to specify character is using a unicode literal: <code>\u</code> and 4 hexadecimal digits. <br>
+Example: <code>\a</code>, <code>\n</code>, <code>\u771F</code> <br>
+Evaluates to itself. <br>
+(* multisymbol character literals other then unicode i.e. \u00A0 are not supported yet)</p>
+
+
+
+<h3 id="str">Str</h3>
+
+<p>String. Wrapper over native java.lang.String . <br>
+Example: <code>"hello world!"</code> <br>
+Evaluates to itself.</p>
+
+
+
+<h3 id="list-sexp">List / Sexp</h3>
+
+<p>Immutable linked list. Or limited S-expression: tail must always be a seq*. <br>
+(* Some Lisps allow: (5 . 8) pairs. There is no dot syntax in MaajScript ind if there were, the second argument would have to be a seq.) <br>
+Example: <code>(foo bar baz)</code>, <code>(count' 5 coll)</code> <br>
+Evaluated as function application.</p>
+
+
+
+<h3 id="seq">Seq</h3>
+
+<p>Sequence. Variant of list that is potentially lazy*. Does not necessarily know it’s own length. <br>
+(* Only partially evaluated. The rest is determined but unevaluated.) <br>
+Can be created from any immutable collection or through other operations <br>
+Example: <code>(seq "hello") ;=&gt; (\h \e \l \l \o)</code> <br>
+Evaluated as function application.</p>
+
+
+
+<h3 id="nil">Nil</h3>
+
+<p>A special value, can be used as: false, end of a sequence, …. - similar to <code>null</code> in Java, but is a valid term in that methods can be invoked on it. <br>
+Example: <code>()</code> - There is no other syntax for this value.</p>
+
+
+
+<h3 id="vector-vec">Vector / Vec</h3>
+
+<p>Immutable array. - Supports O(1) [add to] and [remove from] end. Can hold any number of terms. <br>
+(wrapped Clojure data structure) <br>
+Example: <code>[1 2 3 :kw 4.78 \a]</code> <br>
+Evaluation evaluates all elements, returning resulting vector. (fmap)</p>
+
+
+
+<h3 id="map">Map</h3>
+
+<p>Associative collection of key-value pairs. Both keys and values can by any* term. <br>
+Example: <code>{:key :value, :key2 5, :key3 ()}</code> <br>
+Evaluation evaluates all elements, returning resulting map. (fmap) <br>
+(* maps over 8 pairs require hashable keys. For now, all terms have correctly defined .hashCore() and .equals() - This might no longer be the case after wrapper for any JVM object is implemented. - With less then 8 pairs, only .equals() is required. )</p>
+
+<hr>
+
+
+
+<h3 id="invocable-fn-macro-sf">Invocable, Fn, Macro, Sf</h3>
+
+<p>Can by invoked. There is a variety of types (some evaluate arguments, some are treated differently in Java (different functional interfaces), …) <br>
+Evaluates to itself.</p>
+
+
+
+<h3 id="seqable">Seqable</h3>
+
+<p>Anything that can be coerced into a seq. - seq and collections. (and string, which is a special collection of chars)</p>
+
+
+
+<h2 id="special-forms">Special Forms</h2>
+
+<p>All following special forms are defined in namespace ‘#’. This namespace cannot be directly referenced and is loaded by default, imported into every other created namespace. In case of name clash: qualified form (i.e. <code>#/if</code>) can be used instead.</p>
+
+
+
+<h3 id="def"><code>def</code></h3>
+
+<p>Creates (or updates) a global mutable cell (Var) in the current namespace. Vars can only* be changed from the namespaces they were defined in. (* through <code>def</code> special form) <br>
+Syntax: <code>(def name value)</code>. Any metadata on <code>name</code> will be added to the created var itself. (Not if this only changes.)</p>
+
+
+
+<h3 id="let"><code>let</code></h3>
+
+<p>Binds local scope variables with provided values. A binding is a pair of pattern binder and expression to evaluate. One let can contain multiple such pairs. <br>
+Variables are no longer bound after leaving let construct, in which they were created. <br>
+Syntax: <code>(let [pattern expression ...] body)</code> <br>
+Binding: Currently only 3 version of binding are supported:</p>
+
+<ul>
+<li>simple: just a symbol : binds <br>
+<ul><li>Syntax: any symbol, that from now on can be used to access bound value.</li></ul></li>
+<li>seq: captures positional elements in a seq <br>
+<ul><li>Syntax: <code>[a b c]</code> - This will bind first 3 terms in seq</li>
+<li><code>[a b &amp; r]</code> - The r will capture the rest of the sequence. <br>
+<ul><li>&amp; is a special symbol and cannot be bound to in this context.</li></ul></li>
+<li>If seq contains less terms then required: rest will be bound to nil.</li></ul></li>
+<li>ignore: like simple, but ignore  <br>
+<ul><li>Syntax: <code>_</code></li>
+<li>The value will still be computed, only not captured.</li></ul></li>
+</ul>
+
+<p>Example: <code>(let [a (+ 7 5)] (* a (inc a))) ;=&gt; 156</code> <br>
+<code>(let [[a b c] (50000)] (+ a b c)) ;=&gt; 3</code> <br>
+- Explantion: <code>(50000)</code> creates a lazy seqence of numbers from 0 to 49999. Only first 3 will be actually realized and bound to <code>a</code>, <code>b</code> and <code>c</code>, so expression will become <code>(+ 0 1 2)</code> and <code>+</code> can sum any number of arguments.</p>
+
+<p>Binding are recursive, so something like this is possible too: <code>[[a b] [c d] [_ [q w r &amp; l]]]</code>.</p>
+
+<p>//Note: I say ‘bound’ but associated might be a better term… Either way, they are immutable and expressions in let are evaluated eagerly. (i.e. not “bound” to potential results if needed, but actually computed and “assigned”)</p>
+
+<p>Known problem: Scope retains captured values even if they are no longer needed. - Can cause memory leaks: especially if context is captured in a closure: The same problem: Closure captures the entire scope, not just what is used inside. <br>
+- This might not seem like a problem, but imagine: if scope retains head of a lazy seq, that is then being reduced: under normal circumstances, only the necessary, little, part of seq is created at a time, and already consumed beginning of the seq is garbage collected… If the head is still retained in scope, although unneeded, it will never be GCed and will cause (potentially) huge space leaks.</p>
+
+
+
+<h3 id="do"><code>do</code></h3>
+
+<p>Do special form takes any number of expressions and evaluates them in turn, returning result of last. Other then last can be executed for side effects, as their result will never be captured anywhere.</p>
+
+
+
+<h3 id="if"><code>if</code></h3>
+
+<p>Takes 2 or 3 arguments. Evaluates first argument and based on it’s returned value* evaluates and returns second argument or [if third argument is present, evaluates and returns that, otherwise returns nil]. <br>
+Syntax: <code>(if test then else)</code> or <code>(if test then)</code> ~= <code>(if test then ())</code></p>
+
+
+
+<h3 id="eval"><code>eval</code></h3>
+
+<p>Evaluates it’s arguments like any other function. (can only take 1) But, then evaluates the result of that. Which allows evaluation of any (possibly computed / otherwise obtained) term. As other lisps: Program is data, and possibly vice versa, so it does not take a string or anything special, but normal data structures. <br>
+Syntax: <code>(eval '(+ 7 8))</code></p>
+
+
+
+<h3 id="apply"><code>apply</code></h3>
+
+<p>Transforms a seq into argument list. Last argument of apply must be seqable. It replaces the last argument with all the arguments in the seq. This operation works even if last argument is infinite. <br>
+Syntax: <code>(apply fn possible other args seq-arg)</code> <br>
+Example: <code>(apply + [1 2 3])</code> - the same as <code>(+ 1 2 3)</code>. <br>
+<code>(apply + -15 128 (100))</code> - sums numbers 0 to 99 and -15 and 128</p>
+
+
+
+<h3 id="recur"><code>recur</code></h3>
+
+<p>Allows tail recursion. Every Fn* tests it’s result for being a recur. If it is, it repeats itself with arguments captured in the recur. - Recur itself is just a lightweight box for arguments. This special form can be used anywhere, but invoking virtually any other method then getArgs() results in “Recur outside looping context” exception. <br>
+This implies that it can only be used in a tail position and only inside Fn. <br>
+Syntax: <code>(recur arg1 arg2 ...)</code> <br>
+Example:  A function that will reverse a list.</p>
+
+<pre class="prettyprint prettyprinted"><code class="language-Clojure"><span class="pun">(</span><span class="pln">fn </span><span class="pun">([</span><span class="pln">l</span><span class="pun">]</span><span class="pln"> </span><span class="pun">(</span><span class="pln">recur </span><span class="pun">()</span><span class="pln"> l</span><span class="pun">))</span><span class="pln">
+    </span><span class="pun">([</span><span class="pln">acc l</span><span class="pun">]</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">if</span><span class="pln"> l 
+                </span><span class="pun">(</span><span class="pln">recur </span><span class="pun">(</span><span class="pln">cons </span><span class="pun">(</span><span class="pln">first l</span><span class="pun">)</span><span class="pln"> acc</span><span class="pun">)</span><span class="pln"> </span><span class="pun">(</span><span class="pln">rest l</span><span class="pun">))</span><span class="pln"> 
+                acc</span><span class="pun">)))</span></code></pre>
+
+<p>(* essentially all normal functions: not macros or special forms)</p>
+
+<h3 id="var"><code>var</code></h3>
+
+<p>Normal symbol evaluation becomes lookup of that symbol in scope. Global scope is composed of Vars. i.e. Evaluation of a symbol accesses value of a Var. If I want to access the Var itself, rather then value stored in it, I have to use this special form. This special form completely ignores any scope variables. <br>
+Syntax: <code>(var symbol)</code> <br>
+There exist special reader macro that is translated into this special form: <code>#'symbol</code></p>
+
+
+
+<h3 id="require"><code>require'</code></h3>
+
+<p>Loads and imports a file. Uses default Loader, that searches on CLASSPATH. Splits symbol name by <code>.</code> and replaces with <code>/</code>, adding <code>.maaj</code>. - Loader then evaluates the file and returns created namespace. <code>require'</code> then imports based on it’s options <br>
+For details on options see: <code>(meta :doc #'require')</code></p>
+
+<ul>
+<li><code>:*</code> - loads not qualified</li>
+<li>nothing - fully qualified</li>
+<li><code>:as</code>- qualified with another namespace</li>
+<li>there will also be an option to import as not qualified only specified symbols</li>
+</ul>
+
+<p>Everything will be also fully qualified.</p>
+
+
+
+<h3 id="fnseq"><code>fnseq</code></h3>
+
+<p>Creates a function (or a lambda; not different) that captures current context* / scope. (* Function will be evaluated in the namespace they were created in.) - The body of this expression will become the body of the function. It will not be evaluated now, only stored. The body can be potentially infinite. <br>
+Evaluating the function causes the body to be evaluated in the original context, with one* difference: there is special local variable injected: <code>$args</code>. - This variable shouldn’t be used directly and is prone to change name. This special form generally shouldn’t be used directly, use macro <a href="#fn"><code>fn</code></a> instead. <br>
+Syntax: <code>(fnseq "Hello World!")</code></p>
+
+<p>(* There is potentially more differences : if provided, name of this function will be in scope as well to allow recursion. There might be other changes. Argument list is the most important, though.)</p>
+
+
+
+<h3 id="macroseq"><code>macroseq</code></h3>
+
+<p>The same as <a href="#fnseq"><code>fnseq</code></a>, only has different evaluation semantics. See <a href="#macro-expansion">Macro expansion</a>. Shouldn’t be used directly, use macro <a href="#macro"><code>macro</code></a> instead.</p>
+
+
+
+<h2 id="macro-expansion">Macro expansion</h2>
+
+<p>Macros are function, that upon evaluation generate code. In most Lisps, this is done at compilation time. I’m trying to do it once (while creating a function, essentially). - On the other hand, I can pass macros around and generally threat them as dynamically as functions. - At least some advantage of not having a compiled language.</p>
+
+<p>//Note: At this point, macros sometimes work incorrectly, mainly: expand more then they should… (some combinations of macro expansion and quotation, unquotation…) - And ignores unquote - I will probaly have to make that a special term too… <br>
+// I know about it and I will address it when there is time. At this point, works mostly fine and macros are not the most import part of this project.</p>
+
+
+
+<h3 id="evaluation">Evaluation</h3>
+
+<p>Macros are evaluated <em>from outside in</em>.  <br>
+Macro expansion algorithm: </p>
+
+<ul>
+<li>on seq: Is this a macro application? <br>
+<ul><li>yes: apply and expand result</li>
+<li>no : expand all arguments</li></ul></li>
+<li>on other then seq  <br>
+<ul><li>collection: just fmap (expand all terms)</li>
+<li>ground: return itself</li></ul></li>
+</ul>
+
+
+
+<h3 id="macro-namespace"><code>#macro</code> namespace</h3>
+
+<p>This namespace is imported by default, but kept fully qualified. Contains primitives mainly for manipulating macros.</p>
+
+<p>All these special forms / terms have associated reader macros.</p>
+
+
+
+<h4 id="quote"><code>quote</code></h4>
+
+<p>On evaluation simply returns it’s body (i.e. first argumet) without evaluating it. <br>
+Reader macro: <code>'x</code> -&gt; <code>(#macro/quote x)</code>. <br>
+Example: <code>(#macro/quote (1 2 3)) ;=&gt; (1 2 3)</code></p>
+
+
+
+<h5 id="quote-qualified"><code>quote-qualified</code></h5>
+
+<p>Similar to <code>quote</code>, but traverses it’s argument and : changes unqualified symbols to qualified (either by Var they represent, or current namespace) and runs <code>unquote</code> and <code>unquote-splicing</code>. <br>
+Reader macro: <code>`x</code>. (backtick) <br>
+Example: <code>`(if a test/b) ;=&gt; (#/if current-namespace/a test/b)</code></p>
+
+
+
+<h4 id="expand"><code>expand</code></h4>
+
+<p>Expects single argument. Returns it unevaluated, but macro expanded. <br>
+Example: <code>(#macro/expand (cadr [4 5 6])) ;=&gt; (first (rest [4 5 6]))</code></p>
+
+
+
+<h4 id="unquote"><code>unquote</code></h4>
+
+<p>Unquote special terms (not forms) are terms, because they exist inside quoted terms. These are not evaluated and thus, they would never be found. - Instead a special operation unquoteTraverse is used in quote-qualified. If it encounters unquote, it evaluates it’s body instead. Reader macro is the only way to create this. <br>
+Reader macro: <code>~x</code>generates something like <code>(#macro/unquote x)</code> <br>
+Example: <code>(let [a 5] `[a ~a 5]) ;=&gt; [current-namespace/a 5 5]</code> </p>
+
+<p>Note: unquote only works inside <code>quote-qualified</code></p>
+
+
+
+<h4 id="unquote-splicing"><code>unquote-splicing</code></h4>
+
+<p>Works like <a href="#unquote"><code>unquote</code></a>, only instead of injecting 1 value from evaluating it;’s body, expects body to result in something seqable. It then becomes all of the terms in the evaluated seqable, and replaces itself with that. <br>
+Reader macro: <code>~@x</code> generates something like <code>(#macro/unquote-splicing x)</code> <br>
+Example: <code>(let [a [1 2 3]] `[a ~a ~@a 42] ) ;=&gt; [cur-ns/a [1 2 3] 1 2 3 42]</code></p>
+
+
+
+<h2 id="core-functions-and-macros">Core functions and macros</h2>
+
+
+
+<h3 id="fn"><code>fn</code></h3>
+
+<p>Adds arity checks, arity overloads and argument list pattern binding to <a href="#fnseq"><code>fnseq</code></a>. <br>
+Basic form is: <code>(fn pattern-bind  body in an implicit do block)</code>. <br>
+Arity check: arity is computed from pattern-bind, that must be a seq bind or simple bind … or ignore. </p>
+
+<ul>
+<li>A simple bind represents an overload with variadic arity and no minimal number of arguments required. <br>
+<ul><li>Is functionally equivalent with <code>[&amp; r]</code>.</li></ul></li>
+<li>A seq bind (i.e. vec): <br>
+<ul><li>if does not capture / ignore rest: has fixed arity. <br>
+<ul><li>example: <code>[a b c]</code> : has arity 3</li></ul></li>
+<li>if captures rest : is considered variadic, but might define minimal arity : number of terms specified <br>
+<ul><li>example: <code>[a b &amp; r]</code> - this will match if <code>arity &gt;= 2</code>. And will bind first 2 elements.</li></ul></li></ul></li>
+<li>There cannot be multiple overloads with the same arity or multiple variadic overloads.</li>
+</ul>
+
+<p>Arity overloading syntax: args-bind-pattern and it’s body are in a seq. - For all overloads. <br>
+Example: <code>(fn ([](recur 0)) ([x](inc x)))</code>- A function that increments it’s argument, or calls itself with the argument 0. - Any other arity would throw an arity-exception.</p>
+
+
+
+<h3 id="macro"><code>macro</code></h3>
+
+<p>The same as <a href="#fn"><code>fn</code></a> but uses <a href="#macroseq"><code>macroseq</code></a> instead.</p>
+
+
+
+<h3 id="defn"><code>defn</code></h3>
+
+<p>Combines <a href="#def"><code>def</code></a> and <a href="#fn"><code>fn</code></a>. You can specify meta data after name. <br>
+Form: same as <code>fn</code>, only first argument is name for def. <br>
+Example: <code>(defn name ^"the same as using just :name" [x] (:name x))</code></p>
+
+
+
+<h3 id="defmacro"><code>defmacro</code></h3>
+
+<p>The same as <a href="#defn"><code>defn</code></a> but uses <a href="#macro"><code>macro</code></a> instead.</p>
+
+<hr>
+
+
+
+<h3 id="first"><code>first</code></h3>
+
+<p>Returns first element (head) of a seqable argument.</p>
+
+
+
+<h3 id="rest"><code>rest</code></h3>
+
+<p>Returns the rest (tail) of a seqable arument.</p>
+
+
+
+<h3 id="cons"><code>cons</code></h3>
+
+<p>takes 2 args, second must be seqable; returns second argument with prepended first</p>
+
+
+
+<h3 id="seq-1"><code>seq</code></h3>
+
+<p>Retuns a seqable as a seq.</p>
+
+
+
+<h3 id="reduce"><code>reduce</code></h3>
+
+<p>takes: </p>
+
+<ul>
+<li>fn : invocable, that takes 2 arguments: accumulator and term, producing new accumulator</li>
+<li>acc : starting value of accumulator</li>
+<li>coll : Reducible (essentially: collection / seq)</li>
+</ul>
+
+<p>Applies fn on acc and first term in coll, applies fn on this new accumulator and second term in coll … until no more left. - If coll was from the start empty, returns starting accumulator.</p>
+
+
+
+<h3 id="lazy"><code>lazy</code></h3>
+
+<p>Captures 1 argument body, that must return a seq and returns a seq thunk, with a promise of evaluating the captured body when needed. The returned value can be used as a seq.</p>
+
+<p>If given 2 arguments is essentially <code>(cons arg1 (lazy arg2))</code>.</p>
+
+
+
+<h3 id="require-1"><code>require</code></h3>
+
+<p>Calls <code>require'</code> for each argument.</p>
+
+
+
+<h3 id="cond"><code>cond</code></h3>
+
+<p>Takes even number of args. eacch “pair” is interpreted as : test, body</p>
+
+<ul>
+<li>evaluates and returns body after first succesful test <br>
+<ul><li>if nothing matches returns nil</li></ul></li>
+<li>tests are evaluated in order</li>
+</ul>
+
+<p>Example: <code>(cond (0 &lt; v) :pos, (0 &gt; v) :neg, :else :zero)</code></p>
+
+
+
+<h3 id="case"><code>case</code></h3>
+
+<p>Similar to Java switch construct. <br>
+Takes an expression and pairs. Tests each match on equality with computed value of first expression. <br>
+Tests sequentially. <br>
+Can take a special test match <code>_</code> that will match anything.</p>
+
+<p>Example: <code>(case (get-value), 0 :ok, 1 :warn, 4 :err, _ :unknown)</code></p>
+
+
+
+<h3 id="count"><code>count</code></h3>
+
+<p>Counts collection. Most times O(1), counting a seq can be O(n).</p>
+
+
+
+<h3 id="count-1"><code>count'</code></h3>
+
+<p>O(1) bound count : takes 2 args : bound and seq <br>
+- if counts a seq and gets over specified bound, returns Int.MAX_VALUE</p>
+
+
+
+<h3 id="gensym"><code>gensym</code></h3>
+
+<p>returns new unique symbol, with possible preffix specified as first argumetn</p>
+
+
+
+<h3 id="meta"><code>meta</code></h3>
+
+<p>access meta data of a term</p>
+
+
+
+<h3 id="arithmetics">Arithmetics</h3>
+
+<ul>
+<li><code>+, *</code> : work on arity 0-* (0 argumets : identity in associated monoid)</li>
+<li><code>-, /</code> : work on arity 1-* (single argument : inverse in associated algebraic group)</li>
+<li><code>min, max</code> : works on arity 1-*</li>
+<li><code>&lt;, &gt;, &lt;=, &gt;=, ==</code> : works on arity 2</li>
+<li><code>inc, dec, neg</code>: works on arity 1</li>
+</ul>
+
+
+
+<h3 id="title"><code>=</code></h3>
+
+<p>.equals() : works on arity 1-*</p>
+
+
+
+<h3 id="bool">bool</h3>
+
+<ul>
+<li><code>and, or</code>: works on arity 0-*</li>
+<li><code>not</code>: works on arity 1</li>
+</ul>
+
+<hr>
+
+<p>… Some other functions are: <code>take, conj, assoc</code>…</p>
+
+<ul>
+<li>Informations about them can be found thorough <code>(meta :doc #'fn-name)</code>. Insead of <code>:doc</code> could be <code>:info</code>.</li>
+</ul>
+
+<h2 id="io">IO</h2>
+
+<p>There is no IO yet. It will be implemented together with other Java interop. - I could implement it now as something like: having readln, writeln on some reader and writer (… possibly streams) stored in Context, but it would be mostly just a stub implementation. </p>
+
+<p>Thanks to Repl, it’s easy to explore and can be used from Java…</p>
+
+
+
+<h2 id="repl">Repl</h2>
+
+<p>Interactive read-evaluate-print loop. <br>
+run: <code>maaj.Repl</code>. <br>
+What it does: It will:</p>
+
+<ul>
+<li>Read a term. </li>
+<li>Evaluate it. </li>
+<li>Print what it’s become. </li>
+<li>Repeat this in a loop, until the reader encounters EOF.</li>
+</ul>
+
+<p>You can also look at implementation of this class (it’s very short) on how Maaj Script can be used from Java. <br>
+I did not provide any special API because I plan to use Java Scripting API, when I get to do it.</p>
+
+<h2 id="implemetation-concepts">Implemetation concepts</h2>
+
+<p>Term is an interface, with methods like <code>.eval(Context):Term</code>, <code>.apply(Context, Arguments):Term</code>, <code>.Show(Writer):Void</code>… <br>
+- Each term then knows how to perform these actions specifically to it’s details. Possibly invoking the more methods on other Terms it contains…</p>
+
+<p>Scope is stored in special type <code>Context</code> that consists of mainly 2 things: reference to global variables and local scope, represented as a immutable map.</p>
+
+<p>Reading mainly works as a (single pass) push-down automaton, where the entire state is position in code. Only exception to this are “terminated” constructs like <code>(...),[...],{...},"..."</code> which are read in a loop, but read the insides normally.</p>
+
+<p>Reader has a lot unused “slots” (special characters; switching to different dispatch table). Some are decided, but not yet implemented (like sets or regexps), some are reserved, or otherwise unused. - When these are encountered, reading fails. (as with any syntax error; the difference is : these can in future change to something meaningful)</p>
+
+<p>Complex data structures (vectors, maps) are just wrappers over Clojure data structures.</p>
+
+<p>Let (and fn) argument binding works such that from the bind expression is created a function that can create a bindings map from it’s argument.</p></div></body>
+</html>
