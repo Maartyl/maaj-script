@@ -42,7 +42,7 @@ public class Glob {
     if (v != null) return v;
     v = coreAcc.get(s);
     // if (v != null) return v;
-    // no need to search in others: current has imported anything acessible
+    // no need to search in others: current has imported anything accessible
     return v;
   }
 
