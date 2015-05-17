@@ -15,9 +15,14 @@ import maaj.reader.ReaderContext;
 import maaj.term.Symbol;
 import maaj.term.Term;
 import maaj.util.H;
+import maaj.util.MapH;
 
 /**
- *
+ * Interactive read evaluate print loop. <br/>
+ * You can also how Maaj Script can be used from Java.
+ * - It might be better to provide some object with these methods instead, but
+ * I will do that with Java scripting API directly.
+ * <p>
  * @author maartyl
  */
 public class Repl {
@@ -30,6 +35,8 @@ public class Repl {
   public Repl() {
     this.ns = H.symbol("repl");
     this.cxt = glob.start(ns);
+    //H.eval("(def " + PRINTSTACKTRACE + " ())", cxt);
+    cxt.def(PRINTSTACKTRACE, H.NIL, MapH.emptyPersistent());
   }
 
   public void run(Reader r, Writer w) throws IOException {
@@ -42,8 +49,9 @@ public class Repl {
         w.append("\n>");
         w.flush();
       } catch (Exception e) {
-        System.err.println(e);
-        e.printStackTrace(System.err);
+        if (!H.eval(PRINTSTACKTRACE, cxt).isNil())
+          e.printStackTrace(System.err);
+        else System.err.println(e);
         w.append(">");
         w.flush();
         //throw e;
@@ -58,15 +66,21 @@ public class Repl {
       run(r, w);
       break; //if runs to end fine : exit; otherwise repeat after exception (in reader)
     } catch (ReaderException e) {
-      System.err.println(e);
-      e.printStackTrace(System.err);
+      if (!H.eval(PRINTSTACKTRACE, cxt).isNil())
+        e.printStackTrace(System.err);
+      else System.err.println(e);
     } catch (IOException  e) {
       System.err.println(e);
       break;
     }
   }
+  /**
+   * This variable is in REPL interpreted as whether stack trace of exceptions should be printed or not
+   */
+  private static final Symbol PRINTSTACKTRACE = H.symbol("*print-stack-trace*");
 
   public static void main(String[] args) {
     new Repl().runStd();
   }
+
 }
