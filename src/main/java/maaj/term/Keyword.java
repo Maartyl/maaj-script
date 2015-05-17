@@ -10,7 +10,8 @@ import java.io.Writer;
 import maaj.lang.Context;
 
 /**
- *
+ * Special symbols that evaluate to themselves and are mainly used as markers or as keys in maps.
+ * <p>
  * @author maartyl
  */
 public class Keyword extends Symbol {
