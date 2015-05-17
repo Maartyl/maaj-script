@@ -9,7 +9,8 @@ import maaj.coll.traits.VecLike;
 import maaj.util.VecH;
 
 /**
- *
+ * represents a structure similar to ArrayList\<Term\> but immutable.
+ * <p>
  * @author maartyl
  */
 public interface Vec extends Collection<Vec>, VecBase<Vec>, VecLike<Vec, VecT> {

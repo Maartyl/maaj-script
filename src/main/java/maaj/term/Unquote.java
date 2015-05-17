@@ -13,7 +13,9 @@ import maaj.util.H;
 import maaj.util.Sym;
 
 /**
- *
+ * special term that is meant to exist inside quotation. quoted terms are traversed,
+ * looking for unquote, so it can evaluate it's contents.
+ * <p>
  * @author maartyl
  */
 public abstract class Unquote implements Term {

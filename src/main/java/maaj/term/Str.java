@@ -13,7 +13,8 @@ import maaj.util.H;
 import maaj.util.SeqH;
 
 /**
- *
+ * string wrapper
+ * <p>
  * @author maartyl
  */
 public class Str implements JObj, Collection {
