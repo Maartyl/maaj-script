@@ -6,10 +6,10 @@
 package maaj.term;
 
 import java.util.Objects;
-import maaj.lang.Context;
 
 /**
- *
+ * keyword with namespace
+ * <p>
  * @author maartyl
  */
 public class KeywordNs extends Keyword {

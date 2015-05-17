@@ -10,7 +10,8 @@ import java.io.Writer;
 import java.util.Objects;
 
 /**
- *
+ * symbol with namespace
+ * <p>
  * @author maartyl
  */
 public class SymbolNs extends Symbol {

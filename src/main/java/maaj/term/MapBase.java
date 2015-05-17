@@ -10,7 +10,8 @@ import maaj.coll.traits.MapLikeBase;
 import maaj.lang.Context;
 
 /**
- *
+ * functionality shared between Map and MapT
+ * <p>
  * @author maartyl
  * @param <M> self
  */

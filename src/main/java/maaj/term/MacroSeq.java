@@ -9,7 +9,9 @@ import maaj.lang.Context;
 import maaj.util.Sym;
 
 /**
- * basic functions that operate on evaluated arguments
+ * Macros are functions that operate on unevaluated arguments and
+ * return expression trees to be evaluated instead of itself.
+ * - in this case, implemented through InvSeq
  * <p>
  * @author maartyl
  */

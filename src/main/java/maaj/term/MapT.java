@@ -10,7 +10,8 @@ import java.io.Writer;
 import maaj.coll.traits.MapTLike;
 
 /**
- *
+ * transient counterpart of Map
+ * <p>
  * @author maartyl
  */
 public interface MapT extends CollectionT<MapT>, MapBase<MapT>, MapTLike<MapT, Map> {

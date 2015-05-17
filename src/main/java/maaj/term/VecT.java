@@ -11,7 +11,8 @@ import java.io.Writer;
 import maaj.coll.traits.VecTLike;
 
 /**
- *
+ * transient counterpart of Vec
+ * <p>
  * @author maartyl
  */
 public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, Vec> {

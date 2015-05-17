@@ -12,7 +12,7 @@ import maaj.util.H;
 import maaj.util.SeqH;
 
 /**
- * interface representing all numbers in MaajScript
+ * interface representing all numbers in MaajScript. ~numeric
  * <p>
  * @author maartyl
  */

@@ -16,7 +16,8 @@ import maaj.util.SeqH;
 import maaj.util.VecH;
 
 /**
- *
+ * functionality shared between Vec and VecT
+ * <p>
  * @author maartyl
  * @param <VB> self
  */

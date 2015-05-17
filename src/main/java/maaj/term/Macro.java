@@ -8,7 +8,8 @@ package maaj.term;
 import maaj.lang.Context;
 
 /**
- * A Fn that doesn't evaluate it's args and macro expands it's result.
+ * A Fn that doesn't evaluate it's args and
+ * returns an expression tree to be evaluated instead of itself.
  * <p>
  * @author maartyl
  */
