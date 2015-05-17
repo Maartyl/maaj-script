@@ -16,39 +16,15 @@ import maaj.util.MapH;
 import static maaj.util.Sym.nameSym;
 
 /**
- *
+ * Is passed throughout evaluation and consists of:
+ * - reference to Glob
+ * - current namespace
+ * - local scope (map from simple symbols to associated values)
+ * <p>
  * @author maartyl
  */
 public class Context implements Lookup {
 
-  /*
-   what I contain:
-   reference to 'global' scope :: Symbol/Term -> ? / Var? / Term
-   - all other lisps have Vars - why? - to change stuff? can't I just change the map?
-   -- so closures can remember mutable values? - I will look it up repeatedly, no? ... maybe not, then it could help...
-   -- EDIT: nope: vars are saved inside fns / stuff and only content changes
-
-   local scope variables map :: Map // my or IPersistentMap<Symbol, Term>
-   - using MyMap makes no sense: I wil never need it and it would only be slower
-
-   bindings: in future: only layer before accessing global... ?
-   - how different from local vars? - visible inside Vars ... !!!
-   -- must be INSIDE VARS not here - ok
-
-   and some reference to truly global scope
-   - way to access other objects in JVM
-
-   EDIT:
-   - I will need namespaces:
-   current namespace + name
-   lang namespace: #
-   special namespaces that are referenced through # starting names
-   - these are lang features / ...
-   required namespaces
-   - namespace should be more then just a map
-   -- in case I need to access ... complicated stuff
-
-   */
   private final Glob glob;
 
   private Namespace curNs;
