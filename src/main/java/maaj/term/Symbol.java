@@ -11,12 +11,12 @@ import java.util.Objects;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
 import maaj.util.H;
-import maaj.util.MapH;
 import maaj.util.SeqH;
 import maaj.util.Sym;
 
 /**
- *
+ * Maaj identifiers. Generally used as markers or to "reference" other terms.
+ * <p>
  * @author maartyl
  */
 public class Symbol implements Term {
