@@ -16,7 +16,10 @@ import static maaj.util.Sym.nameSym;
 import static maaj.util.Sym.namespaceSym;
 
 /**
- *
+ * This class has 2 jobs:<br/>
+ * - storing Vars of current namespace, making them accessible through their name.<br/>
+ * - storing references to Vars from other namespaces, that are imported to this namespace.<br/>
+ * <p>
  * @author maartyl
  */
 public final class Namespace {
@@ -37,16 +40,29 @@ public final class Namespace {
     return nsName;
   }
 
+  /**
+   * creates Var under given name
+   * - var will have default meta : name, namespace and meta from name
+   * - if Var with given name already exists, returns that without modifying it
+   */
   public Var def(Symbol name) {
     if (name.isQualified())
       throw new IllegalArgumentException("cannot create var from qualified name");
     return vars.computeIfAbsent(name, n -> Var.empty().addMeta(H.map(nameSym, n, namespaceSym, getName())));
   }
-
+  /**
+   * creates Var under given name with given value
+   * - will merge meta of name and value
+   * - if Var with given name already exists, returns that witch changed contents to value and updated meta
+   */
   public Var def(Symbol name, Term val) {
     return def(name, val, val.getMeta());
   }
-
+  /**
+   * creates Var under given name with given value and meta
+   * - will merge meta of name and value
+   * - if Var with given name already exists, returns that witch changed contents to value and updated meta
+   */
   public Var def(Symbol name, Term val, Map meta) {
     Var v = def(name).doSet(val);
     v.addMeta(meta);
@@ -76,6 +92,10 @@ public final class Namespace {
     return vars.get(name);
   }
 
+  /**
+   * Vars will be accessible through prefix/name instead of namespace/name
+   * it will ALSO import everything as fully qualified
+   */
   public void importQualified(Namespace ns, Symbol prefix) {
     if (!prefix.isSimple())
       throw new IllegalArgumentException("cannot import qualifying with qualified prefix");
@@ -93,7 +113,10 @@ public final class Namespace {
       imported.put(e.getKey().withNamespace(ns.getName()), e.getValue());
     }
   }
-
+  /**
+   * Vars will be accessible through just name instead of namespace/name
+   * it will ALSO import everything as fully qualified
+   */
   public void importNotQualified(Namespace ns) {
     for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
       imported.put(e.getKey().asSimple(), e.getValue());
@@ -101,6 +124,9 @@ public final class Namespace {
     }
   }
 
+  /**
+   * namespaces can be created through custom loaders, that inherit this class.
+   */
   public static abstract class Loader {
     public abstract Namespace loadNamespaceFor(Symbol nsName, maaj.lang.Context cxt);
 
