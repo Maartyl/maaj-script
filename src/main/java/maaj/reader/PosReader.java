@@ -16,7 +16,7 @@ import java.io.Reader;
 import maaj.util.H;
 
 /**
- * Allows to read chars and remembers position in steam, in terms of row, col.
+ * Allows to read chars and remembers position in stream, in terms of row, col.
  * Assumes buffered reader.
  * <p>
  * @author maartyl

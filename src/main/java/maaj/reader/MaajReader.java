@@ -29,7 +29,9 @@ import maaj.util.Sym;
 import maaj.util.VecH;
 
 /**
- *
+ * Transforms text (i.e. stream of characters (Reader)) into a sequence of terms read.
+ * Single pass, ~"pushdown automaton", where position in code is state.
+ * <p>
  * @author maartyl
  */
 public class MaajReader {

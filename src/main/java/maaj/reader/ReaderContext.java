@@ -8,7 +8,10 @@ package maaj.reader;
 import maaj.term.Symbol;
 
 /**
- *
+ * "arguments" for reader (MaajReader).
+ * - Includes information that might be needed while reading terms.
+ * - It is likely to grow with more functionality in MaajReader.
+ * <p>
  * @author maartyl
  */
 public class ReaderContext {
