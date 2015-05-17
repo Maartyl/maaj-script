@@ -13,7 +13,9 @@ import maaj.lang.Context;
 import maaj.util.H;
 
 /**
- *
+ * Base interface for terms that can be invoked: functions, macros, special forms...
+ * Specialized version are used throughout code as functional interfaces...
+ * <p>
  * @author maartyl
  */
 public interface Invocable extends Ground, Runnable, Callable<Term> {

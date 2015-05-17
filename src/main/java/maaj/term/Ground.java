@@ -9,7 +9,8 @@ import maaj.lang.Context;
 import maaj.util.H;
 
 /**
- *
+ * essentially simple terms that evaluate to themselves
+ * <p>
  * @author maartyl
  */
 public interface Ground extends Term {

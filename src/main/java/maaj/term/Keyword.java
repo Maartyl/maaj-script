@@ -14,7 +14,7 @@ import maaj.lang.Context;
  * <p>
  * @author maartyl
  */
-public class Keyword extends Symbol {
+public class Keyword extends Symbol implements Ground {
 
   protected Keyword(String name) {
     super(name);
