@@ -570,6 +570,21 @@ public class CoreLoader extends Namespace.Loader {
       Term start = a.rest().first();
       Reducible coll = H.requireReducible(a.rest().rest().first());
       return coll.reduce(start, fn);
+            });
+
+    defn(core, "map", "maps ^1 fn over 1 to 3 seqs - fn has to be of the same arity as number of seqs", a -> {
+      switch (a.boundLength(4)) {
+      case 2: return SeqH.mapLazy(H.seqFrom(a.rest().first()), H.requireInvocable(a.first()));
+      case 3: return SeqH.zip(H.requireInvocable(a.first()),
+                              H.seqFrom(a.rest().first()),
+                              H.seqFrom(a.rest().rest().first()));
+      case 4: return SeqH.zip(H.requireInvocable(a.first()),
+                              H.seqFrom(a.rest().first()),
+                              H.seqFrom(a.rest().rest().first()),
+                              H.seqFrom(a.rest().rest().rest().first()));
+      default:
+        throw new IllegalArgumentException("map requires arity: 2|3|4 but got: " + a.boundLength(30));
+      }
     });
 
     defn(core, Sym.equalSymCCore.getNm(), "equals?", a -> {
