@@ -29,7 +29,7 @@ public interface Monad<M extends Monad<M>> extends Term, Functor<M> {
 
   @Override
   public default M fmap(Invocable mapper) {
-    return bindM((Invocable1) x -> retM(mapper.invoke(x)));
+    return bindM((Invocable1) x -> retM(x.transform(mapper)));
   }
 
   /**
