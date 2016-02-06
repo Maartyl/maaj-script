@@ -7,7 +7,6 @@ package maaj.term;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Objects;
 
 /**
  * wrapped longs
