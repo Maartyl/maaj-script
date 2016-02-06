@@ -135,7 +135,7 @@ public class H {
     throw new UnsupportedOperationException("wrapper not yet implemented for: " + oc.getName());
   }
 
-  public static Object unwrap(Term t) {
+  public static Object unwrapObject(Term t) {
     //TODO: resolve name crash: Term.unwrap vs. this (different concept)
 
     if (t == null) return null;
@@ -342,7 +342,8 @@ public class H {
     if (t instanceof Seqable)
       return ((Seqable) t).seq();
 
-    throw new IllegalArgumentException("Cannot create Seq from: " + t.getType().getName());
+    String extra = tt.getMeta().isEmpty() ? "" : " (meta: " + tt.getMeta().print() + ")";
+    throw new IllegalArgumentException("Cannot create Seq from: " + t.getType().getName() + extra);
   }
 
   public static <T extends Functor<T>> T fmap(T f, Invocable1 m) {
