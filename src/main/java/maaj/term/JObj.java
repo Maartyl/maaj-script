@@ -6,6 +6,7 @@
 package maaj.term;
 
 import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Used to represent wrappers of native JVM objects.
@@ -16,6 +17,12 @@ public interface JObj extends Term {
 
   @Override
   Object getContent();
+
+  @Override
+  public default void show(Writer w) throws IOException {
+    w.append("#! "); //some way to show it's something 'weird'
+    w.append(getContent().toString());
+  }
 
   @Override
   default void serialize(java.io.Writer w) throws IOException {

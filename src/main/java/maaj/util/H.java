@@ -130,9 +130,8 @@ public class H {
     if (oc == String.class)
       return Str.of((String) o);
 
-    //JObj
-
-    throw new UnsupportedOperationException("wrapper not yet implemented for: " + oc.getName());
+    return JWrap.of(o);
+    //throw new UnsupportedOperationException("wrapper not yet implemented for: " + oc.getName());
   }
 
   public static Object unwrapObject(Term t) {
@@ -227,6 +226,13 @@ public class H {
     return VecH.fromSeq(s);
   }
 
+  public static Vec vec(Object[] arr) {
+    VecT v = VecH.emptyTransient();
+    for (Object o : arr)
+      v.doConj(wrap(o));
+    return v.asPersistent();
+  }
+
   public static Symbol symbol(String symbol) {
     return Symbol.of(symbol);
   }
@@ -245,6 +251,14 @@ public class H {
     Seq s = H.END;
     for (int cur = ts.length - 1; cur >= 0; --cur) {
       s = SeqH.sexp(ts[cur], s);
+    }
+    return s;
+  }
+
+  public static Seq list(Object[] ts) {
+    Seq s = H.END;
+    for (int cur = ts.length - 1; cur >= 0; --cur) {
+      s = SeqH.sexp(wrap(ts[cur]), s);
     }
     return s;
   }
