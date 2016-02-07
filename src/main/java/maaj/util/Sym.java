@@ -72,6 +72,8 @@ public class Sym {
   public static final Symbol requirePrimeSymC = H.symbol("#", "require'");
   public static final Symbol fnSymCore = H.symbol("#core", "fn");
   public static final Symbol macroSymCore = H.symbol("#core", "macro");
+  public static final Symbol invokeStaticSymCore = H.symbol("#jvm", "invoke-static");
+  public static final Symbol invokeVirtualSymCore = H.symbol("#jvm", "invoke-virtual");
 
   public static final Map macroMapTag = H.map(macroSymK, macroSymK);
   public static final Term TRUE = H.symbol("t");
