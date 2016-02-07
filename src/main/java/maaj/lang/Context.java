@@ -7,6 +7,7 @@ package maaj.lang;
 
 import maaj.coll.traits.Lookup;
 import maaj.exceptions.InvalidOperationException;
+import maaj.interop.Interop;
 import maaj.term.Map;
 import maaj.term.Symbol;
 import maaj.term.Term;
@@ -27,9 +28,9 @@ public class Context implements Lookup {
 
   private final Glob glob;
 
-  private Namespace curNs;
+  private final Namespace curNs;
 
-  private Map scope;
+  private final Map scope;
 
   private Context(Glob glob, Namespace curNs, Map scope) {
     this.glob = glob;
@@ -51,6 +52,10 @@ public class Context implements Lookup {
 
   public Namespace getCurNs() {
     return curNs;
+  }
+
+  public Interop getInterop() {
+    return glob.getInterop();
   }
 
   public Var def(Symbol name, Term val, Map meta) {
