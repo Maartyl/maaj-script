@@ -20,7 +20,7 @@ import java.lang.reflect.Modifier;
  *
  * @author maartyl
  */
-public class MethodCaller {
+public class MethodCaller implements Interop {
 
   private final Converter cvrt; //converter to use
 
@@ -28,7 +28,9 @@ public class MethodCaller {
     this.cvrt = cvrt;
   }
 
-  public Term call(Class<?> callOn, Object thisPtr, String methodName, Seq args) {
+  //thisPtr==null <=> static
+  @Override
+  public Term call(Class callOn, Object thisPtr, String methodName, Seq args) {
     //callOn cannot be determined from thisPtr, because it can be static call and thisPtr null
     if (args.boundLength(255) > 255)
       throw new IllegalArgumentException("too many arguments to JVM method: " + methodName + " (on " + callOn.getName() + ")");
