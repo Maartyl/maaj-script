@@ -22,6 +22,8 @@ public interface Invoker {
    * @param thisPtr //ignored if static
    * @param args
    * @return return value, null if void method
+   * @throws java.lang.IllegalAccessException
+   * @throws java.lang.reflect.InvocationTargetException
    */
   Object invoke(Object thisPtr, Object[] args) throws IllegalAccessException, InvocationTargetException;
 
