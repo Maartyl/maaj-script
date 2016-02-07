@@ -14,6 +14,7 @@ import maaj.term.Seq;
 import maaj.term.Term;
 import maaj.util.H;
 import maaj.util.SeqH;
+import java.lang.reflect.Modifier;
 
 /**
  *
@@ -32,7 +33,8 @@ public class MethodCaller {
     if (args.boundLength(255) > 255)
       throw new IllegalArgumentException("too many arguments to JVM method: " + methodName + " (on " + callOn.getName() + ")");
 
-    List<Invoker> matches = filterMethods(callOn.getMethods(), methodName, args.boundLength(256), typesOfElems(args));
+    List<Invoker> matches = filterMethods(callOn.getMethods(), methodName,
+                                          args.boundLength(256), thisPtr == null, typesOfElems(args));
 
     if (matches.size() == 1)
       return callAndWrap(matches.get(0), thisPtr, args);
@@ -69,11 +71,11 @@ public class MethodCaller {
     }
   }
 
-  private List<Invoker> filterMethods(Method[] allMethods, String methodName, int argCount, Class<?>[] argTypes) {
-    List<Invoker> matches = new ArrayList<>();
+  private List<Invoker> filterMethods(Method[] allMethods, String methodName, int argCount, boolean isStatic, Class<?>[] argTypes) {
+    List<Invoker> matches = new ArrayList<>(2);
     for (Method m : allMethods) {
-      if (m.getName().equals(methodName) && m.getParameterTypes().length == argCount) {
-        //TODO: check extra stuff, like static etc.
+      if (m.getName().equals(methodName) && m.getParameterCount() == argCount
+          && ((Modifier.STATIC & m.getModifiers()) > 0 == isStatic)) {
         Invoker v = tryGetInvoker(m, argTypes);
         if (v != null)
           matches.add(v);
