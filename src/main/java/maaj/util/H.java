@@ -130,6 +130,7 @@ public class H {
     if (oc == String.class)
       return Str.of((String) o);
 
+    //if (!oc.isArray())
     return JWrap.of(o);
     //throw new UnsupportedOperationException("wrapper not yet implemented for: " + oc.getName());
   }
