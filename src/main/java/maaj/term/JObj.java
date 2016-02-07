@@ -20,8 +20,9 @@ public interface JObj extends Term {
 
   @Override
   public default void show(Writer w) throws IOException {
-    w.append("#! "); //some way to show it's something 'weird'
+    w.append("#!{"); //some way to show it's something 'weird'
     w.append(getContent().toString());
+    w.append("}");
   }
 
   @Override
