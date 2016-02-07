@@ -32,6 +32,7 @@ public class Glob {
     CoreLoader l = new CoreLoader();
     this.coreAcc = store.getNamespaceFor(H.symbol("#"), l, loaderContext);
     coreAcc.importFullyQualified(store.getNamespaceFor(H.symbol("#macro"), l, loaderContext));
+    coreAcc.importFullyQualified(store.getNamespaceFor(H.symbol("#jvm"), l, loaderContext));
     coreAcc.importNotQualified(store.getNamespaceFor(H.symbol("#core"), l, loaderContext));
   }
 

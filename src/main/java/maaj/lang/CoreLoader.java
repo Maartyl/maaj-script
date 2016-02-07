@@ -39,7 +39,10 @@ public class CoreLoader extends Namespace.Loader {
       break;
     case "#core": loadCore(c, ns, new ReaderContext(nsName, "<?>"));
       break;
-    case "#macro": loadMacro(ns);break;
+    case "#macro": loadMacro(ns);
+      break;
+    case "#jvm": loadJvmInterop(ns);
+      break;
     default: throw new IllegalArgumentException("no core namespace with name: " + nsName.print());
     }
     return ns;
@@ -666,6 +669,51 @@ public class CoreLoader extends Namespace.Loader {
          + "and returning them in their original place in the structure",
          SfQuoting.SfQuoteQualified);
     def(macro, "expand", "expand macro without evaluating it", (c, a) -> a.firstOrNil().evalMacros(c));
+  }
+
+  private void loadJvmInterop(Namespace jvm) {
+    def(jvm, "invoke-virtual", "Invokes method on object with given arguments. (performs implicit conversions) \n"
+                               + "[obj methodName args-list]; "
+                               + "methodName: unqualified symbol. "
+                               + "args-list: any seq.", (c, a) -> {
+      arityRequire(3, a, "invoke-virtual");
+      Term obj = a.first();
+      Symbol name = H.requireSymbol(a.rest().first());
+      Seq args = H.requireSeq(a.rest().rest().first());
+      if (name.isQualified())
+        throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
+
+      return c.getInterop().call(obj.getType(), obj.getContent(), name.getNm(), args);
+            });
+    def(jvm, "invoke-static", "Invokes static method with given arguments. (performs implicit conversions) \n"
+                              + "[type methodName args-list]; "
+                              + "type: full class name (unqualified symbol). "
+                              + "methodName: unqualified symbol. "
+                              + "args-list: any seq.", (Context c, Seq a) -> {
+      arityRequire(3, a, "invoke-static");
+      Symbol type = H.requireSymbol(a.first());
+      Symbol name = H.requireSymbol(a.rest().first());
+      Seq args = H.requireSeq(a.rest().rest().first());
+      if (name.isQualified())
+        throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
+      if (type.isQualified())
+        throw new IllegalArgumentException("invoke-virtual: type name cannot be qualified.");
+
+      Class typeCls;
+      try {
+        typeCls = Class.forName(type.getNm());
+      } catch (ClassNotFoundException e) {
+        try {
+          typeCls = Class.forName("java.lang." + type.getNm()); //TODO: quite terrible, possibly modularize
+        } catch (ClassNotFoundException ex) {
+          throw H.sneakyThrow(e); //both failed
+        }
+        //if (typeCls == null)
+          
+      }
+      
+      return c.getInterop().call(typeCls, null, name.getNm(), args);
+    });
   }
 
   private static Seq arityRequire(int arity, Seq s, String errMsg) {
