@@ -33,11 +33,6 @@ public interface Nil extends Ground {
   }
 
   @Override
-  default Term invokeMethod(Str methodName, Seq args) {
-    throw new NullPointerException("Cannot invoke methods on nil.");
-  }
-
-  @Override
   default boolean isNil() {
     return true;
   }

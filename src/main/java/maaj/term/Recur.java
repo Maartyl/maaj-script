@@ -123,11 +123,6 @@ public class Recur implements Term {
   }
 
   @Override
-  public Term invokeMethod(Str methodName, Seq args) {
-    throw new UnsupportedOperationException("Recur outside looping context");
-  }
-
-  @Override
   public Term applyMacro(Context cxt, Seq args) {
     throw new UnsupportedOperationException("Recur outside looping context");
   }

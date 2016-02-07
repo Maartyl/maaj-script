@@ -92,11 +92,6 @@ public final class LazySeq implements Seq {
   }
 
   @Override
-  public Term invokeMethod(Str methodName, Seq args) {
-    return seq().invokeMethod(methodName, args);
-  }
-
-  @Override
   public Map getMeta() {
     //possibly EMPTY instead? or at least when not evaluated?
     return seq().getMeta();

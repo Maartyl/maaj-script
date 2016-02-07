@@ -83,11 +83,6 @@ public interface Mimic extends Term {
   }
 
   @Override
-  public default Term invokeMethod(Str methodName, Seq args) {
-    return unwrap().invokeMethod(methodName, args);
-  }
-
-  @Override
   public default Term applyMacro(Context cxt, Seq args) {
     return unwrap().applyMacro(cxt, args);
   }

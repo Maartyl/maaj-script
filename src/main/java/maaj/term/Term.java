@@ -74,21 +74,6 @@ public interface Term extends Quotable {
     return SeqH.cons(this, args.fmap((Invocable1) x -> x.evalMacros(cxt)));
   }
 
-  default Term invokeMethod(Str methodName, Seq args) {
-    //works very badly at his point: no automatic casting; can only find method with exacly seme arg types... which happens rarely
-    try {
-      @SuppressWarnings("unchecked")
-      Method method = getType().getMethod(methodName.asString(), H.typesOfElems(args));
-      return H.wrap(method.invoke(getContent(), H.contentsOfElems(args)));
-
-    } catch (NoSuchMethodException | SecurityException |
-             IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-      Logger.getLogger(Term.class.getName()).log(Level.SEVERE, null, ex);
-    }
-
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
-  }
-
   /**
    * Must match type of Content
    * //getContent().getClass()
