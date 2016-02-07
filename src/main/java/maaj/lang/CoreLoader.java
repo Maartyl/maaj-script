@@ -679,7 +679,7 @@ public class CoreLoader extends Namespace.Loader {
       arityRequire(3, a, "invoke-virtual");
       Term obj = a.first();
       Symbol name = H.requireSymbol(a.rest().first());
-      Seq args = H.requireSeq(a.rest().rest().first());
+      Seq args = H.requireSeqable(a.rest().rest().first()).seq();
       if (name.isQualified())
         throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
 
@@ -693,7 +693,7 @@ public class CoreLoader extends Namespace.Loader {
       arityRequire(3, a, "invoke-static");
       Symbol type = H.requireSymbol(a.first());
       Symbol name = H.requireSymbol(a.rest().first());
-      Seq args = H.requireSeq(a.rest().rest().first());
+      Seq args = H.requireSeqable(a.rest().rest().first()).seq();
       if (name.isQualified())
         throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
       if (type.isQualified())
