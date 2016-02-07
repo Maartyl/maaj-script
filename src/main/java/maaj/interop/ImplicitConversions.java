@@ -24,6 +24,15 @@ public final class ImplicitConversions implements Converter {
     // targets are from method definitions: could be anything
     add2T(Long.class, Integer.class, Integer.TYPE, Long::intValue); //needed: all my Ints are Longs
 
+    addT(Byte.class, Byte.TYPE, Byte::byteValue); //this is for unboxed arguments...
+    addT(Short.class, Short.TYPE, Short::shortValue); //- I'm just unboxing it to rebox it again XD
+    addT(Integer.class, Integer.TYPE, Integer::intValue); // oh, well some identity function could be better...
+    addT(Long.class, Long.TYPE, Long::longValue); // I think JVM will optimize unboxing followed by boxing again
+    addT(Float.class, Float.TYPE, Float::floatValue);
+    addT(Double.class, Double.TYPE, Double::doubleValue);
+    addT(Character.class, Character.TYPE, Character::charValue);
+
+
     add2T(Byte.class, Short.class, Short.TYPE, Byte::shortValue);
     add2T(Byte.class, Integer.class, Integer.TYPE, Byte::intValue);
     add2T(Byte.class, Long.class, Long.TYPE, Byte::longValue);
