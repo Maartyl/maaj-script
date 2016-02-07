@@ -677,6 +677,7 @@ public class CoreLoader extends Namespace.Loader {
                                + "methodName: unqualified symbol. "
                                + "args-list: any seq.", (c, a) -> {
       arityRequire(3, a, "invoke-virtual");
+      a = SeqH.mapEval(a, c);
       Term obj = a.first();
       Symbol name = H.requireSymbol(a.rest().first());
       Seq args = H.requireSeqable(a.rest().rest().first()).seq();
@@ -691,6 +692,7 @@ public class CoreLoader extends Namespace.Loader {
                               + "methodName: unqualified symbol. "
                               + "args-list: any seq.", (Context c, Seq a) -> {
       arityRequire(3, a, "invoke-static");
+      a = SeqH.mapEval(a, c);
       Symbol type = H.requireSymbol(a.first());
       Symbol name = H.requireSymbol(a.rest().first());
       Seq args = H.requireSeqable(a.rest().rest().first()).seq();
