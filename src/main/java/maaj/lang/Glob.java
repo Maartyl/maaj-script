@@ -5,6 +5,11 @@
  */
 package maaj.lang;
 
+import maaj.interop.ConverterCombiner;
+import maaj.interop.CvrtId;
+import maaj.interop.ImplicitConversions;
+import maaj.interop.Interop;
+import maaj.interop.MethodCaller;
 import maaj.term.Symbol;
 import maaj.term.Var;
 import maaj.util.H;
@@ -20,7 +25,7 @@ public class Glob {
   private final PathLoader defaultLoader = new PathLoader();
   private final Namespace.Loader emptyLoader = new EmptyLoader();
   private final Context loaderContext = Context.buildStubWithoutNamespace(this);
-
+  private final Interop interop = defaultInteropSimple();
 
   private Glob(NamespaceStore store) {
     this.store = store;
@@ -28,6 +33,13 @@ public class Glob {
     this.coreAcc = store.getNamespaceFor(H.symbol("#"), l, loaderContext);
     coreAcc.importFullyQualified(store.getNamespaceFor(H.symbol("#macro"), l, loaderContext));
     coreAcc.importNotQualified(store.getNamespaceFor(H.symbol("#core"), l, loaderContext));
+  }
+
+  /**
+   * allows access to JVM
+   */
+  /*package private*/ Interop getInterop() {
+    return interop;
   }
 
 
@@ -52,6 +64,10 @@ public class Glob {
 
   public static Glob create() {
     return new Glob(new NamespaceStore());
+  }
+
+  private static Interop defaultInteropSimple() {
+    return new MethodCaller(new ConverterCombiner(CvrtId.singleton(), ImplicitConversions.singleton()));
   }
 
 }
