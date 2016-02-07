@@ -44,10 +44,9 @@ public class MethodCaller {
         return callAndWrap(matches.get(0), thisPtr, args);
 
       StringBuilder b = new StringBuilder();
-      for (int i = 0; matches.get(i).cost() > matches.get(1).cost(); ++i) { //all with same, lowest cost
-        b.append(matches.get(i).getMethod().toString());
-        b.append("\n");
-      }
+      int cost0 = matches.get(0).cost();
+      for (int i = 0; matches.get(i).cost() <= cost0; ++i) //all with same, lowest cost
+        b.append(matches.get(i).getMethod().toString()).append('\n');
 
       //ambiguous call
       //what ex?
