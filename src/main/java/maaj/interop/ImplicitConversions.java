@@ -43,6 +43,8 @@ public final class ImplicitConversions implements Converter {
     add2T(Long.class, Double.class, Double.TYPE, Long::doubleValue);
 
     add2T(Float.class, Double.class, Double.TYPE, Float::doubleValue);
+
+    add2T(Double.class, Float.class, Float.TYPE, Double::floatValue); //extra, but needed: all my floats are doubles
   }
 
   @Override
