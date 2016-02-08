@@ -5,6 +5,7 @@
  */
 package maaj.lang;
 
+import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import maaj.term.Map;
@@ -23,21 +24,36 @@ import static maaj.util.Sym.namespaceSym;
  * @author maartyl
  */
 public final class Namespace {
+
+  //unqualified symbol
   private final Symbol nsName;
 
   //these symbols are not qualified : they "would" be qualified with this namespace
   private final java.util.Map<Symbol, Var> vars = new ConcurrentHashMap<>();
-  //these symbols can be qualified to avoid name collisions
-  //all of them are ALSO fully qualified
-  //this might not be a good way to do it, but for now should be good enough...
+  //NONE of them are qualified (see importedNs)
   private final java.util.Map<Symbol, Var> imported = new ConcurrentHashMap<>();
+
+  //for fully qualified and ns-aliased access
+  //- keys are namespace names
+  //- also contains this namespace to unify lookup
+  private final java.util.Map<String, Namespace> qualified = new ConcurrentHashMap<>();
 
   private Namespace(Symbol name) {
     this.nsName = name;
+    qualified.put(name.getNm(), self());
+  }
+
+  private Namespace self() {
+    return this;
   }
 
   public Symbol getName() {
     return nsName;
+  }
+
+  //so other namespaces can import unqualified snapshot
+  public Collection<Var> getAllOwn() {
+    return vars.values();
   }
 
   /**
@@ -74,12 +90,22 @@ public final class Namespace {
    * @return null if not found; corresponding Var otherwise
    */
   public Var get(Symbol name) {
-    Var v = vars.get(name);
-    if (v == null) {
-      v = imported.get(name);
-      if (v == null && getName().getNm().equals(name.getNs()))
-        v = vars.get(name.asSimple());
-    }
+    Var v = getOwn(name);
+//    if (v == null) {
+//      v = imported.get(name);
+//      if (v == null && getName().getNm().equals(name.getNs()))
+//        v = vars.get(name.asSimple());
+//    }
+
+    //new version
+    if (v == null)
+      if (name.isQualified()) {
+        Namespace ns = qualified.get(name.getNs());
+        if (ns != null)
+          return ns.getOwn(name.asSimple());
+      } else 
+        return imported.get(name);
+      
     return v;
   }
 
@@ -92,6 +118,11 @@ public final class Namespace {
     return vars.get(name);
   }
 
+  private void importTested(Namespace ns, String name) {
+    Namespace saved = qualified.putIfAbsent(name, ns);
+    if (saved != null && saved != ns)
+      throw new IllegalArgumentException("Different namespace already saved under: " + name + " (current: " + saved.getName() + ")");
+  }
   /**
    * Vars will be accessible through prefix/name instead of namespace/name
    * it will ALSO import everything as fully qualified
@@ -99,29 +130,25 @@ public final class Namespace {
   public void importQualified(Namespace ns, Symbol prefix) {
     if (!prefix.isSimple())
       throw new IllegalArgumentException("cannot import qualifying with qualified prefix");
-    if (ns.getName().hasSameName(prefix))
-      importFullyQualified(ns);
-    else
-      for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
-        imported.put(e.getKey().withNamespace(prefix), e.getValue());
-        imported.put(e.getKey().withNamespace(ns.getName()), e.getValue());
-      }
+    importTested(ns, prefix.getNm());
+    importFullyQualified(ns);
   }
 
   public void importFullyQualified(Namespace ns) {
-    for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
-      imported.put(e.getKey().withNamespace(ns.getName()), e.getValue());
-    }
+    importTested(ns, ns.getName().getNm());
   }
   /**
    * Vars will be accessible through just name instead of namespace/name
    * it will ALSO import everything as fully qualified
    */
   public void importNotQualified(Namespace ns) {
-    for (Entry<Symbol, Var> e : ns.vars.entrySet()) {
-      imported.put(e.getKey().asSimple(), e.getValue());
-      imported.put(e.getKey().withNamespace(ns.getName()), e.getValue());
-    }
+    importFullyQualified(ns);
+    //will rewrite any previous imported under the same name
+    ns.getAllOwn().stream().forEach(v -> imported.put(nameOfVar(v), v)); 
+  }
+
+  private Symbol nameOfVar(Var v) {
+    return H.requireSymbol(v.getMeta(nameSym));
   }
 
   /**
