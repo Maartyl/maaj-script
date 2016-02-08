@@ -34,7 +34,6 @@ public final class Var implements Term, RefSet<Var> {
 
   @Override
   public synchronized Var addMeta(Map meta) {
-
     this.meta = MapH.update(this.meta, meta);
     return this;
   }
@@ -99,7 +98,6 @@ public final class Var implements Term, RefSet<Var> {
     else return Term.super.applyMacro(cxt, args);
   }
 
-
   @Override
   public Term apply(Context cxt, Seq args) {
     return deref().apply(cxt, args);
@@ -124,15 +122,13 @@ public final class Var implements Term, RefSet<Var> {
   @Override
   public Term deref() {
     if (value == null)
-      throw new InvalidOperationException("unwrap unbound var");
+      throw new InvalidOperationException("deref unbound var");
     return value;
   }
 
   @Override
   public synchronized Term update(Invocable setter) {
-    Term s = deref().transform(setter);
-    doSet(s);
-    return s;
+    return RefSet.super.update(setter);
   }
 
   @Override
