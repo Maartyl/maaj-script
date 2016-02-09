@@ -6,7 +6,6 @@
 package maaj.lang;
 
 import java.util.Collection;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import maaj.term.Map;
 import maaj.term.Symbol;
