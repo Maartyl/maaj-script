@@ -9,7 +9,7 @@ import maaj.interop.ConverterCombiner;
 import maaj.interop.CvrtId;
 import maaj.interop.ImplicitConversions;
 import maaj.interop.Interop;
-import maaj.interop.MethodCaller;
+import maaj.interop.InteropJvm;
 import maaj.term.Symbol;
 import maaj.term.Var;
 import maaj.util.H;
@@ -67,7 +67,7 @@ public class Glob {
   }
 
   private static Interop defaultInteropSimple() {
-    return new MethodCaller(new ConverterCombiner(CvrtId.singleton(), ImplicitConversions.singleton()));
+    return new InteropJvm(new ConverterCombiner(CvrtId.singleton(), ImplicitConversions.singleton()));
   }
 
 }

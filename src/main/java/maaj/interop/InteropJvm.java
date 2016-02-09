@@ -20,11 +20,11 @@ import java.lang.reflect.Modifier;
  *
  * @author maartyl
  */
-public class MethodCaller implements Interop {
+public class InteropJvm implements Interop {
 
   private final Converter cvrt; //converter to use
 
-  public MethodCaller(Converter cvrt) {
+  public InteropJvm(Converter cvrt) {
     this.cvrt = cvrt;
   }
 
