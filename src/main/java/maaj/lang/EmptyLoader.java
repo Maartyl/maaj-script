@@ -13,7 +13,7 @@ import maaj.term.Symbol;
  * <p>
  * @author maartyl
  */
-public class EmptyLoader extends Namespace.Loader {
+public class EmptyLoader extends NamespaceNormal.Loader {
 
   @Override
   public Namespace loadNamespaceFor(Symbol nsName, Context cxt) {

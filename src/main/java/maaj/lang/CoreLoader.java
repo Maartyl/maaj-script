@@ -19,12 +19,12 @@ import maaj.util.*;
  * <p>
  * @author maartyl
  */
-public class CoreLoader extends Namespace.Loader {
+public class CoreLoader extends NamespaceNormal.Loader {
   /**
-   * can load 3 basic namespaces,
+   * can load 4 basic namespaces,
    * # : required by everything, contains most basic special forms
    * normal namespace don't start with '#'
-   * @param nsName name of namespace to load: #, #core, #macro
+   * @param nsName name of namespace to load: #, #core, #macro, #jvm
    * @param cxt    global context (might not be complete for ns '#')
    * @return some core namespace based on nsName
    */

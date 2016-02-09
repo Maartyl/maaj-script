@@ -43,7 +43,6 @@ public class Glob {
     return interop;
   }
 
-
   public Namespace loadNamespace(Symbol s) {
     return store.getNamespaceFor(s, defaultLoader, loaderContext);
   }

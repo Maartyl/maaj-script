@@ -17,7 +17,7 @@ import maaj.term.Symbol;
 public class NamespaceStore {
   private final Map<Symbol, Namespace> namespaces = new ConcurrentHashMap<>();
 
-  public Namespace getNamespaceFor(Symbol nsName, Namespace.Loader loader, maaj.lang.Context cxt) {
+  public Namespace getNamespaceFor(Symbol nsName, Namespace.Loader loader, Context cxt) {
     return namespaces.computeIfAbsent(nsName, n -> loader.loadNamespaceFor(n, cxt));
   }
 }

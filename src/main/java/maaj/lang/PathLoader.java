@@ -16,20 +16,20 @@ import maaj.util.H;
 
 /**
  * This loader loads namespaces from files, which names are computed from the namespace name.
- * Namespace name transformation into file:
- * - replace '.' with '/' and add ".maaj"
- * - so: foo.bar -> foo/bar.maaj
+ * NamespaceNormal name transformation into file:
+ - replace '.' with '/' and add ".maaj"
+ - so: foo.bar -> foo/bar.maaj
  * -- which essentailly means: /foo/bar.maaj
  * - files are searched for on CLASSPATH
  * <p>
  * @author maartyl
  */
-public class PathLoader extends Namespace.Loader {
+public class PathLoader extends NamespaceNormal.Loader {
 
   @Override
-  public Namespace loadNamespaceFor(Symbol nsName, maaj.lang.Context cxt) {
+  public NamespaceNormal loadNamespaceFor(Symbol nsName, maaj.lang.Context cxt) {
     URL file = findFile(nsName);
-    Namespace ns = createEmptyWithName(nsName);
+    NamespaceNormal ns = createEmptyWithName(nsName);
     load(file, cxt.withNamespace(ns), nsName);
     return ns;
   }
