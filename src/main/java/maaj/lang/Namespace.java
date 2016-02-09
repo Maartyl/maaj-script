@@ -90,23 +90,13 @@ public final class Namespace {
    * @return null if not found; corresponding Var otherwise
    */
   public Var get(Symbol name) {
-    Var v = getOwn(name);
-//    if (v == null) {
-//      v = imported.get(name);
-//      if (v == null && getName().getNm().equals(name.getNs()))
-//        v = vars.get(name.asSimple());
-//    }
-
-    //new version
-    if (v == null)
-      if (name.isQualified()) {
-        Namespace ns = qualified.get(name.getNs());
-        if (ns != null)
-          return ns.getOwn(name.asSimple());
-      } else 
-        return imported.get(name);
-      
-    return v;
+    if (name.isQualified()) {
+      Namespace ns = qualified.get(name.getNs());
+      return ns == null ? null : ns.getOwn(name.asSimple());
+    } else {
+      Var v = getOwn(name);
+      return v != null ? v : imported.get(name);
+    }
   }
 
   /**
