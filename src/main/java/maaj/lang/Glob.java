@@ -13,6 +13,7 @@ import maaj.interop.InteropJvm;
 import maaj.term.Symbol;
 import maaj.term.Var;
 import maaj.util.H;
+import maaj.util.Sym;
 
 /**
  * Global context. Expected to be extended by some connection to system etc.
@@ -33,6 +34,7 @@ public class Glob {
     this.coreAcc = store.getNamespaceFor(H.symbol("#"), l, loaderContext);
     coreAcc.importFullyQualified(store.getNamespaceFor(H.symbol("#macro"), l, loaderContext));
     coreAcc.importFullyQualified(store.getNamespaceFor(H.symbol("#jvm"), l, loaderContext));
+    coreAcc.importFullyQualified(store.getNamespaceFor(Sym.dotSym, (name, cxt) -> new NsDot(), loaderContext));
     coreAcc.importNotQualified(store.getNamespaceFor(H.symbol("#core"), l, loaderContext));
   }
 
