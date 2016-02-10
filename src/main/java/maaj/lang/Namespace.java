@@ -99,4 +99,42 @@ public interface Namespace {
   public static interface Loader {
     public Namespace loadNamespaceFor(Symbol nsName, maaj.lang.Context cxt);
   }
+
+  public static interface ReadOnly extends Namespace {
+
+    @Override
+    default Var def(Symbol name) {
+      throw new UnsupportedOperationException("This namespace [" + getName() + "] cannot define anything.");
+    }
+
+    @Override
+    default Var def(Symbol name, Term val) {
+      return def(name);
+    }
+
+    @Override
+    default Var def(Symbol name, Term val, Map meta) {
+      return def(name);
+    }
+
+    @Override
+    default Var get(Symbol name) {
+      return getOwn(name); //cannot import anything
+    }
+
+    @Override
+    default void importFullyQualified(Namespace ns) {
+      throw new UnsupportedOperationException("This namespace [" + getName() + "] cannot import anything.");
+    }
+
+    @Override
+    default void importNotQualified(Namespace ns) {
+      importFullyQualified(ns);
+    }
+
+    @Override
+    default void importQualified(Namespace ns, Symbol prefix) {
+      importFullyQualified(ns);
+    }
+  }
 }
