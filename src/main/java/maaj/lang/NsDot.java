@@ -19,6 +19,27 @@ import maaj.util.Sym;
  */
 public final class NsDot implements Namespace.ReadOnly {
 
+  /*
+   name transformation:
+   any ...x-y... gets translated to ...xY...
+
+   (./xxx obj arg1 arg2 ...) -> method call with name xxx
+   (./xxx 'Type arg1 arg2 ...) -> static method call
+
+   (./xx: obj) -> (./getXx obj)
+   (./xx? obj) -> (./isXx obj)
+   (./xx! obj val) -> (./setXx obj val)
+
+   (./xx- obj) -> field getter
+   (./xx- obj val) -> field setter
+   (./xx- 'Type) -> access static field //set if adds second arg
+
+
+   (./!! ex) -> throw ex
+   (./:Xxx arg1 arg2) -> .ctor of type Xxx  //??
+
+   */
+
   @Override
   public Collection<Var> getAllOwn() {
     return Collections.emptyList();
