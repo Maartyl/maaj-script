@@ -11,6 +11,7 @@ import java.util.Objects;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
 import maaj.util.H;
+import maaj.util.MapH;
 import maaj.util.SeqH;
 import maaj.util.Sym;
 
@@ -141,21 +142,15 @@ public class Symbol implements Term {
     return args.first().apply(cxt, H.cons(this, args.rest()));
   }
 
-//  @Override
-//  public Term applyMacro(Context cxt, Seq args) {
-//    //System.err.println("symbol.ApplyMacro: " + this);
-//    //this must be here, not in evalMacro : why?
-//    //I only want to get macros if in context of application of 1
-//    //if just (defn m [a] (inc 5)), m is macro : I don't wan't m to get evaluated into the #/macroseq
-//    //Var v = cxt.getVar(this);
-//    //if (rslt == this) return this;
-//    //if (v != null && !MapH.hasTag(v.getMeta(), Sym.macroSymK)) return v.applyMacro(cxt, args); //only "inline" what claims to be a macro
-//    // Term.super: fmaps evalMacro on args
-//    //System.err.println("symbol.ApplyMacro: " + v);
-//    //!!! - should have been done INSIDE VAR from the beginning
-//    //so, here can be checks for special "cases" ... not good practice
-//    return Term.super.applyMacro(cxt, args);
-//  }
+  @Override
+  public Term applyMacro(Context cxt, Seq args) {
+    //this must be here, not in evalMacro : why?
+    //I only want to get macros if in context of application of the macro
+    Var v = cxt.getVar(this);
+    if (v != null && MapH.hasTag(v.getMeta(), Sym.macroSymK))
+      return v.applyMacro(cxt, args);
+    return Term.super.applyMacro(cxt, args);
+  }
 
   @Override
   public void serialize(java.io.Writer w) throws IOException {
