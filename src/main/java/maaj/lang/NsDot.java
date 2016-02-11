@@ -120,7 +120,7 @@ public final class NsDot implements Namespace.ReadOnly {
 
     return args -> {
       if (args.isNil())
-        throw (new IllegalArgumentException("Cannot invoke " + nm + " without target argument."));
+        throw (new IllegalArgumentException("Cannot invoke '" + nm + " without target argument."));
 
       Term target = args.first();
       return H.list(isQuotedSymbol(target) ? Sym.invokeStaticSymCore : Sym.invokeVirtualSymCore,
