@@ -130,11 +130,19 @@ public final class NsDot implements Namespace.ReadOnly {
     };
   }
 
-  private String checkAndEscape(String name) {
+  private static String checkAndEscape(String name) {
+    int len = name.length();
+    int last = len - 1;
+    int pos;
+    while ((pos = name.indexOf('-')) >= 0) { //TODO: make more efficient
+      if (pos == last)
+        throw new IllegalArgumentException("Illegal method name: \"" + name + "\" (ends with '-')");
+      name = name.substring(0, pos) + Character.toUpperCase(name.charAt(pos + 1)) + name.substring(pos + 2);
+    }
     return name; //TODO
   }
 
-  private boolean isQuotedSymbol(Term t) {
+  private static boolean isQuotedSymbol(Term t) {
     // code ala haskell, to make this function clear
     // let isQuotedSymbol Seq (Sym.quoteSymC : (Symbol   _)   : []) = true
     //     isQuotedSymbol Seq (Sym.quoteSymC : (SymbolNs _ _) : []) = true
