@@ -45,7 +45,7 @@ public abstract class SfQuoting implements Sf {
 
     @Override
     public void show(Writer w) throws IOException {
-      Sym.unquoteSymC.show(w);
+      Sym.quoteSymC.show(w);
     }
   }
 
