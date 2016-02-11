@@ -89,10 +89,6 @@ public final class NsDot implements Namespace.ReadOnly {
     return escapeAndInvoke(name);
   }
 
-  private Macro ctor(String substring) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
-  }
-
   private Macro getter(String name) {
     return tter("get", name);
   }
@@ -107,6 +103,10 @@ public final class NsDot implements Namespace.ReadOnly {
 
   private Macro tter(String prefix, String name) {
     return escapeAndInvoke(prefix + name.substring(0, 1).toUpperCase() + name.substring(1));
+  }
+
+  private Macro ctor(String substring) {
+    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
   }
 
   private Macro field(String substring) {
