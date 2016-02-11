@@ -649,7 +649,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
     H.eval("(defn assoc ^\"[map/vec] key val; associate key with val in map; there can be multiple key val pairs\""
            + "([c k v] (assoc# c k v)) ([c k v & r] (apply recur (assoc# c k v) r)))", cxt, rcxt);
 
-    H.eval("(defn list ^\"returns list from evaluated arguments\""
+    H.eval("(defn list ^\"returns list of evaluated arguments\""
            + "as as)", cxt, rcxt);
 
     defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
