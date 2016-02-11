@@ -8,8 +8,11 @@ package maaj.lang;
 import java.util.Collection;
 import java.util.Collections;
 import maaj.term.Macro;
+import maaj.term.Seq;
 import maaj.term.Symbol;
+import maaj.term.Term;
 import maaj.term.Var;
+import maaj.util.H;
 import maaj.util.Sym;
 
 /**
@@ -67,24 +70,23 @@ public final class NsDot implements Namespace.ReadOnly {
   }
 
   private Macro extractName(String name) {
-
     //name is nonempty
     switch (name.charAt(0)) { //on first char
     case ':': return ctor(name.substring(1));
+    default: //continue
     }
 
     int lastIndex = name.length() - 1;
 
-    if (lastIndex == 0)
-      throw new UnsupportedOperationException("name has only 1 char"); //TODO: implement
-
-    switch (name.charAt(lastIndex)) { //on last char
-    case ':': return getter(name.substring(0, lastIndex));
-    case '?': return getterBool(name.substring(0, lastIndex));
-    case '!': return setter(name.substring(0, lastIndex));
-    case '-': return field(name.substring(0, lastIndex));
-    }
-
+    if (lastIndex != 0) //name is longer than 1 char
+      switch (name.charAt(lastIndex)) { //on last char
+      case ':': return getter(name.substring(0, lastIndex));
+      case '?': return getterBool(name.substring(0, lastIndex));
+      case '!': return setter(name.substring(0, lastIndex));
+      case '-': return field(name.substring(0, lastIndex));
+      default: //continue
+      }
+    
     //ok, nothing special: just normal method invoke: replace all x-y with xY etc.
     return escapeAndInvoke(name);
   }
@@ -102,7 +104,7 @@ public final class NsDot implements Namespace.ReadOnly {
   }
 
   private Macro tter(String prefix, String name) {
-    return escapeAndInvoke(prefix + name.substring(0, 1).toUpperCase() + name.substring(1));
+    return escapeAndInvoke(prefix + Character.toUpperCase(name.charAt(0)) + name.substring(1));
   }
 
   private Macro ctor(String substring) {
@@ -114,7 +116,41 @@ public final class NsDot implements Namespace.ReadOnly {
   }
 
   private Macro escapeAndInvoke(String name) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    String nm = checkAndEscape(name);
+
+    return args -> {
+      if (args.isNil())
+        throw (new IllegalArgumentException("Cannot invoke " + nm + " without target argument."));
+
+      Term target = args.first();
+      return H.list(isQuotedSymbol(target) ? Sym.invokeStaticSymCore : Sym.invokeVirtualSymCore,
+                    target,
+                    H.list(Sym.quoteSymC, H.symbol(nm)),
+                    H.cons(Sym.listSymCore, args.rest()));
+    };
+  }
+
+  private String checkAndEscape(String name) {
+    return name; //TODO
+  }
+
+  private boolean isQuotedSymbol(Term t) {
+    // code ala haskell, to make this function clear
+    // let isQuotedSymbol Seq (Sym.quoteSymC : (Symbol   _)   : []) = true
+    //     isQuotedSymbol Seq (Sym.quoteSymC : (SymbolNs _ _) : []) = true
+    //     isQuotedSymbol _ = false
+
+    t = t.unwrap();
+    if (!(t instanceof Seq)) return false;
+
+    Seq s = (Seq) t;
+    if (s.boundLength(2) != 2) return false;
+
+    Term f1 = s.first().unwrap();
+    if (!Sym.quoteSymC.equals(f1)) return false;
+
+    Term f2 = s.rest().first().unwrap();
+    return (f2 instanceof Symbol) && !((Symbol) f2).isKeyword();
   }
 
 }
