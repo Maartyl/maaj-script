@@ -8,6 +8,7 @@ package maaj.util;
 import java.util.Iterator;
 import maaj.coll.Cons;
 import maaj.coll.Sexp;
+import maaj.coll.traits.SeqLike;
 import maaj.lang.Context;
 import maaj.term.*;
 
@@ -225,6 +226,12 @@ public class SeqH {
 
   public static Seq repeat(int times, Term t) {
     return times <= 0 ? H.END : H.lazy(t, () -> repeat(times - 1, t));
+  }
+
+  public static Term reduce(SeqLike cur, Term acc, Invocable reducer) {
+    for (; !cur.isNil(); cur = cur.rest())
+      acc = reducer.invoke(acc, cur.first());
+    return acc;
   }
 
   /**

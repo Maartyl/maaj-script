@@ -571,7 +571,13 @@ public class CoreLoader extends NamespaceNormal.Loader {
       arityRequire(3, a, "reduce");
       Invocable fn = H.requireInvocable(a.first());
       Term start = a.rest().first();
-      Reducible coll = H.requireReducible(a.rest().rest().first());
+      Term t3 = a.rest().rest().first().unwrap();
+      a = null; //free ptr for GC
+      if (t3 instanceof SeqLike) 
+        return SeqH.reduce((SeqLike) H.ret1(t3, t3 = null), H.ret1(start, start = null), fn);
+      //realization: it's impossible anyway: virtual methods (eval) prevent GC of their object...
+      
+      Reducible coll = H.requireReducible(t3); //this retains entire coll in memory while reducing
       return coll.reduce(start, fn);
             });
 
