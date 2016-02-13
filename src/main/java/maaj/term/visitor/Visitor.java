@@ -8,10 +8,17 @@ package maaj.term.visitor;
 import maaj.term.*;
 
 /**
- *
+ * By default recursively applies itself on given term and returns 'copy'/self.
+ * Is meant for (mainly 1to1) transformations of AST.
+ * <p>
  * @author maartyl
  */
 public interface Visitor {
+
+  ///starting point
+  default Term run(Term t) {
+    return t.transform((Invocable1) this::doVisit);
+  }
 
   default Term id(Term t) {
     return t;
@@ -31,11 +38,6 @@ public interface Visitor {
 
   default Term doVisit(Term t) {
     return t.visit(this);
-  }
-
-  ///starting point
-  default Term run(Term t) {
-    return t.transform((Invocable1) this::doVisit);
   }
 
   //---
