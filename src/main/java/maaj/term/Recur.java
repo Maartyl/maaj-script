@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * very simple lightweight box for arguments;
@@ -50,6 +51,11 @@ public class Recur implements Term {
     //some transformations require wrapping... (even of just fn results...)
     return this;
     //throw new UnsupportedOperationException("Recur outside looping context");
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.recur(this);
   }
 
   @Override

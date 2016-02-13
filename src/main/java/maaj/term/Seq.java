@@ -7,6 +7,7 @@ import maaj.coll.Sexp;
 import maaj.coll.traits.SeqLike;
 import maaj.lang.Context;
 import maaj.exceptions.InvalidOperationException;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.SeqH;
 
@@ -97,5 +98,9 @@ public interface Seq extends Monad<Seq>, SeqLike<Seq> {
     }
   }
 
+  @Override
+  public default Term visit(Visitor v) {
+    return v.seq(this);
+  }
 
 }

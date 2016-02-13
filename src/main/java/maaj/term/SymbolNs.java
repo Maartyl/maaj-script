@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
+import maaj.term.visitor.Visitor;
 
 /**
  * symbol with namespace
@@ -53,6 +54,12 @@ public class SymbolNs extends Symbol {
   public void show(Writer w) throws IOException {
     w.append(ns + '/' + name);
   }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.symbolNs(this);
+  }
+
   @Override
   public int hashCode() {
     int hash = 7;

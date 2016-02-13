@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.SeqH;
 
@@ -117,6 +118,11 @@ public class Str implements JObj, Collection {
   public void serialize(Writer w) throws IOException {
     //todo: escape
     w.append("\"" + value + "\"");
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.str(this);
   }
 
   public String asString() {

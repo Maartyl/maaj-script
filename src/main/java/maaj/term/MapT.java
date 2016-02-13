@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.coll.traits.MapTLike;
+import maaj.term.visitor.Visitor;
 
 /**
  * transient counterpart of Map
@@ -26,5 +27,9 @@ public interface MapT extends CollectionT<MapT>, MapBase<MapT>, MapTLike<MapT, M
     w.append("#<transient map>");
   }
 
+  @Override
+  public default Term visit(Visitor v) {
+    return v.mapT(this);
+  }
 
 }

@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.Sym;
 
@@ -47,6 +48,11 @@ public abstract class SfQuoting implements Sf {
     public void show(Writer w) throws IOException {
       Sym.quoteSymC.show(w);
     }
+
+    @Override
+    public Term visit(Visitor v) {
+      return v.sfQuoteSimple(this);
+    }
   }
 
   /**
@@ -64,6 +70,11 @@ public abstract class SfQuoting implements Sf {
     @Override
     public void show(Writer w) throws IOException {
       Sym.quoteQualifiedSymC.show(w);
+    }
+
+    @Override
+    public Term visit(Visitor v) {
+      return v.sfQuoteQualified(this);
     }
   }
 

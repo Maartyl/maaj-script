@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.util.Objects;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.MapH;
 import maaj.util.SeqH;
@@ -160,6 +161,11 @@ public class Symbol implements Term {
   @Override
   public void show(Writer w) throws IOException {
     w.append(name);
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.symbolSimple(this);
   }
 
   @Override

@@ -7,6 +7,7 @@ package maaj.term;
 
 import maaj.coll.traits.Functor;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  *
@@ -44,5 +45,10 @@ public interface Monad<M extends Monad<M>> extends Term, Functor<M> {
   @Override
   public default Monad unquoteTraverse(Context c) {
     return retM(bindM((Invocable1) x -> x.unquoteTraverse(c)));
+  }
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.monad(this);
   }
 }

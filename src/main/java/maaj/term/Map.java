@@ -10,6 +10,7 @@ import java.io.Writer;
 import maaj.coll.traits.Functor;
 import maaj.coll.traits.MapLike;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.MapH;
 import maaj.util.SeqH;
@@ -90,5 +91,9 @@ public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
     w.append("}");
   }
 
+  @Override
+  public default Term visit(Visitor v) {
+    return v.map(this);
+  }
 
 }

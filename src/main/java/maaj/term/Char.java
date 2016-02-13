@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
 import maaj.exceptions.InvalidOperationException;
-import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * wrapped longs
@@ -117,6 +117,11 @@ public final class Char implements Num {
   @Override
   public void show(Writer w) throws IOException {
     w.append(toString());
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.character(this);
   }
 
   @Override

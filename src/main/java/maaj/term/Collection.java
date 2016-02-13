@@ -8,6 +8,7 @@ package maaj.term;
 import maaj.coll.traits.Growable;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.Seqable;
+import maaj.term.visitor.Visitor;
 
 /**
  * Collection of Terms.
@@ -20,6 +21,11 @@ public interface Collection<C extends Collection<C>> extends CollectionBase<C>, 
   @Override
   public default Term reduce(Term start, Invocable reducer) {
     return seq().reduce(reducer);
+  }
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.coll(this);
   }
 
 }

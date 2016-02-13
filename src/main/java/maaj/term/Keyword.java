@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * Special symbols that evaluate to themselves and are mainly used as markers or as keys in maps.
@@ -52,6 +53,11 @@ public class Keyword extends Symbol implements Ground {
   @Override
   public void show(Writer w) throws IOException {
     w.append(composeShow());
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.keywordSimple(this);
   }
 
   @Override

@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  *
@@ -99,6 +100,11 @@ public final class Dbl implements Num {
   @Override
   public void show(Writer w) throws IOException {
     w.append(this.toString());
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.dbl(this);
   }
 
   @Override

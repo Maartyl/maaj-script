@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * A Fn that doesn't evaluate it's args and
@@ -29,5 +30,10 @@ public interface Macro extends Invocable {
 
   @Override
   public Term invokeSeq(Seq args);
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.macro(this);
+  }
 
 }

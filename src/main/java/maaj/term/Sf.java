@@ -7,6 +7,7 @@ package maaj.term;
 
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * special forms (like Fn/Macro, but accesses context)
@@ -22,6 +23,11 @@ public interface Sf extends Invocable {
   @Override
   public default Term invokeSeq(Seq args) {
     throw new InvalidOperationException("Cannot directly invoke special form.");
+  }
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.sf(this);
   }
 
 }

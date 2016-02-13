@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.concurrent.Callable;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 
 /**
@@ -82,5 +83,11 @@ public interface Invocable extends Ground, Runnable, Callable<Term> {
   public default void show(Writer w) throws IOException {
     w.append("#<$>");
   }
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.invocable(this);
+  }
+
 
 }

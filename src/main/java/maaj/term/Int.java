@@ -7,6 +7,7 @@ package maaj.term;
 
 import java.io.IOException;
 import java.io.Writer;
+import maaj.term.visitor.Visitor;
 
 /**
  * wrapped longs
@@ -110,6 +111,11 @@ public final class Int implements Num {
   @Override
   public void show(Writer w) throws IOException {
     w.append(this.toString());
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.integer(this);
   }
 
   @Override

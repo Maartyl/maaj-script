@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.SeqH;
 
@@ -26,5 +27,10 @@ public interface Fn extends Invocable {
 
   @Override
   public Term invokeSeq(Seq args);
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.fn(this);
+  }
 
 }

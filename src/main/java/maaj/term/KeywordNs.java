@@ -6,6 +6,7 @@
 package maaj.term;
 
 import java.util.Objects;
+import maaj.term.visitor.Visitor;
 
 /**
  * keyword with namespace
@@ -39,6 +40,11 @@ public class KeywordNs extends Keyword {
   @Override
   protected String composeShow() {
     return ':' + ns + '/' + name;
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.keywordNs(this);
   }
 
   @Override

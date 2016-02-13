@@ -9,6 +9,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.coll.traits.VecTLike;
+import maaj.term.visitor.Visitor;
 
 /**
  * transient counterpart of Vec
@@ -43,5 +44,9 @@ public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, V
     w.append("#<transient vector>");
   }
 
+  @Override
+  public default Term visit(Visitor v) {
+    return v.vecT(this);
+  }
 
 }

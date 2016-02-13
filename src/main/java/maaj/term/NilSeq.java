@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * Empty seq. Used as seq terminator: normal seq segment is [head and rest], last rest must be something special; empty.
@@ -73,6 +74,10 @@ public interface NilSeq extends Seq {
     return this;
   }
 
+  @Override
+  public default Term visit(Visitor v) {
+    return v.nilSeq(this);
+  }
 
 
   public static final NilSeq END = new NilSeq() {

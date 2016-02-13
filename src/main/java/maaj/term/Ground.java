@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 
 /**
@@ -28,6 +29,11 @@ public interface Ground extends Term {
   @Override
   public default Collection unquoteTraverse(Context c) {
     return H.tuple(this);
+  }
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.ground(this);
   }
 
 

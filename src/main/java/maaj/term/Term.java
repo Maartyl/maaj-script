@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.MapH;
 import maaj.util.SeqH;
@@ -50,6 +51,8 @@ public interface Term extends Quotable {
   default Term addMeta(Term key, Term val) {
     return addMeta(H.map(key, val));
   }
+
+  Term visit(Visitor v);
 
 
 

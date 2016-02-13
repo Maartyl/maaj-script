@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * Mimics underlying term, possibly adding some functionality.
@@ -100,6 +101,11 @@ public interface Mimic extends Term {
   @Override
   public default Term addMeta(maaj.term.Map meta) {
     return unwrap().addMeta(meta);
+  }
+
+  @Override
+  public default Term visit(Visitor v) {
+    throw new UnsupportedOperationException(".visit must be called from within .transform ; (use .run)"); //TODO: implement
   }
 
   @Override

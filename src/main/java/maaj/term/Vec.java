@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.coll.traits.VecLike;
+import maaj.term.visitor.Visitor;
 import maaj.util.VecH;
 
 /**
@@ -43,5 +44,9 @@ public interface Vec extends Collection<Vec>, VecBase<Vec>, VecLike<Vec, VecT> {
     return acc;
   }
 
+  @Override
+  public default Term visit(Visitor v) {
+    return v.vec(this);
+  }
 
 }

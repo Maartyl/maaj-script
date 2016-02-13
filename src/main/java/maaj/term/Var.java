@@ -10,6 +10,7 @@ import java.io.Writer;
 import maaj.coll.traits.RefSet;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.MapH;
 import maaj.util.Sym;
@@ -146,6 +147,10 @@ public final class Var implements Term, RefSet<Var> {
     return super.hashCode();
   }
 
+  @Override
+  public Term visit(Visitor v) {
+    return v.var(this);
+  }
 
   public static Var empty() {
     return new Var(null);

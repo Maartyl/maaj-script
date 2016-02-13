@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  *
@@ -27,6 +28,11 @@ public class JWrap implements JObj, Ground {
   @Override
   public Term apply(Context cxt, Seq args) {
     throw new UnsupportedOperationException("Not supported yet."); // wrong?
+  }
+
+  @Override
+  public Term visit(Visitor v) {
+    return v.jwrap(this);
   }
 
   public static JWrap of(Object obj) {

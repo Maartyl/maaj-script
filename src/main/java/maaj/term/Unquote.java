@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.H;
 import maaj.util.Sym;
 
@@ -69,6 +70,11 @@ public abstract class Unquote implements Term {
     public void show(Writer w) throws IOException {
       H.list(Sym.unquoteSymC, body).show(w);
     }
+
+    @Override
+    public Term visit(Visitor v) {
+      return v.unquoteSimple(this);
+    }
   }
 
   private static class UnquoteSplicing extends Unquote {
@@ -85,6 +91,11 @@ public abstract class Unquote implements Term {
     @Override
     public void show(Writer w) throws IOException {
       H.list(Sym.unquoteSplicingSymC, body).show(w);
+    }
+
+    @Override
+    public Term visit(Visitor v) {
+      return v.unquoteSplicing(this);
     }
   }
 }

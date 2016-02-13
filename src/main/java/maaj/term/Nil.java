@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 
 /**
  * Singleton representing null; null is not allowed in MaajScript and is always wrapped* in a Nil.
@@ -47,6 +48,10 @@ public interface Nil extends Ground {
     w.append("()");
   }
 
+  @Override
+  public default Term visit(Visitor v) {
+    return v.nil(this);
+  }
 
 
   /**

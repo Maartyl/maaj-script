@@ -6,6 +6,7 @@
 package maaj.term;
 
 import maaj.coll.traits.GrowableT;
+import maaj.term.visitor.Visitor;
 
 /**
  * transient Collection of Terms.
@@ -14,5 +15,10 @@ import maaj.coll.traits.GrowableT;
  * @param <C> self : final type of collection
  */
 public interface CollectionT<C extends CollectionT<C>> extends CollectionBase<C>, GrowableT<C> {
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.collT(this);
+  }
 
 }

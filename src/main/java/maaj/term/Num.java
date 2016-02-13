@@ -7,6 +7,7 @@ package maaj.term;
 
 import maaj.coll.traits.Lookup;
 import maaj.lang.Context;
+import maaj.term.visitor.Visitor;
 import maaj.util.Generators;
 import maaj.util.H;
 import maaj.util.SeqH;
@@ -17,6 +18,11 @@ import maaj.util.SeqH;
  * @author maartyl
  */
 public interface Num extends Ground {
+
+  @Override
+  public default Term visit(Visitor v) {
+    return v.num(this);
+  }
 
   Num neg();
 
