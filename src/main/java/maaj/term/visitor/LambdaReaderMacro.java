@@ -49,10 +49,9 @@ public class LambdaReaderMacro implements Visitor {
     if ("%".equals(nm)) return replacer(1);
 
     m.reset(nm);
-    if (m.matches()) {
-      int pos = Integer.parseInt(nm.substring(1));
-      return args.computeIfAbsent(pos, i -> H.uniqueSymbol());
-    } else return Visitor.super.symbolSimple(t);
+    if (m.matches())
+      return replacer(Integer.parseInt(nm.substring(1)));
+    else return Visitor.super.symbolSimple(t);
   }
 
   private Symbol replacer(int pos) {
