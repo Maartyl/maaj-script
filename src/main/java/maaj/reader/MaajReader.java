@@ -22,6 +22,7 @@ import maaj.term.Term;
 import maaj.term.Unquote;
 import maaj.term.Vec;
 import maaj.term.VecT;
+import maaj.term.visitor.LambdaReaderMacro;
 import maaj.util.H;
 import maaj.util.MapH;
 import maaj.util.SeqH;
@@ -131,7 +132,7 @@ public class MaajReader {
   private Term readHash() {
     int c = nextSkipWhitespace();
     switch (c) {
-    case '(': return fail("not implemented yet: fn syntax");
+    case '(': return readLambda(); //fail("not implemented yet: fn syntax");
     case '[': return fail("not implemented yet: array? something...");
     case '{': return fail("not implemented yet: set");
     case '"': return fail("not implemented yet: regexp");
@@ -276,6 +277,10 @@ public class MaajReader {
     default:
       return SeqH.sexp(read0Cur(), readList());
     }
+  }
+
+  private Term readLambda() {
+    return LambdaReaderMacro.create().run(readList());
   }
 
   private Vec readVec() {
