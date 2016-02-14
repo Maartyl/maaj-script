@@ -15,6 +15,9 @@ import maaj.term.Term;
 import maaj.util.H;
 import maaj.util.SeqH;
 import java.lang.reflect.Modifier;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import javax.xml.ws.Provider;
 
 /**
  *
@@ -90,9 +93,13 @@ public class InteropJvm implements Interop {
     return matches;
   }
 
-  //null if impossible to call (find conversion)
   private Invoker tryGetMethodInvoker(Method m, Class[] argTypes) {
-    final Class[] slots = m.getParameterTypes();
+    return tryGetInvoker(m.getParameterTypes(), m::toString, m::invoke, argTypes);
+  }
+
+
+  //null if impossible to call (find conversion)
+  private Invoker tryGetInvoker(final Class[] slots, final Supplier<String> toS, BasicInvoker inv, Class[] argTypes) {
     assert argTypes.length == slots.length : "diff len of arg list (" + argTypes.length + ", " + slots.length + ")";
     final Conversion[] cs = new Conversion[slots.length];
 
@@ -110,7 +117,7 @@ public class InteropJvm implements Interop {
         for (int i = 0; i < args.length; ++i)
           params[i] = cs[i].convert(args[i]);
 
-        return m.invoke(thisPtr, params);
+        return inv.invoke(thisPtr, params);
       }
       @Override
       public int cost() {
@@ -119,7 +126,7 @@ public class InteropJvm implements Interop {
 
       @Override
       public String getMethodString() {
-        return m.toString();
+        return toS.get();
       }
     };
   }
