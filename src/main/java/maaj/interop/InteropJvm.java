@@ -82,7 +82,7 @@ public class InteropJvm implements Interop {
     for (Method m : allMethods) {
       if (m.getName().equals(methodName) && m.getParameterCount() == argCount
           && ((Modifier.STATIC & m.getModifiers()) > 0 == isStatic)) {
-        Invoker v = tryGetInvoker(m, argTypes);
+        Invoker v = tryGetMethodInvoker(m, argTypes);
         if (v != null)
           matches.add(v);
       }
@@ -91,7 +91,7 @@ public class InteropJvm implements Interop {
   }
 
   //null if impossible to call (find conversion)
-  private Invoker tryGetInvoker(Method m, Class[] argTypes) {
+  private Invoker tryGetMethodInvoker(Method m, Class[] argTypes) {
     final Class[] slots = m.getParameterTypes();
     assert argTypes.length == slots.length : "diff len of arg list (" + argTypes.length + ", " + slots.length + ")";
     final Conversion[] cs = new Conversion[slots.length];
