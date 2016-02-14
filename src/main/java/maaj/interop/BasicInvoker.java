@@ -21,6 +21,6 @@ public interface BasicInvoker {
    * @throws java.lang.IllegalAccessException
    * @throws java.lang.reflect.InvocationTargetException
    */
-  Object invoke(Object thisPtr, Object[] args) throws IllegalAccessException, InvocationTargetException;
+  Object invoke(Object thisPtr, Object[] args) throws IllegalAccessException, InvocationTargetException, InstantiationException;
 
 }

@@ -5,6 +5,7 @@
  */
 package maaj.interop;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -15,9 +16,7 @@ import maaj.term.Term;
 import maaj.util.H;
 import maaj.util.SeqH;
 import java.lang.reflect.Modifier;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
-import javax.xml.ws.Provider;
 
 /**
  *
@@ -75,7 +74,7 @@ public class InteropJvm implements Interop {
   private Term callAndWrap(Invoker v, Object thisPtr, Seq args) {
     try {
       return H.wrap(v.invoke(thisPtr, contentsOfElems(args)));
-    } catch (IllegalAccessException | InvocationTargetException e) {
+    } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
       throw H.sneakyThrow(e);
     }
   }
@@ -97,6 +96,9 @@ public class InteropJvm implements Interop {
     return tryGetInvoker(m.getParameterTypes(), m::toString, m::invoke, argTypes);
   }
 
+  private Invoker tryGetCtorInvoker(Constructor c, Class[] argTypes) {
+    return tryGetInvoker(c.getParameterTypes(), c::toString, (t, a) -> c.newInstance(a), argTypes);
+  }
 
   //null if impossible to call (find conversion)
   private Invoker tryGetInvoker(final Class[] slots, final Supplier<String> toS, BasicInvoker inv, Class[] argTypes) {
@@ -112,7 +114,7 @@ public class InteropJvm implements Interop {
 
     return new Invoker() {
       @Override
-      public Object invoke(Object thisPtr, Object[] args) throws IllegalAccessException, InvocationTargetException {
+      public Object invoke(Object thisPtr, Object[] args) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Object[] params = new Object[args.length];
         for (int i = 0; i < args.length; ++i)
           params[i] = cs[i].convert(args[i]);
