@@ -20,6 +20,7 @@ public interface BasicInvoker {
    * @return return value, null if void method
    * @throws java.lang.IllegalAccessException
    * @throws java.lang.reflect.InvocationTargetException
+   * @throws java.lang.InstantiationException
    */
   Object invoke(Object thisPtr, Object[] args) throws IllegalAccessException, InvocationTargetException, InstantiationException;
 
