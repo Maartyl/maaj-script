@@ -60,7 +60,7 @@ public class LambdaReaderMacro implements Visitor {
 
   private Term argsVec() {
     Integer[] a = args.keySet().toArray(new Integer[1]);
-    if (a.length == 0) return H.tuple(); //no arguments -> []
+    if (a.length == 0 || a[0] == null) return H.tuple(); //no arguments -> []
 
     Arrays.sort(a);
 
