@@ -38,6 +38,10 @@ public class InteropJvm implements Interop {
     List<Invoker> matches = filterMethods(callOn.getMethods(), methodName,
                                           args.boundLength(256), thisPtr == null, typesOfElems(args));
 
+    return selectMatch(matches, thisPtr, args, methodName, callOn);
+  }
+
+  private Term selectMatch(List<Invoker> matches, Object thisPtr, Seq args, String methodName, Class callOn) {
     if (matches.size() == 1)
       return callAndWrap(matches.get(0), thisPtr, args);
 
