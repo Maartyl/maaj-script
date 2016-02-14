@@ -681,7 +681,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
   }
 
   private void loadJvmInterop(Namespace jvm) {
-    def(jvm, Sym.invokeVirtualSymCore.getNm(),
+    def(jvm, Sym.invokeVirtualSymInterop.getNm(),
         "Invokes method on object with given arguments. (performs implicit conversions) \n"
         + "[obj methodName args-list]; "
         + "methodName: unqualified symbol. "
@@ -696,7 +696,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
       return c.getInterop().call(obj.getType(), obj.getContent(), name.getNm(), args);
     });
-    def(jvm, Sym.invokeStaticSymCore.getNm(),
+    def(jvm, Sym.invokeStaticSymInterop.getNm(),
         "Invokes static method with given arguments. (performs implicit conversions) \n"
         + "[type methodName args-list]; "
         + "type: full class name (unqualified symbol). "
@@ -723,7 +723,29 @@ public class CoreLoader extends NamespaceNormal.Loader {
         }
       }
       return c.getInterop().call(typeCls, null, name.getNm(), args);
-    });
+            });
+
+    def(jvm, Sym.ctorSymInterop.getNm(),
+        "Constructs new object with given arguments. (performs implicit conversions) \n"
+        + "[typeName args-list]; "
+        + "typeName: unqualified symbol. "
+        + "args-list: any seq.", (c, a) -> {
+      arityRequire(2, a, "ctor");
+      a = SeqH.mapEval(a, c);
+      Symbol type = H.requireSymbol(a.first());
+      Seq args = H.requireSeqable(a.rest().first()).seq();
+      if (type.isQualified())
+        throw new IllegalArgumentException("ctor: type name cannot be qualified.");
+
+      String typeNm = type.getNm();
+      String[] imported = new String[]{"", "java.lang."};
+      Class typeCls = null;
+      for (String imp : imported)
+        if ((typeCls = H.classOrNull(imp + typeNm)) != null)
+          break;
+
+      return c.getInterop().ctor(typeCls, args);
+      });
   }
 
   private static Seq arityRequire(int arity, Seq s, String errMsg) {

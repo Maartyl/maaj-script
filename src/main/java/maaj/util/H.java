@@ -559,6 +559,14 @@ public class H {
     return ret;
   }
 
+  public static Class classOrNull(String className) {
+    try {
+      return Class.forName(className);
+    } catch (final ClassNotFoundException e) {
+      return null;
+    }
+  }
+
 
   /**
    * http://www.mail-archive.com/javaposse@googlegroups.com/msg05984.html
