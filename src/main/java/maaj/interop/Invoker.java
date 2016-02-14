@@ -39,5 +39,5 @@ public interface Invoker {
    * <p>
    * @return internally used method object
    */
-  Method getMethod();
+  String getMethodString();
 }

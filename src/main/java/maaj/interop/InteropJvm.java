@@ -50,7 +50,7 @@ public class InteropJvm implements Interop {
       StringBuilder b = new StringBuilder();
       int cost0 = matches.get(0).cost();
       for (int i = 0; matches.get(i).cost() <= cost0; ++i) //all with same, lowest cost
-        b.append(matches.get(i).getMethod().toString()).append('\n');
+        b.append(matches.get(i).getMethodString()).append('\n');
 
       //ambiguous call
       //what ex?
@@ -114,8 +114,8 @@ public class InteropJvm implements Interop {
       }
 
       @Override
-      public Method getMethod() {
-        return m;
+      public String getMethodString() {
+        return m.toString();
       }
     };
   }
