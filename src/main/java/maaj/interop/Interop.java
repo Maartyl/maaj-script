@@ -25,4 +25,12 @@ public interface Interop {
    */
   Term call(Class callOn, Object thisPtr, String methodName, Seq args);
 
+  /**
+   *
+   * @param what class to create instance of
+   * @param args constructor arguments
+   * @return new instance of class `what`
+   */
+  Term ctor(Class what, Seq args);
+
 }

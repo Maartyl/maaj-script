@@ -33,14 +33,26 @@ public class InteropJvm implements Interop {
   //thisPtr==null <=> static
   @Override
   public Term call(Class callOn, Object thisPtr, String methodName, Seq args) {
+    return selectMatch(filterMethods(callOn.getMethods(),
+                                     methodName, countArgs(args, methodName, callOn),
+                                     thisPtr == null, typesOfElems(args)),
+                       thisPtr, args, methodName, callOn);
+  }
+
+  @Override
+  public Term ctor(Class what, Seq args) {
+    return selectMatch(filterCtors(what.getConstructors(),
+                                   countArgs(args, ".ctor", what),
+                                   typesOfElems(args)),
+                       null, args, ".ctor", what);
+  }
+
+  private int countArgs(Seq args, String methodName, Class callOn) throws IllegalArgumentException {
+    final int len = args.boundLength(255);
     //callOn cannot be determined from thisPtr, because it can be static call and thisPtr null
-    if (args.boundLength(255) > 255)
+    if (len > 255)
       throw new IllegalArgumentException("too many arguments to JVM method: " + methodName + " (on " + callOn.getName() + ")");
-
-    List<Invoker> matches = filterMethods(callOn.getMethods(), methodName,
-                                          args.boundLength(256), thisPtr == null, typesOfElems(args));
-
-    return selectMatch(matches, thisPtr, args, methodName, callOn);
+    return len;
   }
 
   private Term selectMatch(List<Invoker> matches, Object thisPtr, Seq args, String methodName, Class callOn) {
@@ -85,6 +97,18 @@ public class InteropJvm implements Interop {
       if (m.getName().equals(methodName) && m.getParameterCount() == argCount
           && ((Modifier.STATIC & m.getModifiers()) > 0 == isStatic)) {
         Invoker v = tryGetMethodInvoker(m, argTypes);
+        if (v != null)
+          matches.add(v);
+      }
+    }
+    return matches;
+  }
+
+  private List<Invoker> filterCtors(Constructor[] allCtors, int argCount, Class<?>[] argTypes) {
+    List<Invoker> matches = new ArrayList<>(2);
+    for (Constructor c : allCtors) {
+      if (c.getParameterCount() == argCount) {
+        Invoker v = tryGetCtorInvoker(c, argTypes);
         if (v != null)
           matches.add(v);
       }
