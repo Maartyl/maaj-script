@@ -54,21 +54,27 @@ public interface SeqLike<S extends SeqLike<S>> extends Numerable, Seqable, Reduc
 
   @Override
   public default Iterator<Term> iterator() {
-    return new Iterator<Term>() {
-      private SeqLike self = SeqLike.this;
+    return new SeqIterator(this);
+  }
 
-      @Override
-      public boolean hasNext() {
-        return !self.isNil();
-      }
+  static final class SeqIterator implements Iterator<Term> {
+    private SeqLike self;
 
-      @Override
-      public Term next() {
-        Term v = self.first();
-        self = self.rest();
-        return v;
-      }
-    };
+    public SeqIterator(SeqLike self) {
+      this.self = self;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return !self.isNil();
+    }
+
+    @Override
+    public Term next() {
+      Term v = self.first();
+      self = self.rest();
+      return v;
+    }
   }
 
   public default Term firstOrNil() {
