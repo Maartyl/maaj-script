@@ -107,8 +107,14 @@ public final class NsDot implements Namespace.ReadOnly {
     return escapeAndInvoke(prefix + Character.toUpperCase(name.charAt(0)) + name.substring(1));
   }
 
-  private Macro ctor(String substring) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+  private Macro ctor(String name) {
+    String nm = checkAndEscape(name);
+
+    return args -> {
+      return H.list(Sym.ctorSymInterop,
+                    H.list(Sym.quoteSymC, H.symbol(nm)),
+                    H.cons(Sym.listSymCore, args));
+    };
   }
 
   private Macro field(String substring) {
