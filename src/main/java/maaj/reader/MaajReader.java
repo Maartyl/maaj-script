@@ -6,6 +6,9 @@
 package maaj.reader;
 
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import maaj.exceptions.ReaderException;
 import maaj.term.Char;
 import maaj.term.Dbl;
@@ -265,7 +268,7 @@ public class MaajReader {
 
   private Char readMulticharEscape() {
     switch (cur()) {
-    case 'u': return Char.of((char) read4Num16Int());
+    case 'u': return Char.of((char) readNNum16Int(4));
     default:
       return fail("not implemented: textual char literals");
     }
@@ -315,29 +318,40 @@ public class MaajReader {
     return Str.of(sb.toString());
   }
 
-  private char readStrEscape() {
+  private String readStrEscape() {
     switch (next()) {
-    case 'n': return '\n';
-    case 't': return '\t';
-    case '\\': return '\\';
-    case '"': return '"';
-    case 'r': return '\r';
-    case 'b': return '\b';
-    case 'f': return '\f';
-    case '\'': return '\'';
-    case 'u': return (char) read4Num16Int();
+    case 'n': return "" + '\n';
+    case 't': return "" + '\t';
+    case '\\': return "" + '\\';
+    case '"': return "" + '"';
+    case 'r': return "" + '\r';
+    case 'b': return "" + '\b';
+    case 'f': return "" + '\f';
+    case '\'': return "" + '\'';
+    case 'x': return "" + (char) readNNum16Int(2);
+    case 'u': return "" + (char) readNNum16Int(4);
+    case 'U':
+      //won't fit into signed integer
+      byte[] bs = new byte[4];
+      for (int i = 0; i < 4; i++) 
+        bs[i] = (byte) readNNum16Int(2);
+      try {
+        return new String(bs, "UTF-8");
+      } catch (UnsupportedEncodingException ex) {
+        throw H.sneakyThrow(ex);
+      }
     }
     return fail("unrecognized escape sequence: \\" + (char) cur());
   }
   /**
    * read 4 characters (0-f) and return them read into integer using radix 16
    */
-  private int read4Num16Int() {
-    StringBuilder sb = new StringBuilder(4);
-    for (int i = 0; i < 4; ++i)
+  private int readNNum16Int(int nChars) {
+    StringBuilder sb = new StringBuilder(nChars);
+    for (int i = 0; i < nChars; ++i)
       if (isNumeric16(next()))
         sb.append((char) cur());
-      else fail("Invalid hexadecimal char: " + cur());
+      else fail("Invalid hexadecimal char: " + cur() + ": " + (char) cur());
     return Integer.parseInt(sb.toString(), 16);
   }
 
