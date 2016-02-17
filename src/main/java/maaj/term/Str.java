@@ -82,7 +82,7 @@ public class Str implements JObj, Collection<Str> {
   @Override
   public Term reduce(Term acc, Invocable reducer) {
     //TODO: possibly optimize
-    for (char c : value.toCharArray()) 
+    for (char c : value.toCharArray())
       acc = reducer.invoke(acc, H.wrap(c));
     return acc;
   }
@@ -113,8 +113,16 @@ public class Str implements JObj, Collection<Str> {
   }
 
   private void escapeAppend(String s, Writer w) throws IOException {
-    for (int i = 0; i < s.length(); i++) {
-      switch (s.charAt(i)) {
+    int last = 0; //after last written pos in s
+    for (int pos = 0; pos < s.length(); pos++) {
+      char curChar = s.charAt(pos);
+      if (curChar >= 32) continue; //printable chars
+
+      //write normal part
+      w.write(s, last, pos - last);
+      last = pos + 1;
+
+      switch (curChar) {
       case '\n': w.append("\\n");
         break;
       case '\\': w.append("\\\\");
@@ -128,15 +136,12 @@ public class Str implements JObj, Collection<Str> {
       case '\f': w.append("\\\f");
         break;
       default:
-        if (s.charAt(i) < 32) { //unprintable and not above
-          w.append("\\x");
-          w.append(Integer.toHexString((byte) s.charAt(i)));
-        } else {
-          w.append(s.charAt(i));
-        }
+        w.append("\\x");
+        if (curChar < 16) w.append('0'); // pad: \x4 is wrong: \x04 instead
+        w.append(Integer.toHexString((byte) curChar));
       }
-
     }
+    w.write(s, last, s.length() - last);
   }
 
   @Override
