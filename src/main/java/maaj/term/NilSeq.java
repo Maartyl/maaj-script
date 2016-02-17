@@ -89,7 +89,7 @@ public interface NilSeq extends Seq {
 
     @Override
     public boolean equals(Object obj) {
-      return obj instanceof Term ? ((Term) obj).isNil() : false;
+      return obj instanceof Term && ((Term) obj).isNil();
     }
 
     @Override
