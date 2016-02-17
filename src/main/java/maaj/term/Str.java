@@ -116,18 +116,18 @@ public class Str implements JObj, Collection<Str> {
     int last = 0; //after last written pos in s
     for (int pos = 0; pos < s.length(); pos++) {
       char curChar = s.charAt(pos);
-      if (curChar >= 32) continue; //printable chars
+      if (curChar >= 32 && curChar != '\\' && curChar != '"') continue; //printable chars that don't need escape
 
       //write normal part
       w.write(s, last, pos - last);
       last = pos + 1;
 
       switch (curChar) {
-      case '\n': w.append("\\n");
-        break;
       case '\\': w.append("\\\\");
         break;
       case '"': w.append("\\\"");
+        break;
+      case '\n': w.append("\\n");
         break;
       case '\r': w.append("\\\r");
         break;
