@@ -97,15 +97,7 @@ public class Str implements JObj, Collection<Str> {
 
   @Override
   public Str conj(Term t) {
-    Term composed = t.transform((Invocable1) x -> {
-      if (x instanceof Str)
-        return Str.of(asString() + ((Str) x).asString());
-      return H.NIL;
-    });
-    if (!composed.isNil())
-      return composed.show();
-
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+    return Str.of(asString() + t.toString());
   }
 
   @Override
