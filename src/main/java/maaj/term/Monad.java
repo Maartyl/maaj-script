@@ -48,7 +48,7 @@ public interface Monad<M extends Monad<M>> extends Term, Functor<M> {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.monad(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.monad(this, arg);
   }
 }

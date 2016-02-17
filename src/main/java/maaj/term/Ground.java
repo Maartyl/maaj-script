@@ -32,8 +32,8 @@ public interface Ground extends Term {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.ground(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.ground(this, arg);
   }
 
 

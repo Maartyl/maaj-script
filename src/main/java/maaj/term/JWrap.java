@@ -31,8 +31,8 @@ public class JWrap implements JObj, Ground {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.jwrap(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.jwrap(this, arg);
   }
 
   public static JWrap of(Object obj) {

@@ -72,8 +72,8 @@ public abstract class Unquote implements Term {
     }
 
     @Override
-    public Term visit(Visitor v) {
-      return v.unquoteSimple(this);
+    public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+      return v.unquoteSimple(this, arg);
     }
   }
 
@@ -94,8 +94,8 @@ public abstract class Unquote implements Term {
     }
 
     @Override
-    public Term visit(Visitor v) {
-      return v.unquoteSplicing(this);
+    public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+      return v.unquoteSplicing(this, arg);
     }
   }
 }

@@ -29,8 +29,8 @@ public interface Fn extends Invocable {
   public Term invokeSeq(Seq args);
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.fn(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.fn(this, arg);
   }
 
 }

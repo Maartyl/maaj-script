@@ -49,8 +49,8 @@ public interface Nil extends Ground {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.nil(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.nil(this, arg);
   }
 
 

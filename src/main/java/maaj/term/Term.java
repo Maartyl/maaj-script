@@ -52,7 +52,7 @@ public interface Term extends Quotable {
     return addMeta(H.map(key, val));
   }
 
-  Term visit(Visitor v);
+  <TR, TA> TR visit(Visitor<TR, TA> v, TA arg);
 
 
 

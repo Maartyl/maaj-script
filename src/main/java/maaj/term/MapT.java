@@ -28,8 +28,8 @@ public interface MapT extends CollectionT<MapT>, MapBase<MapT>, MapTLike<MapT, M
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.mapT(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.mapT(this, arg);
   }
 
 }

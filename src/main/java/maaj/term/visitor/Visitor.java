@@ -6,181 +6,104 @@
 package maaj.term.visitor;
 
 import maaj.term.*;
+import maaj.util.H;
 
 /**
  * By default recursively applies itself on given term and returns 'copy'/self.
  * Is meant for (mainly 1to1) transformations of AST.
  * <p>
  * @author maartyl
+ * @param <TR> return type of visit-traverse
+ * @param <TA> type of extra argument to visit
  */
-public interface Visitor {
+public interface Visitor<TR, TA> {
 
   ///starting point
-  default Term run(Term t) {
-    return t.transform((Invocable1) this::doVisit);
+  TR run(Term t, TA arg);
+
+  default TR run(Term t) {
+    return run(H.ret1(t, t = null), init());
   }
 
-  default Term id(Term t) {
-    return t;
+  default TA init() {
+    return null;
   }
 
-  default Term ground(Ground t) {
-    return id(t);
-  }
+  TR monad(Monad t, TA arg);
 
-  default Term monad(Monad t) {
-    return t.fmap((Invocable1) this::mapper);
-  }
-
-  default Term mapper(Term t) {
-    return t.transform((Invocable1) this::doVisit);
-  }
-
-  default Term doVisit(Term t) {
-    return t.visit(this);
-  }
+  TR ground(Ground t, TA arg);
 
   //---
-  default Term seq(Seq t) {
-    return monad(t);
-  }
+  TR seq(Seq t, TA arg);
 
-  default Term coll(Collection t) {
-    return monad(t);
-  }
-  
-  default Term vec(Vec t) {
-    return coll(t);
-  }
+  TR coll(Collection t, TA arg);
 
-  default Term map(Map t) {
-    return coll(t);
-  }
+  TR vec(Vec t, TA arg);
 
-  default Term collT(CollectionT t) {
-    return monad(t);
-  }
+  TR map(Map t, TA arg);
 
-  default Term vecT(VecT t) {
-    return collT(t);
-  }
+  TR collT(CollectionT t, TA arg);
 
-  default Term mapT(MapT t) {
-    return collT(t);
-  }
+  TR vecT(VecT t, TA arg);
+
+  TR mapT(MapT t, TA arg);
 
   //---
+  TR num(Num t, TA arg);
 
-  default Term num(Num t) {
-    return ground(t);
-  }
+  TR character(Char t, TA arg);
 
-  default Term character(Char t) {
-    return num(t);
-  }
+  TR dbl(Dbl t, TA arg);
 
-  default Term dbl(Dbl t) {
-    return num(t);
-  }
-
-  default Term integer(Int t) {
-    return num(t);
-  }
+  TR integer(Int t, TA arg);
 
   //---
+  TR invocable(Invocable t, TA arg);
 
-  default Term invocable(Invocable t) {
-    return ground(t);
-  }
+  TR fn(Fn t, TA arg);
 
-  default Term fn(Fn t) {
-    return invocable(t);
-  }
+  TR macro(Macro t, TA arg);
 
-  default Term macro(Macro t) {
-    return invocable(t);
-  }
-
-  default Term sf(Sf t) {
-    return invocable(t);
-  }
+  TR sf(Sf t, TA arg);
 
   //---
+  TR symbol(Symbol t, TA arg);
 
-  default Term symbol(Symbol t) {
-    return id(t);
-  }
+  TR symbolSimple(Symbol t, TA arg);
 
-  default Term symbolSimple(Symbol t) {
-    return symbol(t);
-  }
+  TR symbolNs(SymbolNs t, TA arg);
 
-  default Term symbolNs(SymbolNs t) {
-    return symbol(t);
-  }
+  TR keyword(Keyword t, TA arg);
 
-  default Term keyword(Keyword t) {
-    return symbol(t);
-  }
+  TR keywordSimple(Keyword t, TA arg);
 
-  default Term keywordSimple(Keyword t) {
-    return keyword(t);
-  }
-
-  default Term keywordNs(KeywordNs t) {
-    return keyword(t);
-  }
+  TR keywordNs(KeywordNs t, TA arg);
 
   //---
-  default Term str(Str t) {
-    return id(t);
-  }
+  TR str(Str t, TA arg);
 
-  default Term var(Var t) {
-    return id(t);
-  }
+  TR var(Var t, TA arg);
 
   //---
+  TR jwrap(JWrap t, TA arg);
 
-  default Term jwrap(JWrap t) {
-    return ground(t);
-  }
+  TR nil(Nil t, TA arg);
 
-  default Term nil(Nil t) {
-    return ground(t);
-  }
+  TR nilSeq(NilSeq t, TA arg);
 
-  default Term nilSeq(NilSeq t) {
-    return id(t);
-  }
-
-  default Term recur(Recur t) {
-    return id(t); //I don't see how this could be useful, but why not
-  }
+  TR recur(Recur t, TA arg);
 
   //---
-  default Term sfQuote(SfQuoting t) {
-    return sf(t);
-  }
+  TR sfQuote(SfQuoting t, TA arg);
 
-  default Term sfQuoteSimple(SfQuoting t) {
-    return sfQuote(t);
-  }
+  TR sfQuoteSimple(SfQuoting t, TA arg);
 
-  default Term sfQuoteQualified(SfQuoting t) {
-    return sfQuote(t);
-  }
+  TR sfQuoteQualified(SfQuoting t, TA arg);
 
-  default Term unquote(Unquote t) {
-    return id(t);
-  }
+  TR unquote(Unquote t, TA arg);
 
-  default Term unquoteSimple(Unquote t) {
-    return unquote(t);
-  }
+  TR unquoteSimple(Unquote t, TA arg);
 
-  default Term unquoteSplicing(Unquote t) {
-    return unquote(t);
-  }
+  TR unquoteSplicing(Unquote t, TA arg);
 
 }

@@ -148,8 +148,8 @@ public final class Var implements Term, RefSet<Var> {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.var(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.var(this, arg);
   }
 
   public static Var empty() {

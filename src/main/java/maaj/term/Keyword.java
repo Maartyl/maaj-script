@@ -56,8 +56,8 @@ public class Keyword extends Symbol implements Ground {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.keywordSimple(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.keywordSimple(this, arg);
   }
 
   @Override

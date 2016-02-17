@@ -164,8 +164,8 @@ public class Symbol implements Term {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.symbolSimple(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.symbolSimple(this, arg);
   }
 
   @Override

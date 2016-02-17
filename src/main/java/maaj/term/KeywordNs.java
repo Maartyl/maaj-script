@@ -43,8 +43,8 @@ public class KeywordNs extends Keyword {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.keywordNs(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.keywordNs(this, arg);
   }
 
   @Override

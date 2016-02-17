@@ -114,8 +114,8 @@ public final class Int implements Num {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.integer(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.integer(this, arg);
   }
 
   @Override

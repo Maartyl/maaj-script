@@ -26,8 +26,8 @@ public interface Sf extends Invocable {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.sf(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.sf(this, arg);
   }
 
 }

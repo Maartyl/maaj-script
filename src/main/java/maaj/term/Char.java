@@ -120,8 +120,8 @@ public final class Char implements Num {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.character(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.character(this, arg);
   }
 
   @Override

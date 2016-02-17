@@ -56,8 +56,8 @@ public class SymbolNs extends Symbol {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.symbolNs(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.symbolNs(this, arg);
   }
 
   @Override

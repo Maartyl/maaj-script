@@ -99,8 +99,8 @@ public interface Seq extends Monad<Seq>, SeqLike<Seq> {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.seq(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.seq(this, arg);
   }
 
 }

@@ -45,8 +45,8 @@ public interface Vec extends Collection<Vec>, VecBase<Vec>, VecLike<Vec, VecT> {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.vec(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.vec(this, arg);
   }
 
 }

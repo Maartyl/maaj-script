@@ -32,8 +32,8 @@ public interface Macro extends Invocable {
   public Term invokeSeq(Seq args);
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.macro(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.macro(this, arg);
   }
 
 }

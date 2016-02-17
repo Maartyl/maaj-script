@@ -104,7 +104,7 @@ public interface Mimic extends Term {
   }
 
   @Override
-  public default Term visit(Visitor v) {
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
     throw new UnsupportedOperationException(".visit must be called from within .transform ; (use .run)"); //TODO: implement
   }
 

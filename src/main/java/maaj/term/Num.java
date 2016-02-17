@@ -20,8 +20,8 @@ import maaj.util.SeqH;
 public interface Num extends Ground {
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.num(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.num(this, arg);
   }
 
   Num neg();

@@ -17,8 +17,8 @@ import maaj.term.visitor.Visitor;
 public interface CollectionT<C extends CollectionT<C>> extends CollectionBase<C>, GrowableT<C> {
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.collT(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.collT(this, arg);
   }
 
 }

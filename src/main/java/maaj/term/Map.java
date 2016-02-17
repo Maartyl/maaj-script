@@ -92,8 +92,8 @@ public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.map(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.map(this, arg);
   }
 
 }

@@ -24,8 +24,8 @@ public interface Collection<C extends Collection<C>> extends CollectionBase<C>, 
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.coll(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.coll(this, arg);
   }
 
 }

@@ -50,8 +50,8 @@ public abstract class SfQuoting implements Sf {
     }
 
     @Override
-    public Term visit(Visitor v) {
-      return v.sfQuoteSimple(this);
+    public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+      return v.sfQuoteSimple(this, arg);
     }
   }
 
@@ -73,8 +73,8 @@ public abstract class SfQuoting implements Sf {
     }
 
     @Override
-    public Term visit(Visitor v) {
-      return v.sfQuoteQualified(this);
+    public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+      return v.sfQuoteQualified(this, arg);
     }
   }
 

@@ -22,7 +22,7 @@ import maaj.util.VecH;
  *
  * @author maartyl
  */
-public class LambdaReaderMacro implements Visitor {
+public class LambdaReaderMacro implements VisitorTerm<Object> {
 
   //arg-position -> name; -1 means rest arg
   Map<Integer, Symbol> args = new HashMap<>();
@@ -30,20 +30,20 @@ public class LambdaReaderMacro implements Visitor {
 
   @Override
   public Term run(Term t) {
-    Term body = Visitor.super.run(t); //cannot inline: sidefects
+    Term body = VisitorTerm.super.run(t); //cannot inline: sidefects
     return H.list(Sym.fnSymCore, argsVec(), body);
   }
 
   @Override
-  public Term seq(Seq t) {
-    Seq s = (Seq) Visitor.super.seq(t);
+  public Term seq(Seq t, Object arg) {
+    Seq s = (Seq) VisitorTerm.super.seq(t, arg);
     if (s.boundLength(256) > 256) //realize seq for side effects (find all args)
       throw new IllegalArgumentException("Cannot use lambda literal with seqs over 256 elements, consider using fn instead.");
     return s;
   }
 
   @Override
-  public Term symbolSimple(Symbol t) {
+  public Term symbolSimple(Symbol t, Object arg) {
     String nm = t.getNm();
     if ("%&".equals(nm)) return replacer(-1);
     if ("%".equals(nm)) return replacer(1);
@@ -51,7 +51,7 @@ public class LambdaReaderMacro implements Visitor {
     m.reset(nm);
     if (m.matches())
       return replacer(Integer.parseInt(nm.substring(1)));
-    else return Visitor.super.symbolSimple(t);
+    else return VisitorTerm.super.symbolSimple(t, arg);
   }
 
   private Symbol replacer(int pos) {
@@ -82,7 +82,7 @@ public class LambdaReaderMacro implements Visitor {
 
   private static final Pattern argPtrn = Pattern.compile("\\%[1-9]+[0-9]*");
 
-  public static Visitor create() {
+  public static VisitorTerm<Object> create() {
     return new LambdaReaderMacro();
   }
 

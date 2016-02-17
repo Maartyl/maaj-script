@@ -75,8 +75,8 @@ public interface NilSeq extends Seq {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.nilSeq(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.nilSeq(this, arg);
   }
 
 

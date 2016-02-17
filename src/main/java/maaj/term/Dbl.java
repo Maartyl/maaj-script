@@ -103,8 +103,8 @@ public final class Dbl implements Num {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.dbl(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.dbl(this, arg);
   }
 
   @Override

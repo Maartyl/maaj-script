@@ -18,7 +18,7 @@ import maaj.util.SeqH;
  * <p>
  * @author maartyl
  */
-public class Str implements JObj, Collection {
+public class Str implements JObj, Collection<Str> {
 
   private final String value;
 
@@ -95,9 +95,8 @@ public class Str implements JObj, Collection {
     return this;
   }
 
-
   @Override
-  public Collection conj(Term t) {
+  public Str conj(Term t) {
     Term composed = t.transform((Invocable1) x -> {
       if (x instanceof Str)
         return Str.of(asString() + ((Str) x).asString());
@@ -121,8 +120,8 @@ public class Str implements JObj, Collection {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.str(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.str(this, arg);
   }
 
   public String asString() {

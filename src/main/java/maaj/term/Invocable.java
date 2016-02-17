@@ -85,8 +85,8 @@ public interface Invocable extends Ground, Runnable, Callable<Term> {
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.invocable(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.invocable(this, arg);
   }
 
 

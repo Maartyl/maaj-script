@@ -54,8 +54,8 @@ public class Recur implements Term {
   }
 
   @Override
-  public Term visit(Visitor v) {
-    return v.recur(this);
+  public <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.recur(this, arg);
   }
 
   @Override

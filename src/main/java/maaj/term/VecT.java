@@ -45,8 +45,8 @@ public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, V
   }
 
   @Override
-  public default Term visit(Visitor v) {
-    return v.vecT(this);
+  public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
+    return v.vecT(this, arg);
   }
 
 }
