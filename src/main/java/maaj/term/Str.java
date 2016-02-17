@@ -102,13 +102,41 @@ public class Str implements JObj, Collection<Str> {
 
   @Override
   public void show(Writer w) throws IOException {
-    w.append("\"" + value + "\"");
+    serialize(w);
   }
 
   @Override
   public void serialize(Writer w) throws IOException {
-    //todo: escape
-    w.append("\"" + value + "\"");
+    w.append("\"");
+    escapeAppend(value, w);
+    w.append("\"");
+  }
+
+  private void escapeAppend(String s, Writer w) throws IOException {
+    for (int i = 0; i < s.length(); i++) {
+      switch (s.charAt(i)) {
+      case '\n': w.append("\\n");
+        break;
+      case '\\': w.append("\\\\");
+        break;
+      case '"': w.append("\\\"");
+        break;
+      case '\r': w.append("\\\r");
+        break;
+      case '\b': w.append("\\\b");
+        break;
+      case '\f': w.append("\\\f");
+        break;
+      default:
+        if (s.charAt(i) < 32) { //unprintable and not above
+          w.append("\\x");
+          w.append(Integer.toHexString((byte) s.charAt(i)));
+        } else {
+          w.append(s.charAt(i));
+        }
+      }
+
+    }
   }
 
   @Override

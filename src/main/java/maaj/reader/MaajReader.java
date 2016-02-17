@@ -7,8 +7,6 @@ package maaj.reader;
 
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import maaj.exceptions.ReaderException;
 import maaj.term.Char;
 import maaj.term.Dbl;
