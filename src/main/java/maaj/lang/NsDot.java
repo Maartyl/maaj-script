@@ -108,7 +108,7 @@ public final class NsDot implements Namespace.ReadOnly {
   }
 
   private Macro ctor(String name) {
-    String nm = checkAndEscape(name);
+    String nm = checkAndEscape(name); //TODO: allow . in names (when check checks those)
 
     return args -> {
       return H.list(Sym.ctorSymInterop,
@@ -137,6 +137,7 @@ public final class NsDot implements Namespace.ReadOnly {
   }
 
   private static String checkAndEscape(String name) {
+    //. ; [ / < > : --- these chars need escaping to be JVM identifier //TODO
     int len = name.length();
     int last = len - 1;
     int pos;
