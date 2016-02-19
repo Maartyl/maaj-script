@@ -89,8 +89,6 @@ public interface Visitor<TR, TA> {
 
   TR nil(Nil t, TA arg);
 
-  TR nilSeq(NilSeq t, TA arg);
-
   TR recur(Recur t, TA arg);
 
   //---

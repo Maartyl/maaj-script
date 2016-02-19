@@ -161,11 +161,6 @@ public interface VisitorDefault<TR, TA> extends Visitor<TR, TA> {
   }
 
   @Override
-  public default TR nilSeq(NilSeq t, TA arg) {
-    return dflt();
-  }
-
-  @Override
   public default TR recur(Recur t, TA arg) {
     return dflt();
   }

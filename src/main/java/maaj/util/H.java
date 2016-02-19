@@ -41,8 +41,8 @@ public class H {
   private H() {
   }
 
-  public static final Nil NIL = Nil.NIL;
-  public static final NilSeq END = NilSeq.END;
+  public static final Nil NIL = Nil.END;
+  public static final Nil END = Nil.END;
   /**
    * this value is to never be actually stored as anything valid.
    * Possibly returned from lookups to signal that given key was not found.
