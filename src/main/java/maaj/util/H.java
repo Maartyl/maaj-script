@@ -18,13 +18,19 @@ import maaj.coll.Tuple1;
 import maaj.coll.Tuple2;
 import maaj.coll.Tuple3;
 import maaj.coll.traits.AssocUpdate;
+import maaj.coll.traits.AssocUpdateT;
 import maaj.coll.traits.Deref;
+import maaj.coll.traits.Dissoc;
+import maaj.coll.traits.DissocT;
 import maaj.coll.traits.Functor;
 import maaj.coll.traits.Growable;
+import maaj.coll.traits.GrowableT;
 import maaj.coll.traits.Indexed;
 import maaj.coll.traits.Numerable;
+import maaj.coll.traits.Peekable;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.Seqable;
+import maaj.coll.traits.TraPer;
 import maaj.coll.wrap.VecPWrap;
 import maaj.lang.Context;
 import maaj.reader.MaajReader;
@@ -439,6 +445,51 @@ public class H {
     throw new IllegalArgumentException("Requires AssocUpdate, got: " + t.getClass().getName());
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & GrowableT<T>> T requireGrowableT(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof GrowableT)
+      return (T) t;
+
+    throw new IllegalArgumentException("Requires GrowableT, got: " + t.getClass().getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & AssocUpdateT<T>> T requireAssocUpdateT(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof AssocUpdateT)
+      return (T) t;
+
+    throw new IllegalArgumentException("Requires AssocUpdateT, got: " + t.getClass().getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & Dissoc<T>> T requireDissoc(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Dissoc)
+      return (T) t;
+
+    throw new IllegalArgumentException("Requires Dissoc, got: " + t.getClass().getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & DissocT<T>> T requireDissocT(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof DissocT)
+      return (T) t;
+
+    throw new IllegalArgumentException("Requires DissocT, got: " + t.getClass().getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & Peekable> T requirePeekable(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Peekable)
+      return (T) t;
+
+    throw new IllegalArgumentException("Requires Peekable, got: " + t.getClass().getName());
+  }
+
   public static Invocable requireInvocable(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Invocable)
@@ -497,6 +548,14 @@ public class H {
       return ((Seqable) t).seq();
 
     throw new IllegalArgumentException("Requires Reducible, got: " + t.getClass().getName());
+  }
+
+  public static TraPer requireTraPer(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof TraPer)
+      return (TraPer) t;
+
+    throw new IllegalArgumentException("Requires TraPer, got: " + t.getClass().getName());
   }
 
   public static int inc(int i) {

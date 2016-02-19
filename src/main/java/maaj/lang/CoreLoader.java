@@ -9,6 +9,7 @@ import maaj.coll.traits.Counted;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.SeqLike;
 import maaj.coll.traits.Seqable;
+import maaj.coll.traits.TraPer;
 import maaj.exceptions.InvalidOperationException;
 import maaj.reader.ReaderContext;
 import maaj.term.*;
@@ -533,12 +534,13 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defmacro(core, "cdr", "rest of seq (tail)", a -> H.cons(Sym.restSym, a));
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
-    defn(core, "seq", "seq from collection", a -> H.seqFrom(arityRequire(1, a, "seq").first()));
+    defn(core, "seq", "seq from collection", a -> arityRequire(a, "seq", H::seqFrom));
     defn(core, "count", "number of elements in collection; possibly O(N)", a
          -> H.requireNumerable(arityRequire(1, a, "count").first()).count());
-    defn(core, "count'", "number of elements in [2nd arg] collection; O(1), possibly incorrect; "
-                         + "if counts, returns maximally [1st arg] specified value"
-                         + "(count' 5 (100)) -> Int.MaxValue;"
+    defn(core, "count'", "number of elements in ^2 collection; O(1), possibly incorrect; "
+                         + "if counts, returns maximally ^1 specified value; "
+                         + "(count' 5 (100)) -> Int.MaxValue; "
+                         + "(count' 200 (100)) -> 100; "
                          + "(count' 2 [7 8 9 7]) -> 4", a -> {
       arityRequire(2, a, "count'");
       Term coll = a.rest().first().unwrap();
@@ -548,38 +550,46 @@ public class CoreLoader extends NamespaceNormal.Loader {
       return H.wrap(H.seqFrom(coll).boundLength(max.asInteger()));
     });
 
-    defn(core, "cons", "prepends to list; O(1)", a -> {
-      arityRequire(2, a, "cons");
-      return H.cons(a.first(), H.seqFrom(a.rest().first()));
-    });
+    defnArity(core, "cons", "prepends to list; O(1)", (t, s) -> H.cons(t, H.seqFrom(s)));
 
-    defn(core, "conj#", "ads to cellection; where depends on collection", a -> {
-      arityRequire(2, a, "conj'");
-      return H.requireGrowable(a.first()).conj(a.rest().first());
-    });
+    defnArity(core, "peek", "ads to cellection; where depends on collection", coll -> H.requirePeekable(coll).peek());
 
-    defn(core, "assoc#", "update collection at given key with given value", a -> {
-      arityRequire(3, a, "assoc'");
-      return H.requireAssocUpdate(a.first()).assoc(a.rest().first(), a.rest().rest().first());
-    });
+    defnArity(core, "conj#", "ads to cellection; where depends on collection",
+              (coll, val) -> H.requireGrowable(coll).conj(val));
+
+    defnArity(core, "assoc#", "update collection at given key with given value",
+              (coll, key, val) -> H.requireAssocUpdate(coll).assoc(key, val));
+    defnArity(core, "dissoc#", "remove from ^1 collection at given ^2 key",
+              (coll, key) -> H.requireDissoc(coll).dissoc(key));
 
 
-    defn(core, "not", "(if % () 't)", a -> arityRequire(1, a, "not").first().isNil() ? Sym.TRUE : H.NIL);
+    defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
 
-    defn(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
-                         + " producing new accumulator, appling on second ...; returns final accumulator", a -> {
-      arityRequire(3, a, "reduce");
-      Invocable fn = H.requireInvocable(a.first());
-      Term start = a.rest().first();
-      Term t3 = a.rest().rest().first().unwrap();
-      a = null; //free ptr for GC
+    defnArity(core, "transient", "transient version of ^1 collection",
+              coll -> H.wrap(H.requireTraPer(coll).asTransient()));
+    defnArity(core, "persistent!", "fix ^1 transient to behave like persistent",
+              coll -> H.wrap(H.requireTraPer(coll).asTransient()));
+
+    defnArity(core, "conj!#", "ads to cellection; where depends on collection",
+              (coll, val) -> H.requireGrowableT(coll).doConj(val));
+
+    defnArity(core, "assoc!#", "update collection at given key with given value",
+              (coll, key, val) -> H.requireAssocUpdateT(coll).doAssoc(key, val));
+    defnArity(core, "dissoc!#", "remove from ^1 collection at given ^2 key",
+              (coll, key) -> H.requireDissocT(coll).doDissoc(key));
+
+    defnArity(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
+                              + " producing new accumulator, appling on second ...; returns final accumulator",
+              (tfn, start, tt3) -> {
+      Invocable fn = H.requireInvocable(tfn);
+      Term t3 = tt3.unwrap();
       if (t3 instanceof SeqLike) 
         return SeqH.reduce((SeqLike) H.ret1(t3, t3 = null), H.ret1(start, start = null), fn);
       //realization: it's impossible anyway: virtual methods (eval) prevent GC of their object...
       
       Reducible coll = H.requireReducible(t3); //this retains entire coll in memory while reducing
       return coll.reduce(start, fn);
-            });
+    });
 
     defn(core, "map", "maps ^1 fn over 1 to 3 seqs - fn has to be of the same arity as number of seqs", a -> {
       switch (a.boundLength(4)) {
@@ -596,18 +606,13 @@ public class CoreLoader extends NamespaceNormal.Loader {
       }
     });
 
-    defn(core, Sym.equalSymCCore.getNm(), "equals?", a -> {
-      arityRequire(2, a, "=#");
-      return H.wrap(a.first().equals(a.rest().first()));
-    });
+    defnArity(core, Sym.equalSymCCore.getNm(), "equals?", (l, r) -> H.wrap(l.equals(r)));
 
-    defn(core, "lazy'", "creates seq thunk from an invocable argument: must return a seq", a
-         -> H.lazy(H.requireInvocable(arityRequire(1, a, "lazy'").first())));
+    defnArity(core, "lazy'", "creates seq thunk from an invocable argument: must return a seq", body
+              -> H.lazy(H.requireInvocable(body)));
 
-    defn(core, "take", "takes first n elements of a seq", a -> {
-      arityRequire(2, a, "take");
-      return SeqH.take(H.requireNum(a.first()).asInteger(), H.seqFrom(a.rest().first()));
-    });
+    defnArity(core, "take", "takes first ^1 n elements of a ^2 seq", (cnt, s) -> 
+      SeqH.take(H.requireNum(cnt).asInteger(), H.seqFrom(s)));
 
     defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
     defn(core, "-#", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
@@ -658,12 +663,18 @@ public class CoreLoader extends NamespaceNormal.Loader {
     H.eval("(defn list ^\"returns list of evaluated arguments\""
            + "as as)", cxt, rcxt);
 
-    defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
-                                              + "(throw-arity $args \"message\")",
-         a -> {
-           int argC = H.seqFrom(arityRequire(2, a, Sym.throwAritySymCore.getNm()).first()).boundLength(50);
-           throw new IllegalArgumentException("Wrong number of args: " + argC
-                                              + "; " + a.rest().first() + " //args: " + SeqH.take(50, H.seqFrom(a.first())));
+//    defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
+//                                              + "(throw-arity $args \"message\")",
+//         a -> {
+//           int argC = H.seqFrom(arityRequire(2, a, Sym.throwAritySymCore.getNm()).first()).boundLength(50);
+//           throw new IllegalArgumentException("Wrong number of args: " + argC
+//                                              + "; " + a.rest().first() + " //args: " + SeqH.take(50, H.seqFrom(a.first())));
+//         });
+
+    defnArity(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
+                                                   + "(throw-arity $args \"message\")", (args, msg) -> {
+           throw new IllegalArgumentException("Wrong number of args: " + H.seqFrom(args).boundLength(50)
+                                              + "; " + msg + " //args: " + SeqH.take(50, H.seqFrom(args)));
          });
   }
 
@@ -754,6 +765,30 @@ public class CoreLoader extends NamespaceNormal.Loader {
     return s;
   }
 
+  private static Term arityRequire(Seq s, String errMsg, Invocable0 fn) {
+    return fn.invokeSeq(arityRequire(0, H.ret1(s, s = null), errMsg));
+  }
+
+  private static Term arityRequire(Seq s, String errMsg, Invocable1 fn) {
+    return fn.invokeSeq(arityRequire(1, H.ret1(s, s = null), errMsg));
+  }
+
+  private static Term arityRequire(Seq s, String errMsg, Invocable2 fn) {
+    return fn.invokeSeq(arityRequire(2, H.ret1(s, s = null), errMsg));
+  }
+
+  private static Term arityRequire(Seq s, String errMsg, Invocable3 fn) {
+    return fn.invokeSeq(arityRequire(3, H.ret1(s, s = null), errMsg));
+  }
+
+  private static Term arityRequire(Seq s, String errMsg, Invocable4 fn) {
+    return fn.invokeSeq(arityRequire(4, H.ret1(s, s = null), errMsg));
+  }
+
+  private static Term arityRequire(Seq s, String errMsg, Invocable5 fn) {
+    return fn.invokeSeq(arityRequire(5, H.ret1(s, s = null), errMsg));
+  }
+
   private static void def(Namespace ns, String name, String doc, Sf sf) {
     def(ns, H.symbol(name), doc, sf);
   }
@@ -785,5 +820,54 @@ public class CoreLoader extends NamespaceNormal.Loader {
   private static void defmacro(Namespace ns, Symbol name, String doc, Macro m) {
     ns.def(name, m, H.map(Sym.docSymK, Str.of(doc), Sym.macroSymK, Sym.macroSymK));
   }
+
+  private static void defnArity(Namespace ns, String name, String doc, Invocable0 fn) {
+    defn(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, fn));
+  }
+
+  private static void defnArity(Namespace ns, String name, String doc, Invocable1 fn) {
+    defn(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, fn));
+  }
+
+  private static void defnArity(Namespace ns, String name, String doc, Invocable2 fn) {
+    defn(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, fn));
+  }
+
+  private static void defnArity(Namespace ns, String name, String doc, Invocable3 fn) {
+    defn(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, fn));
+  }
+
+  private static void defnArity(Namespace ns, String name, String doc, Invocable4 fn) {
+    defn(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, fn));
+  }
+
+  private static void defnArity(Namespace ns, String name, String doc, Invocable5 fn) {
+    defn(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, fn));
+  }
+
+  private static void defmacroArity(Namespace ns, String name, String doc, Invocable0 m) {
+    defmacro(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, m));
+  }
+
+  private static void defmacroArity(Namespace ns, String name, String doc, Invocable1 m) {
+    defmacro(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, m));
+  }
+
+  private static void defmacroArity(Namespace ns, String name, String doc, Invocable2 m) {
+    defmacro(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, m));
+  }
+
+  private static void defmacroArity(Namespace ns, String name, String doc, Invocable3 m) {
+    defmacro(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, m));
+  }
+
+  private static void defmacroArity(Namespace ns, String name, String doc, Invocable4 m) {
+    defmacro(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, m));
+  }
+
+  private static void defmacroArity(Namespace ns, String name, String doc, Invocable5 m) {
+    defmacro(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, m));
+  }
+
 
 }
