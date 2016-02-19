@@ -41,7 +41,7 @@ public interface VecT extends CollectionT<VecT>, VecBase<VecT>, VecTLike<VecT, V
 
   @Override
   public default void show(Writer w) throws IOException {
-    w.append("#<transient vector>");
+    w.append("#<transient vector, :size " + getCount() + ">");
   }
 
   @Override

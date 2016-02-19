@@ -24,7 +24,7 @@ public interface MapT extends CollectionT<MapT>, MapBase<MapT>, MapTLike<MapT, M
 
   @Override
   public default void show(Writer w) throws IOException {
-    w.append("#<transient map>");
+    w.append("#<transient map, :size " + getCount() + ">");
   }
 
   @Override

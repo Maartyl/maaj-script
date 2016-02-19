@@ -547,6 +547,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
       return H.wrap(H.seqFrom(coll).boundLength(max.asInteger()));
     });
 
+    defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
+
     defnArity(core, "cons", "prepends to list; O(1)", (t, s) -> H.cons(t, H.seqFrom(s)));
 
     defnArity(core, "peek", "ads to cellection; where depends on collection", coll -> H.requirePeekable(coll).peek());
@@ -560,12 +562,10 @@ public class CoreLoader extends NamespaceNormal.Loader {
               (coll, key) -> H.requireDissoc(coll).dissoc(key));
 
 
-    defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
-
     defnArity(core, "transient", "transient version of ^1 collection",
               coll -> H.wrap(H.requireTraPer(coll).asTransient()));
     defnArity(core, "persistent!", "fix ^1 transient to behave like persistent",
-              coll -> H.wrap(H.requireTraPer(coll).asTransient()));
+              coll -> H.wrap(H.requireTraPer(coll).asPersistent()));
 
     defnArity(core, "conj!#", "ads to cellection; where depends on collection",
               (coll, val) -> H.requireGrowableT(coll).doConj(val));
@@ -574,6 +574,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
               (coll, key, val) -> H.requireAssocUpdateT(coll).doAssoc(key, val));
     defnArity(core, "dissoc!#", "remove from ^1 collection at given ^2 key",
               (coll, key) -> H.requireDissocT(coll).doDissoc(key));
+
 
     defnArity(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
                               + " producing new accumulator, appling on second ...; returns final accumulator",
@@ -647,18 +648,35 @@ public class CoreLoader extends NamespaceNormal.Loader {
     H.eval("(defmacro = ^\"true iff all arguments are equal\"([x y] `(=# ~x ~y)) ([_] ''t) "
            + "      ([x y & a] `(and (= ~x ~y) (= ~y ~@a))))", cxt, rcxt);
 
+    H.eval("(defn list ^\"returns list of evaluated arguments\""
+           + "as as)", cxt, rcxt);
+
+    H.eval("(defn id ^\"returns it's first argument\""
+           + "[x] x)", cxt, rcxt);
+
     H.eval("(defmacro lazy ^\"postpones evaluation of argument and returns seq thunk; body must evaluate into seq; "
            + "if 2 arguments given ~= (cons fst-arg (lazy snd-arg))\""
            + "([x] `(lazy' (#/fnseq ~x))) ([h t] `(cons ~h (lazy ~t))))", cxt, rcxt);
 
-    H.eval("(defn conj ^\"conjoins 1 or more terms to a collection\""
+    H.eval("(defn conj ^\"conjoins 1 or more ^2 terms to a ^1 collection\""
            + "([coll x] (conj# coll x)) ([coll & r] (reduce conj# coll r)))", cxt, rcxt);
 
-    H.eval("(defn assoc ^\"[map/vec] key val; associate key with val in map; there can be multiple key val pairs\""
+    H.eval("(defn assoc ^\"[associative key val] associate key with val in map; there can be multiple key val pairs\""
            + "([c k v] (assoc# c k v)) ([c k v & r] (apply recur (assoc# c k v) r)))", cxt, rcxt);
 
-    H.eval("(defn list ^\"returns list of evaluated arguments\""
-           + "as as)", cxt, rcxt);
+    H.eval("(defn dissoc ^\"removes 1 or more kv by ^2 key from a ^1 map\""
+           + "([coll x] (dissoc# coll x)) ([coll & r] (reduce dissoc# coll r)))", cxt, rcxt);
+
+    H.eval("(defn conj! ^\"conjoins 1 or more ^2 terms to a transient ^1 collection\""
+           + "([coll x] (conj!# coll x)) ([coll & r] (reduce conj!# coll r)))", cxt, rcxt);
+
+    H.eval("(defn assoc! ^\"[associative key val] associate key with val in transient map; there can be multiple key val pairs\""
+           + "([c k v] (assoc!# c k v)) ([c k v & r] (apply recur (assoc!# c k v) r)))", cxt, rcxt);
+
+    H.eval("(defn dissoc! ^\"removes 1 or more kv by ^2 key from a ^1 transient map\""
+           + "([coll x] (dissoc!# coll x)) ([coll & r] (reduce dissoc!# coll r)))", cxt, rcxt);
+
+    
 
 //    defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
 //                                              + "(throw-arity $args \"message\")",
