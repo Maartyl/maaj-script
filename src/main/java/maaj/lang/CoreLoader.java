@@ -693,53 +693,52 @@ public class CoreLoader extends NamespaceNormal.Loader {
         "Invokes method on object with given arguments. (performs implicit conversions) \n"
         + "[obj methodName args-list]; "
         + "methodName: unqualified symbol. "
-        + "args-list: any seq.", (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeVirtualSymInterop.getNm(),
-                                                        (obj, tname, targs) -> {
-        Symbol name = H.requireSymbol(tname);
-        Seq args = H.requireSeqable(targs).seq();
-        if (name.isQualified())
-          throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
+        + "args-list: any seqable.",
+        (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeVirtualSymInterop.getNm(), (obj, tname, targs) -> {
+          Symbol name = H.requireSymbol(tname);
+          Seq args = H.requireSeqable(targs).seq();
+          if (name.isQualified())
+            throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
 
-        return c.getInterop().call(obj.getType(), obj.getContent(), name.getNm(), args);
+          return c.getInterop().call(obj.getType(), obj.getContent(), name.getNm(), args);
     }));
     def(jvm, Sym.invokeStaticSymInterop.getNm(),
         "Invokes static method with given arguments. (performs implicit conversions) \n"
         + "[type methodName args-list]; "
         + "type: full class name (unqualified symbol). "
         + "methodName: unqualified symbol. "
-        + "args-list: any seq.", (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeStaticSymInterop.getNm(),
-           (ttype, tname, targs) -> {
-      Symbol type = H.requireSymbol(ttype);
-      Symbol name = H.requireSymbol(tname);
-      Seq args = H.requireSeqable(targs).seq();
-      if (name.isQualified())
-        throw new IllegalArgumentException("invoke-static: method name cannot be qualified.");
-      if (type.isQualified())
-        throw new IllegalArgumentException("invoke-static: type name cannot be qualified.");
+        + "args-list: any seqable.",
+        (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeStaticSymInterop.getNm(), (ttype, tname, targs) -> {
+          Symbol type = H.requireSymbol(ttype);
+          Symbol name = H.requireSymbol(tname);
+          Seq args = H.requireSeqable(targs).seq();
+          if (name.isQualified())
+            throw new IllegalArgumentException("invoke-static: method name cannot be qualified.");
+          if (type.isQualified())
+            throw new IllegalArgumentException("invoke-static: type name cannot be qualified.");
 
-      Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang"}));
-      return c.getInterop().call(typeCls, null, name.getNm(), args);
+          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
+          return c.getInterop().call(typeCls, null, name.getNm(), args);
     }));
-
     def(jvm, Sym.ctorSymInterop.getNm(),
         "Constructs new object with given arguments. (performs implicit conversions) \n"
         + "[typeName args-list]; "
         + "typeName: unqualified symbol. "
-        + "args-list: any seq.", (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.ctorSymInterop.getNm(),
-           (ttype, targs) -> {
-        Symbol type = H.requireSymbol(ttype);
-        Seq args = H.requireSeqable(targs).seq();
-        if (type.isQualified())
-          throw new IllegalArgumentException("ctor: type name cannot be qualified.");
+        + "args-list: any seqable.",
+        (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.ctorSymInterop.getNm(), (ttype, targs) -> {
+          Symbol type = H.requireSymbol(ttype);
+          Seq args = H.requireSeqable(targs).seq();
+          if (type.isQualified())
+            throw new IllegalArgumentException("ctor: type name cannot be qualified.");
 
-        Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang"}));
-        return c.getInterop().ctor(typeCls, args);
-      })
-    );
+          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
+          return c.getInterop().ctor(typeCls, args);
+      }));
   }
 
   private static Class typeRequire(String name, Iterable prefixes) {
     //prefixes will be vector of strings or something: special var declared in current namespace //or default
+    //TODO: var ^
     Class typeCls;
 
     if ((typeCls = H.classOrNull(name)) != null) return typeCls; // no prefix
@@ -750,8 +749,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
       if (!p.endsWith(".")) //so name can be appended
         p += '.';
 
-      if ((typeCls = H.classOrNull(p + name)) != null)
-        return typeCls;
+      if ((typeCls = H.classOrNull(p + name)) != null) return typeCls;
     }
 
     try {
