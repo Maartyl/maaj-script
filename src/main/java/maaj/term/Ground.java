@@ -27,7 +27,7 @@ public interface Ground extends Term {
   }
 
   @Override
-  public default Collection unquoteTraverse(Context c) {
+  public default Monad unquoteTraverse(Context c) {
     return H.tuple(this);
   }
 

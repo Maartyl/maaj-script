@@ -18,7 +18,7 @@ import maaj.term.visitor.Visitor;
  * <p>
  * @author maartyl
  */
-public interface Nil extends Seq {
+public interface Nil extends Seq, Ground {
 
   @Override
   default boolean isCounted() {
@@ -79,6 +79,11 @@ public interface Nil extends Seq {
   @Override
   default Term apply(Context cxt, Seq args) {
     throw new UnsupportedOperationException("Nil cannot be used as function.");
+  }
+
+  @Override
+  public default Seq unquoteTraverse(Context c) {
+    return retM(this);
   }
 
   @Override
