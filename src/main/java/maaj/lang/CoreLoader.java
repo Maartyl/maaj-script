@@ -717,7 +717,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
       if (type.isQualified())
         throw new IllegalArgumentException("invoke-static: type name cannot be qualified.");
 
-      Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang."}));
+      Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang"}));
       return c.getInterop().call(typeCls, null, name.getNm(), args);
     }));
 
@@ -732,13 +732,14 @@ public class CoreLoader extends NamespaceNormal.Loader {
         if (type.isQualified())
           throw new IllegalArgumentException("ctor: type name cannot be qualified.");
 
-        Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang."}));
+        Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang"}));
         return c.getInterop().ctor(typeCls, args);
       })
     );
   }
 
   private static Class typeRequire(String name, Iterable prefixes) {
+    //prefixes will be vector of strings or something: special var declared in current namespace //or default
     Class typeCls;
 
     if ((typeCls = H.classOrNull(name)) != null) return typeCls; // no prefix
