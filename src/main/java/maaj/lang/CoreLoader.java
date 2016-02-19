@@ -644,8 +644,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
     H.eval("(defmacro or  ^\"logical and\"([x] x)([]()) ([x & y] (let [a (gensym)] "
            + "        `(let [~a ~x] (if ~a ~a (~or ~@y)))    )))", cxt, rcxt);
 
-    H.eval("(defn = ^\"true iff all arguments are equal\"([x y] (=# x y)) ([x] x) "
-           + "      ([x y & a] (and (= x y) (apply = y a))))", cxt, rcxt);
+    H.eval("(defmacro = ^\"true iff all arguments are equal\"([x y] `(=# ~x ~y)) ([_] ''t) "
+           + "      ([x y & a] `(and (= ~x ~y) (= ~y ~@a))))", cxt, rcxt);
 
     H.eval("(defmacro lazy ^\"postpones evaluation of argument and returns seq thunk; body must evaluate into seq; "
            + "if 2 arguments given ~= (cons fst-arg (lazy snd-arg))\""
