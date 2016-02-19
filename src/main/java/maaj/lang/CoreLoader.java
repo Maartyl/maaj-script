@@ -5,6 +5,7 @@
  */
 package maaj.lang;
 
+import java.util.Arrays;
 import maaj.coll.traits.Counted;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.SeqLike;
@@ -108,20 +109,15 @@ public class CoreLoader extends NamespaceNormal.Loader {
     });
     def(core, "fnseq", "(fnseq body body $args body)", (c, a) -> FnSeq.of(a, c));
     def(core, "macroseq", "(macroseq body body $args body)", (c, a) -> MacroSeq.of(a, c));
-    def(core, "eval", "evaluates given term", (c, a) -> {
-      arityRequire(1, a, "eval");
-      return a.first().eval(c).eval(c);
-    });
+    def(core, "eval", "evaluates given term", (c, a) -> arityRequire(a, "eval", t -> t.eval(c).eval(c)));
     def(core, "apply", "applies first argument on [last argumet (seq) with other arguments prepended]; "
                        + "(apply + 7 8 [4 5 6]) -> (+ 7 8 4 5 6)",
         (c, a) -> a.isNil() ? H.NIL : SeqH.extend(SeqH.mapEval(a, c)).eval(c));
     def(core, "recur", "repeat function with new arguments : tail recursion optimized;"
                        + " cannot be used in any other context", (c, a) -> Recur.ofArgs(SeqH.mapEval(a, c)));
 
-    def(core, "var", "gets Var itself associated with symbol; not the value in Var", (c,a)->{
-      arityRequire(1, a, "var");
-      return c.getVar(H.requireSymbol(a.first().eval(c)));
-    });
+    def(core, "var", "gets Var itself associated with symbol; not the value in Var",
+        (c, a) -> arityRequire(a, "var", sym -> c.getVar(H.requireSymbol(sym.eval(c)))));
 
     def(core, "require'", "takes symbol with namespace name; then options:\n"
                           + ":* - import all vars from namespace directly\n"
@@ -522,31 +518,32 @@ public class CoreLoader extends NamespaceNormal.Loader {
                                                 -> x.unwrap() instanceof Seqable ?
                                                    H.cons(Sym.requirePrimeSymC, H.seqFrom(x)) :
                                                         H.list(Sym.requirePrimeSymC, x))));
-    defn(core, "deref", "dereferences argument (for cells and boxes)", a -> H.requireDeref(arityRequire(1, a, "deref").first()).deref());
+    defnArity(core, "deref", "dereferences argument (for cells and boxes)",
+              box -> H.requireDeref(box).deref());
 
     defn(core, "meta", "get meta data of term; (meta term) ->{...}; (meta :key term) ~= (:key (meta term))", a
          -> a.isNil() ? H.NIL.getMeta() :
             (a.rest().isNil() ? a.first().getMeta() :
              a.rest().first().getMeta(a.first().unwrap())));
-    defn(core, Sym.firstSym.getNm(), "first of seq (head)", a -> H.seqFrom(arityRequire(1, a, "first").first()).firstOrNil());
-    defn(core, Sym.restSym.getNm(), "rest of seq (tail)", a -> H.seqFrom(arityRequire(1, a, "rest").first()).restOrNil());
+    defnArity(core, Sym.firstSym.getNm(), "first of seq (head)", s -> H.seqFrom(s).firstOrNil());
+    defnArity(core, Sym.restSym.getNm(), "rest of seq (tail)", s -> H.seqFrom(s).restOrNil());
     defmacro(core, "car", "first of seq (head)", a -> H.cons(Sym.firstSym, a));
     defmacro(core, "cdr", "rest of seq (tail)", a -> H.cons(Sym.restSym, a));
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
-    defn(core, "seq", "seq from collection", a -> arityRequire(a, "seq", H::seqFrom));
-    defn(core, "count", "number of elements in collection; possibly O(N)", a
-         -> H.requireNumerable(arityRequire(1, a, "count").first()).count());
-    defn(core, "count'", "number of elements in ^2 collection; O(1), possibly incorrect; "
-                         + "if counts, returns maximally ^1 specified value; "
-                         + "(count' 5 (100)) -> Int.MaxValue; "
-                         + "(count' 200 (100)) -> 100; "
-                         + "(count' 2 [7 8 9 7]) -> 4", a -> {
-      arityRequire(2, a, "count'");
-      Term coll = a.rest().first().unwrap();
+    defnArity(core, "seq", "seq from collection", H::seqFrom);
+
+    defnArity(core, "count", "number of elements in collection; possibly O(N)",
+              coll -> H.requireNumerable(coll).count());
+    defnArity(core, "count'", "number of elements in ^2 collection; O(1), possibly incorrect; "
+                              + "if counts, returns maximally ^1 specified value; "
+                              + "(count' 5 (100)) -> Int.MaxValue; "
+                              + "(count' 200 (100)) -> 100; "
+                              + "(count' 2 [7 8 9 7]) -> 4", (cnt, tcoll) -> {
+      Term coll = tcoll.unwrap();
       if (coll instanceof Counted)
         return ((Counted) coll).getCount();
-      Num max = H.requireNum(a.first());
+      Num max = H.requireNum(cnt);
       return H.wrap(H.seqFrom(coll).boundLength(max.asInteger()));
     });
 
@@ -696,67 +693,71 @@ public class CoreLoader extends NamespaceNormal.Loader {
         "Invokes method on object with given arguments. (performs implicit conversions) \n"
         + "[obj methodName args-list]; "
         + "methodName: unqualified symbol. "
-        + "args-list: any seq.", (c, a) -> {
-      arityRequire(3, a, "invoke-virtual");
-      a = SeqH.mapEval(a, c);
-      Term obj = a.first();
-      Symbol name = H.requireSymbol(a.rest().first());
-      Seq args = H.requireSeqable(a.rest().rest().first()).seq();
-      if (name.isQualified())
-        throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
+        + "args-list: any seq.", (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeVirtualSymInterop.getNm(),
+                                                        (obj, tname, targs) -> {
+        Symbol name = H.requireSymbol(tname);
+        Seq args = H.requireSeqable(targs).seq();
+        if (name.isQualified())
+          throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
 
-      return c.getInterop().call(obj.getType(), obj.getContent(), name.getNm(), args);
-    });
+        return c.getInterop().call(obj.getType(), obj.getContent(), name.getNm(), args);
+    }));
     def(jvm, Sym.invokeStaticSymInterop.getNm(),
         "Invokes static method with given arguments. (performs implicit conversions) \n"
         + "[type methodName args-list]; "
         + "type: full class name (unqualified symbol). "
         + "methodName: unqualified symbol. "
-        + "args-list: any seq.", (c, a) -> {
-      arityRequire(3, a, "invoke-static");
-      a = SeqH.mapEval(a, c);
-      Symbol type = H.requireSymbol(a.first());
-      Symbol name = H.requireSymbol(a.rest().first());
-      Seq args = H.requireSeqable(a.rest().rest().first()).seq();
+        + "args-list: any seq.", (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeStaticSymInterop.getNm(),
+           (ttype, tname, targs) -> {
+      Symbol type = H.requireSymbol(ttype);
+      Symbol name = H.requireSymbol(tname);
+      Seq args = H.requireSeqable(targs).seq();
       if (name.isQualified())
         throw new IllegalArgumentException("invoke-static: method name cannot be qualified.");
       if (type.isQualified())
         throw new IllegalArgumentException("invoke-static: type name cannot be qualified.");
 
-      Class typeCls;
-      try {
-        typeCls = Class.forName(type.getNm());
-      } catch (ClassNotFoundException e) {
-        try {
-          typeCls = Class.forName("java.lang." + type.getNm()); //TODO: quite terrible, possibly modularize
-        } catch (ClassNotFoundException ex) {
-          throw H.sneakyThrow(e); //both failed
-        }
-      }
+      Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang."}));
       return c.getInterop().call(typeCls, null, name.getNm(), args);
-            });
+    }));
 
     def(jvm, Sym.ctorSymInterop.getNm(),
         "Constructs new object with given arguments. (performs implicit conversions) \n"
         + "[typeName args-list]; "
         + "typeName: unqualified symbol. "
-        + "args-list: any seq.", (c, a) -> {
-      arityRequire(2, a, "ctor");
-      a = SeqH.mapEval(a, c);
-      Symbol type = H.requireSymbol(a.first());
-      Seq args = H.requireSeqable(a.rest().first()).seq();
-      if (type.isQualified())
-        throw new IllegalArgumentException("ctor: type name cannot be qualified.");
+        + "args-list: any seq.", (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.ctorSymInterop.getNm(),
+           (ttype, targs) -> {
+        Symbol type = H.requireSymbol(ttype);
+        Seq args = H.requireSeqable(targs).seq();
+        if (type.isQualified())
+          throw new IllegalArgumentException("ctor: type name cannot be qualified.");
 
-      String typeNm = type.getNm();
-      String[] imported = new String[]{"", "java.lang."};
-      Class typeCls = null;
-      for (String imp : imported)
-        if ((typeCls = H.classOrNull(imp + typeNm)) != null)
-          break;
+        Class typeCls = typeRequire(type.getNm(), Arrays.asList(new String[]{"java.lang."}));
+        return c.getInterop().ctor(typeCls, args);
+      })
+    );
+  }
 
-      return c.getInterop().ctor(typeCls, args);
-      });
+  private static Class typeRequire(String name, Iterable prefixes) {
+    Class typeCls;
+
+    if ((typeCls = H.classOrNull(name)) != null) return typeCls; // no prefix
+
+    for (Object po : prefixes) {
+      String p = po.toString();
+      if ("".equals(p)) continue;
+      if (!p.endsWith(".")) //so name can be appended
+        p += '.';
+
+      if ((typeCls = H.classOrNull(p + name)) != null)
+        return typeCls;
+    }
+
+    try {
+      return Class.forName(name);
+    } catch (ClassNotFoundException e) {
+      throw H.sneakyThrow(e); //no prefix matched
+    }
   }
 
   private static Seq arityRequire(int arity, Seq s, String errMsg) {
