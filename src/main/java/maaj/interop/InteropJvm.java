@@ -6,6 +6,7 @@
 package maaj.interop;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,6 +29,33 @@ public class InteropJvm implements Interop {
 
   public InteropJvm(Converter cvrt) {
     this.cvrt = cvrt;
+  }
+
+  //thisPtr==null <=> static
+  @Override
+  public void fieldSet(Class onType, Object thisPtr, String fieldName, Term value) {
+    Field f = fieldByName(onType, fieldName, thisPtr == null);
+    try {
+      Conversion c = cvrt.lookup(value.getType(), f.getType());
+      if (c == null)
+        throw new IllegalArgumentException("don't know how to assign variable of type "
+                                           + value.getType() + " to field of type " + f.getType());
+
+      f.set(thisPtr, c.convert(value.getContent()));
+    } catch (IllegalAccessException ex) {
+      throw H.sneakyThrow(ex);
+    }
+  }
+
+  //thisPtr==null <=> static
+  @Override
+  public Term fieldGet(Class onType, Object thisPtr, String fieldName) {
+    Field f = fieldByName(onType, fieldName, thisPtr == null);
+    try {
+      return H.wrap(f.get(thisPtr));
+    } catch (IllegalAccessException ex) {
+      throw H.sneakyThrow(ex);
+    }
   }
 
   //thisPtr==null <=> static
@@ -157,6 +185,19 @@ public class InteropJvm implements Interop {
     };
   }
 
+  private static Field fieldByName(Class onType, String fieldName, boolean expectStatic) {
+    try {
+      Field f = onType.getField(fieldName);
+      if (((Modifier.STATIC & f.getModifiers()) > 0) == expectStatic)
+        return f;
+
+      String notMaybe = expectStatic ? "" : "not ";
+      throw new IllegalArgumentException("Expected field: " + fieldName + " to " + notMaybe + "be staic. (on: " + onType + ")");
+    } catch (NoSuchFieldException | SecurityException ex) {
+      throw H.sneakyThrow(ex);
+    }
+  }
+
   private static Class[] typesOfElems(Seq seq) {
     Class[] clss = new Class[seq.count().asInteger()];
     H.RangeSeeder rs = new H.RangeSeeder(); //lambda cannot bind mutable reference
@@ -176,4 +217,5 @@ public class InteropJvm implements Interop {
     });
     return objs;
   }
+
 }
