@@ -6,6 +6,8 @@
 package maaj.lang;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import maaj.coll.traits.Counted;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.SeqLike;
@@ -754,7 +756,71 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
           Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
           return c.getInterop().ctor(typeCls, args);
-      }));
+        }));
+
+    def(jvm, "instance-field-get",
+        "Get's value of field on an instace.\n"
+        + "[obj fieldName]; "
+        + "fieldName: unqualified symbol. ",
+        (c, a) -> arityRequire(SeqH.mapEval(a, c), "instance-field-get", (obj, tname) -> {
+          Symbol name = H.requireSymbol(tname);
+          if (name.isQualified())
+            throw new IllegalArgumentException("instance-field-get: method name cannot be qualified.");
+          final Object content = obj.getContent();
+          if (content == null)
+            throw new IllegalArgumentException("instance-field-get: object cannot be nil");
+
+          return c.getInterop().fieldGet(obj.getType(), content, name.getNm());
+        }));
+    def(jvm, "static-field-get",
+        "Get's value of static field.\n"
+        + "[type fieldName]; "
+        + "type: full class name (unqualified symbol). "
+        + "fieldName: unqualified symbol. ",
+        (c, a) -> arityRequire(SeqH.mapEval(a, c), "static-field-get", (ttype, tname) -> {
+          Symbol type = H.requireSymbol(ttype);
+          Symbol name = H.requireSymbol(tname);
+          if (name.isQualified())
+            throw new IllegalArgumentException("static-field-get: method name cannot be qualified.");
+          if (type.isQualified())
+            throw new IllegalArgumentException("static-field-get: type name cannot be qualified.");
+
+          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
+          return c.getInterop().fieldGet(typeCls, null, name.getNm());
+        }));
+
+    def(jvm, "instance-field-set",
+        "Sets's value of field on an instace. (performs implicit conversions) \n"
+        + "[obj fieldName value]; "
+        + "fieldName: unqualified symbol. ",
+        (c, a) -> arityRequire(SeqH.mapEval(a, c), "instance-field-set", (obj, tname, value) -> {
+          Symbol name = H.requireSymbol(tname);
+          if (name.isQualified())
+            throw new IllegalArgumentException("instance-field-set: method name cannot be qualified.");
+          final Object content = obj.getContent();
+          if (content == null)
+            throw new IllegalArgumentException("instance-field-set: object cannot be nil");
+
+          c.getInterop().fieldSet(obj.getType(), content, name.getNm(), value);
+          return obj;
+        }));
+    def(jvm, "static-field-set",
+        "Sets's value of static field. (performs implicit conversions) \n"
+        + "[type fieldName value]; "
+        + "type: full class name (unqualified symbol). "
+        + "fieldName: unqualified symbol. ",
+        (c, a) -> arityRequire(SeqH.mapEval(a, c), "static-field-set", (ttype, tname, value) -> {
+          Symbol type = H.requireSymbol(ttype);
+          Symbol name = H.requireSymbol(tname);
+          if (name.isQualified())
+            throw new IllegalArgumentException("static-field-set: method name cannot be qualified.");
+          if (type.isQualified())
+            throw new IllegalArgumentException("static-field-set: type name cannot be qualified.");
+
+          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
+          c.getInterop().fieldSet(typeCls, null, name.getNm(), value);
+          return H.NIL;
+        }));
   }
 
   private static Class typeRequire(String name, Iterable prefixes) {
@@ -890,5 +956,19 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defmacro(ns, name, doc, a -> arityRequire(H.ret1(a, a = null), name, m));
   }
 
+  private static <T> void defnArity(Namespace ns, String name, String doc, Function<Term, T> arg1, Function<T, Term> fn) {
+    defnArity(ns, name, doc, x -> fn.apply(arg1.apply(H.ret1(x, x = null))));
+  }
+
+  private static <T1, T2> void defnArity(Namespace ns, String name, String doc,
+                                         Function<Term, T1> arg1, Function<Term, T2> arg2, BiFunction<T1, T2, Term> fn) {
+    defnArity(ns, name, doc, (x, y) -> fn.apply(arg1.apply(H.ret1(x, x = null)), arg2.apply(H.ret1(y, y = null))));
+  }
+
+//  private static <T1, T2, T3> void defnArity(Namespace ns, String name, String doc,
+//                                       Function<Term, T1> arg1, Function<Term, T2> arg2,Function<Term, T2> arg3,
+//                                       BiFunction<T1, T2, Term> fn) {
+//    defnArity(ns, name, doc, (x, y) -> fn.apply(arg1.apply(x), arg2.apply(y)));
+//  }
 
 }
