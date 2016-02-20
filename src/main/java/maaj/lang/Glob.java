@@ -7,11 +7,13 @@ package maaj.lang;
 
 import maaj.interop.ConverterCombiner;
 import maaj.interop.CvrtId;
+import maaj.interop.CvrtNil;
 import maaj.interop.ImplicitConversions;
 import maaj.interop.Interop;
 import maaj.interop.InteropJvm;
 import maaj.term.Symbol;
 import maaj.term.Var;
+import maaj.util.CvrtH;
 import maaj.util.H;
 import maaj.util.Sym;
 
@@ -69,7 +71,10 @@ public class Glob {
   }
 
   private static Interop defaultInteropSimple() {
-    return new InteropJvm(new ConverterCombiner(CvrtId.singleton(), ImplicitConversions.singleton()));
+    return new InteropJvm(CvrtH.combine(
+            CvrtId.singleton(),
+            ImplicitConversions.singleton(),
+            CvrtNil.singleton()));
   }
 
 }
