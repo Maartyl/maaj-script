@@ -9,6 +9,11 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import maaj.coll.traits.Counted;
+import maaj.coll.traits.Deref;
+import maaj.coll.traits.DissocT;
+import maaj.coll.traits.Growable;
+import maaj.coll.traits.Numerable;
+import maaj.coll.traits.Peekable;
 import maaj.coll.traits.Reducible;
 import maaj.coll.traits.SeqLike;
 import maaj.coll.traits.Seqable;
@@ -520,40 +525,38 @@ public class CoreLoader extends NamespaceNormal.Loader {
                                                 -> x.unwrap() instanceof Seqable ?
                                                    H.cons(Sym.requirePrimeSymC, H.seqFrom(x)) :
                                                         H.list(Sym.requirePrimeSymC, x))));
-    defnArity(core, "deref", "dereferences argument (for cells and boxes)",
-              box -> H.requireDeref(box).deref());
+    defnArity(core, "deref", "dereferences argument (for cells and boxes)", H::requireDeref, Deref::deref);
 
     defn(core, "meta", "get meta data of term; (meta term) ->{...}; (meta :key term) ~= (:key (meta term))", a
          -> a.isNil() ? H.NIL.getMeta() :
             (a.rest().isNil() ? a.first().getMeta() :
              a.rest().first().getMeta(a.first().unwrap())));
-    defnArity(core, Sym.firstSym.getNm(), "first of seq (head)", s -> H.seqFrom(s).firstOrNil());
-    defnArity(core, Sym.restSym.getNm(), "rest of seq (tail)", s -> H.seqFrom(s).restOrNil());
+    defnArity(core, Sym.firstSym.getNm(), "first of seq (head)", H::seqFrom, Seq::firstOrNil);
+    defnArity(core, Sym.restSym.getNm(), "rest of seq (tail)", H::seqFrom, Seq::restOrNil);
     defmacro(core, "car", "first of seq (head)", a -> H.cons(Sym.firstSym, a));
     defmacro(core, "cdr", "rest of seq (tail)", a -> H.cons(Sym.restSym, a));
     defmacro(core, "cadr", "(first (rest a))", a -> H.list(Sym.firstSym, H.cons(Sym.restSym, a)));
     defmacro(core, "cddr", "(rest (rest a))", a -> H.list(Sym.restSym, H.cons(Sym.restSym, a)));
     defnArity(core, "seq", "seq from collection", H::seqFrom);
 
-    defnArity(core, "count", "number of elements in collection; possibly O(N)",
-              coll -> H.requireNumerable(coll).count());
+    defnArity(core, "count", "number of elements in collection; possibly O(N)", H::requireNumerable, Numerable::count);
     defnArity(core, "count'", "number of elements in ^2 collection; O(1), possibly incorrect; "
                               + "if counts, returns maximally ^1 specified value; "
                               + "(count' 5 (100)) -> Int.MaxValue; "
                               + "(count' 200 (100)) -> 100; "
-                              + "(count' 2 [7 8 9 7]) -> 4", (cnt, tcoll) -> {
+                              + "(count' 2 [7 8 9 7]) -> 4",
+              H::requireNum, FnH::id, (max, tcoll) -> {
       Term coll = tcoll.unwrap();
       if (coll instanceof Counted)
         return ((Counted) coll).getCount();
-      Num max = H.requireNum(cnt);
       return H.wrap(H.seqFrom(coll).boundLength(max.asInteger()));
     });
 
     defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
 
-    defnArity(core, "cons", "prepends to list; O(1)", (t, s) -> H.cons(t, H.seqFrom(s)));
+    defnArity(core, "cons", "prepends to list; O(1)", FnH::id, H::seqFrom, H::cons);
 
-    defnArity(core, "peek", "ads to cellection; where depends on collection", coll -> H.requirePeekable(coll).peek());
+    defnArity(core, "peek", "ads to cellection; where depends on collection", H::requirePeekable, Peekable::peek);
 
     defnArity(core, "conj#", "ads to cellection; where depends on collection",
               (coll, val) -> H.requireGrowable(coll).conj(val));
@@ -608,11 +611,9 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     defnArity(core, Sym.equalSymCCore.getNm(), "equals?", (l, r) -> H.wrap(l.equals(r)));
 
-    defnArity(core, "lazy'", "creates seq thunk from an invocable argument: must return a seq", body
-              -> H.lazy(H.requireInvocable(body)));
+    defnArity(core, "lazy'", "creates seq thunk from an invocable argument: must return a seq", H::requireInvocable, H::lazy);
 
-    defnArity(core, "take", "takes first ^1 n elements of a ^2 seq", (cnt, s) -> 
-      SeqH.take(H.requireNum(cnt).asInteger(), H.seqFrom(s)));
+    defnArity(core, "take", "takes first ^1 n elements of a ^2 seq", H::requireNum, H::seqFrom, SeqH::take);
 
     defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
     defn(core, "-#", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
@@ -961,7 +962,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
   }
 
   private static <T1, T2> void defnArity(Namespace ns, String name, String doc,
-                                         Function<Term, T1> arg1, Function<Term, T2> arg2, BiFunction<T1, T2, Term> fn) {
+                                         Function<Term, T1> arg1, Function<Term, T2> arg2,
+                                         BiFunction<T1, T2, ? extends Term> fn) {
     defnArity(ns, name, doc, (x, y) -> fn.apply(arg1.apply(H.ret1(x, x = null)), arg2.apply(H.ret1(y, y = null))));
   }
 

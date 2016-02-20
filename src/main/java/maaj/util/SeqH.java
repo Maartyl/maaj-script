@@ -218,6 +218,10 @@ public class SeqH {
     return H.lazy(s.first(), () -> take(n - 1, s.rest()));
   }
 
+  public static Seq take(Num n, Seq s) {
+    return take(n.asInteger(), s);
+  }
+
   public static Seq drop(int n, Seq s) {
     while (n-- >= 0 && !s.isNil())
       s = s.rest();
