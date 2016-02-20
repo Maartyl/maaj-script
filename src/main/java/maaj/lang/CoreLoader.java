@@ -717,8 +717,11 @@ public class CoreLoader extends NamespaceNormal.Loader {
           Seq args = H.requireSeqable(targs).seq();
           if (name.isQualified())
             throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
+          final Object content = obj.getContent();
+          if (content == null)
+            throw new IllegalArgumentException("invoke-virtual: object cannot be nil");
 
-          return c.getInterop().call(obj.getType(), obj.getContent(), name.getNm(), args);
+          return c.getInterop().call(obj.getType(), content, name.getNm(), args);
     }));
     def(jvm, Sym.invokeStaticSymInterop.getNm(),
         "Invokes static method with given arguments. (performs implicit conversions) \n"

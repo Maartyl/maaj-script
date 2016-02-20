@@ -26,8 +26,13 @@ public interface Nil extends Seq, Ground {
   }
 
   @Override
+  default Class getType() {
+    return this.getClass();
+  }
+
+  @Override
   default Object getContent() {
-    return this;
+    return null;
   }
 
   @Override
