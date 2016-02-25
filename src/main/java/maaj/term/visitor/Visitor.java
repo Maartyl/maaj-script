@@ -34,6 +34,8 @@ public interface Visitor<TR, TA> {
   TR ground(Ground t, TA arg);
 
   //---
+  TR io(IO t, TA arg);
+
   TR seq(Seq t, TA arg);
 
   TR coll(Collection t, TA arg);

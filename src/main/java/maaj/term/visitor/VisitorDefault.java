@@ -31,6 +31,11 @@ public interface VisitorDefault<TR, TA> extends Visitor<TR, TA> {
   }
 
   @Override
+  public default TR io(IO t, TA arg) {
+    return dflt();
+  }
+
+  @Override
   public default TR ground(Ground t, TA arg) {
     return dflt();
   }

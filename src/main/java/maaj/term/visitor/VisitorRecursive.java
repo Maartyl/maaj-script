@@ -23,6 +23,11 @@ public interface VisitorRecursive<TR, TA> extends Visitor<TR, TA> {
 
   //---
   @Override
+  default TR io(IO t, TA arg) {
+    return monad(t, arg);
+  }
+
+  @Override
   default TR seq(Seq t, TA arg) {
     return monad(t, arg);
   }
