@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
 import maaj.term.visitor.Visitor;
+import maaj.util.H;
 
 /**
  *
@@ -26,12 +27,12 @@ public interface IO extends Monad<IO>, Ground {
 
   @Override
   public default IO bindM(Invocable fn2Monad) {
-    return c -> ((IO) fn2Monad.invoke(run(c)));
+    return c -> H.requireIO(fn2Monad.invoke(run(c)));
   }
 
   @Override
   public default <TR, TA> TR visit(Visitor<TR, TA> v, TA arg) {
-    return v.monad(this, arg);
+    return v.io(this, arg);
   }
 
   @Override

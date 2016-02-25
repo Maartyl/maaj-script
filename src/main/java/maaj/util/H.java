@@ -558,6 +558,14 @@ public class H {
     throw new IllegalArgumentException("Requires TraPer, got: " + t.getClass().getName());
   }
 
+  public static IO requireIO(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof IO)
+      return (IO) t;
+
+    throw new IllegalArgumentException("Requires IO, got: " + t.getClass().getName());
+  }
+
   public static int inc(int i) {
     return i + 1;
   }
