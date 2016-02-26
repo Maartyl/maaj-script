@@ -500,55 +500,55 @@ public class H {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Term & Growable<T>> T requireGrowable(Term tt) {
+  public static <T extends Term & Growable<T>> Growable<T> requireGrowable(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Growable)
-      return (T) t;
+      return (Growable<T>) t;
 
     throw new IllegalArgumentException("Requires Growable, got: " + t.getClass().getName());
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Term & AssocUpdate<T>> T requireAssocUpdate(Term tt) {
+  public static <T extends Term & AssocUpdate<T>> AssocUpdate<T> requireAssocUpdate(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof AssocUpdate)
-      return (T) t;
+      return (AssocUpdate<T>) t;
 
     throw new IllegalArgumentException("Requires AssocUpdate, got: " + t.getClass().getName());
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Term & GrowableT<T>> T requireGrowableT(Term tt) {
+  public static <T extends Term & GrowableT<T>> GrowableT<T> requireGrowableT(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof GrowableT)
-      return (T) t;
+      return (GrowableT<T>) t;
 
     throw new IllegalArgumentException("Requires GrowableT, got: " + t.getClass().getName());
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Term & AssocUpdateT<T>> T requireAssocUpdateT(Term tt) {
+  public static <T extends Term & AssocUpdateT<T>> AssocUpdateT<T> requireAssocUpdateT(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof AssocUpdateT)
-      return (T) t;
+      return (AssocUpdateT<T>) t;
 
     throw new IllegalArgumentException("Requires AssocUpdateT, got: " + t.getClass().getName());
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Term & Dissoc<T>> T requireDissoc(Term tt) {
+  public static <T extends Term & Dissoc<T>> Dissoc<T> requireDissoc(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Dissoc)
-      return (T) t;
+      return (Dissoc<T>) t;
 
     throw new IllegalArgumentException("Requires Dissoc, got: " + t.getClass().getName());
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Term & DissocT<T>> T requireDissocT(Term tt) {
+  public static <T extends Term & DissocT<T>> DissocT<T> requireDissocT(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof DissocT)
-      return (T) t;
+      return (DissocT<T>) t;
 
     throw new IllegalArgumentException("Requires DissocT, got: " + t.getClass().getName());
   }
@@ -580,7 +580,18 @@ public class H {
     throw new IllegalArgumentException("Requires Reducible, got: " + t.getClass().getName());
   }
 
-  public static TraPer requireTraPer(Term tt) {
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & Functor<T>> Functor<T> requireFunctor(Term tt) {
+    Term t = tt.unwrap();
+    if (t instanceof Functor)
+      return (Functor<T>) t;
+
+    throw new IllegalArgumentException("Requires Functor, got: " + t.getClass().getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Term & TraPer<T, U>, U extends Term & TraPer<T, U>>
+          TraPer<T, U> requireTraPer(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof TraPer)
       return (TraPer) t;

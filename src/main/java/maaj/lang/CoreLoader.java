@@ -7,12 +7,20 @@ package maaj.lang;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import maaj.coll.traits.AssocUpdate;
+import maaj.coll.traits.AssocUpdateT;
 import maaj.coll.traits.Counted;
 import maaj.coll.traits.Deref;
+import maaj.coll.traits.Dissoc;
+import maaj.coll.traits.DissocT;
+import maaj.coll.traits.Functor;
+import maaj.coll.traits.Growable;
+import maaj.coll.traits.GrowableT;
 import maaj.coll.traits.Numerable;
 import maaj.coll.traits.Peekable;
 import maaj.coll.traits.SeqLike;
 import maaj.coll.traits.Seqable;
+import maaj.coll.traits.TraPer;
 import maaj.exceptions.InvalidOperationException;
 import maaj.reader.ReaderContext;
 import maaj.term.*;
@@ -550,37 +558,28 @@ public class CoreLoader extends NamespaceNormal.Loader {
             });
 
     defnArity(core, ">>=", "monadic bind: (>>= m #(... % ...))", H::requireMonad, H::requireInvocable, Monad::bindM);
-
     defnArity(core, "retM", "monadic return (first arg is monad of desired type): (retM m a)", H::requireMonad, FnH::id,
               Monad::retM);
+    defnArity(core, "retIO", "retM of type IO: (retIO a)", FnH::id, IO::retM1);
 
     defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
 
     defnArity(core, "cons", "prepends to list; O(1)", FnH::id, H::seqFrom, H::cons);
 
-    defnArity(core, "peek", "ads to cellection; where depends on collection", H::requirePeekable, Peekable::peek);
+    defnArity(core, "peek", "retieves last conj-ed element", H::requirePeekable, Peekable::peek);
 
-    defnArity(core, "conj#", "ads to cellection; where depends on collection",
-              (coll, val) -> H.requireGrowable(coll).conj(val));
-
+    defnArity(core, "conj#", "adds to cellection; where depends on collection", H::requireGrowable, FnH::id, Growable::conj);
     defnArity(core, "assoc#", "update collection at given key with given value",
-              (coll, key, val) -> H.requireAssocUpdate(coll).assoc(key, val));
-    defnArity(core, "dissoc#", "remove from ^1 collection at given ^2 key",
-              (coll, key) -> H.requireDissoc(coll).dissoc(key));
+              H::requireAssocUpdate, FnH::id, FnH::id, AssocUpdate::assoc);
+    defnArity(core, "dissoc#", "remove from ^1 collection at given ^2 key", H::requireDissoc, FnH::id, Dissoc::dissoc);
 
+    defnArity(core, "transient", "transient version of ^1 collection", H::requireTraPer, TraPer::asTransient);
+    defnArity(core, "persistent!", "freeze ^1 transient to behave like persistent", H::requireTraPer, TraPer::asPersistent);
 
-    defnArity(core, "transient", "transient version of ^1 collection",
-              coll -> H.wrap(H.requireTraPer(coll).asTransient()));
-    defnArity(core, "persistent!", "fix ^1 transient to behave like persistent",
-              coll -> H.wrap(H.requireTraPer(coll).asPersistent()));
-
-    defnArity(core, "conj!#", "ads to cellection; where depends on collection",
-              (coll, val) -> H.requireGrowableT(coll).doConj(val));
-
+    defnArity(core, "conj!#", "adds to cellection; where depends on collection", H::requireGrowableT, FnH::id, GrowableT::doConj);
     defnArity(core, "assoc!#", "update collection at given key with given value",
-              (coll, key, val) -> H.requireAssocUpdateT(coll).doAssoc(key, val));
-    defnArity(core, "dissoc!#", "remove from ^1 collection at given ^2 key",
-              (coll, key) -> H.requireDissocT(coll).doDissoc(key));
+              H::requireAssocUpdateT, FnH::id, FnH::id, AssocUpdateT::doAssoc);
+    defnArity(core, "dissoc!#", "remove from ^1 collection at given ^2 key", H::requireDissocT, FnH::id, DissocT::doDissoc);
 
 
     defnArity(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
@@ -594,7 +593,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
       return coll.reduce(start, fn);
     });
 
-    defn(core, "map", "maps ^1 fn over 1 to 3 seqs - fn has to be of the same arity as number of seqs", a -> {
+    defn(core, "map", "lazily maps ^1 fn over 1 to 3 seqs - fn has to be of the same arity as number of seqs", a -> {
       switch (a.boundLength(4)) {
       case 2: return SeqH.mapLazy(H.seqFrom(a.rest().first()), H.requireInvocable(a.first()));
       case 3: return SeqH.zip(H.requireInvocable(a.first()),
@@ -608,6 +607,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
         throw new IllegalArgumentException("map requires arity: 2|3|4 but got: " + a.boundLength(30));
       }
     });
+
+    defnArity(core, "fmap", "applies ^2 funtion to a ^1 functor", H::requireFunctor, H::requireInvocable, Functor::fmap);
 
     defnArity(core, Sym.equalSymCCore.getNm(), "equals?", (l, r) -> H.wrap(l.equals(r)));
 
