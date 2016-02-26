@@ -14,7 +14,7 @@ import maaj.term.Term;
  * @param <TR>
  * @param <TA>
  */
-public interface VisitorDfltRec<TR, TA> extends VisitorRecursive<TR, TA> {
+public interface VisitorDfltHierarchy<TR, TA> extends VisitorRecursive<TR, TA> {
 
   //default value returned from all
   TR dflt(Term t, TA arg);
