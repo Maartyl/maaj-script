@@ -5,19 +5,14 @@
  */
 package maaj.lang;
 
-import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import maaj.coll.traits.Counted;
 import maaj.coll.traits.Deref;
-import maaj.coll.traits.DissocT;
-import maaj.coll.traits.Growable;
 import maaj.coll.traits.Numerable;
 import maaj.coll.traits.Peekable;
-import maaj.coll.traits.Reducible;
 import maaj.coll.traits.SeqLike;
 import maaj.coll.traits.Seqable;
-import maaj.coll.traits.TraPer;
 import maaj.exceptions.InvalidOperationException;
 import maaj.reader.ReaderContext;
 import maaj.term.*;
@@ -155,7 +150,9 @@ public class CoreLoader extends NamespaceNormal.Loader {
       }
       throw new IllegalArgumentException("require': invalid clause: " + a);
     });
-    
+
+    def(core, "io!", "runs given IO monad, returning it's final value",
+        (c, a) -> arityRequire(a, "io!", arg -> H.requireIO(arg.eval(c)).run(c)));
   }
 
   /**
@@ -698,60 +695,57 @@ public class CoreLoader extends NamespaceNormal.Loader {
   }
 
   private void loadJvmInterop(Namespace jvm) {
-    def(jvm, Sym.invokeVirtualSymInterop.getNm(),
-        "Invokes method on object with given arguments. (performs implicit conversions) \n"
-        + "[obj methodName args-list]; "
-        + "methodName: unqualified symbol. "
-        + "args-list: any seqable.",
-        (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeVirtualSymInterop.getNm(), (obj, tname, targs) -> {
-          Symbol name = H.requireSymbol(tname);
-          Seq args = H.requireSeqable(targs).seq();
-          if (name.isQualified())
-            throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
-          final Object content = obj.getContent();
-          if (content == null)
-            throw new IllegalArgumentException("invoke-virtual: object cannot be nil");
+    defnArity(jvm, Sym.invokeVirtualSymInterop.getNm(),
+              "Invokes method on object with given arguments. (performs implicit conversions) \n"
+              + "[obj methodName args-list]; "
+              + "methodName: unqualified symbol. "
+              + "args-list: any seqable.",
+              FnH::id, H::requireSymbol, H::requireSeqable,
+              (obj, name, args) -> {
+                if (name.isQualified())
+                  throw new IllegalArgumentException("invoke-virtual: method name cannot be qualified.");
+                final Object content = obj.getContent();
+                if (content == null)
+                  throw new IllegalArgumentException("invoke-virtual: object cannot be nil");
 
-          return c.getInterop().call(obj.getType(), content, name.getNm(), args);
-    }));
-    def(jvm, Sym.invokeStaticSymInterop.getNm(),
-        "Invokes static method with given arguments. (performs implicit conversions) \n"
+                return IO.make(c -> c.getInterop().call(obj.getType(), content, name.getNm(), args.seq()));
+              });
+
+    defnArity(jvm, Sym.invokeStaticSymInterop.getNm(),
+              "Invokes static method with given arguments. (performs implicit conversions) \n"
         + "[type methodName args-list]; "
         + "type: full class name (unqualified symbol). "
         + "methodName: unqualified symbol. "
-        + "args-list: any seqable.",
-        (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.invokeStaticSymInterop.getNm(), (ttype, tname, targs) -> {
-          Symbol type = H.requireSymbol(ttype);
-          Symbol name = H.requireSymbol(tname);
-          Seq args = H.requireSeqable(targs).seq();
+              + "args-list: any seqable.",
+              H::requireSymbol, H::requireSymbol, H::requireSeqable,
+              (type, name, args) -> {
           if (name.isQualified())
             throw new IllegalArgumentException("invoke-static: method name cannot be qualified.");
           if (type.isQualified())
             throw new IllegalArgumentException("invoke-static: type name cannot be qualified.");
 
-          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
-          return c.getInterop().call(typeCls, null, name.getNm(), args);
-    }));
-    def(jvm, Sym.ctorSymInterop.getNm(),
-        "Constructs new object with given arguments. (performs implicit conversions) \n"
+                return IO.make(c -> c.getInterop().call(typeRequire(type.getNm(), H.tuple(H.wrap("java.lang"))),
+                                                        null, name.getNm(), args.seq()));
+    });
+    defnArity(jvm, Sym.ctorSymInterop.getNm(),
+              "Constructs new object with given arguments. (performs implicit conversions) \n"
         + "[typeName args-list]; "
         + "typeName: unqualified symbol. "
-        + "args-list: any seqable.",
-        (c, a) -> arityRequire(SeqH.mapEval(a, c), Sym.ctorSymInterop.getNm(), (ttype, targs) -> {
-          Symbol type = H.requireSymbol(ttype);
-          Seq args = H.requireSeqable(targs).seq();
+              + "args-list: any seqable.",
+              H::requireSymbol, H::requireSeqable,
+              (type, args) -> {
           if (type.isQualified())
             throw new IllegalArgumentException("ctor: type name cannot be qualified.");
 
-          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
-          return c.getInterop().ctor(typeCls, args);
-        }));
+          return IO.make(c -> c.getInterop().ctor(typeRequire(type.getNm(), H.tuple(H.wrap("java.lang"))), args.seq()));
+        });
 
-    def(jvm, "instance-field-get",
-        "Get's value of field on an instace.\n"
+    defnArity(jvm, "instance-field-get",
+              "Get's value of field on an instace.\n"
         + "[obj fieldName]; "
-        + "fieldName: unqualified symbol. ",
-        (c, a) -> arityRequire(SeqH.mapEval(a, c), "instance-field-get", (obj, tname) -> {
+              + "fieldName: unqualified symbol. ",
+              FnH::id, H::requireSymbol,
+              (obj, tname) -> {
           Symbol name = H.requireSymbol(tname);
           if (name.isQualified())
             throw new IllegalArgumentException("instance-field-get: method name cannot be qualified.");
@@ -759,57 +753,60 @@ public class CoreLoader extends NamespaceNormal.Loader {
           if (content == null)
             throw new IllegalArgumentException("instance-field-get: object cannot be nil");
 
-          return c.getInterop().fieldGet(obj.getType(), content, name.getNm());
-        }));
-    def(jvm, "static-field-get",
-        "Get's value of static field.\n"
+          return IO.make(c -> c.getInterop().fieldGet(obj.getType(), content, name.getNm()));
+        });
+    defnArity(jvm, "static-field-get",
+              "Get's value of static field.\n"
         + "[type fieldName]; "
         + "type: full class name (unqualified symbol). "
-        + "fieldName: unqualified symbol. ",
-        (c, a) -> arityRequire(SeqH.mapEval(a, c), "static-field-get", (ttype, tname) -> {
-          Symbol type = H.requireSymbol(ttype);
-          Symbol name = H.requireSymbol(tname);
+              + "fieldName: unqualified symbol. ",
+              H::requireSymbol, H::requireSymbol,
+              (type, name) -> {
           if (name.isQualified())
             throw new IllegalArgumentException("static-field-get: method name cannot be qualified.");
           if (type.isQualified())
             throw new IllegalArgumentException("static-field-get: type name cannot be qualified.");
 
-          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
-          return c.getInterop().fieldGet(typeCls, null, name.getNm());
-        }));
+                return IO.make(c -> c.getInterop().fieldGet(typeRequire(type.getNm(), H.tuple(H.wrap("java.lang"))),
+                                                            null, name.getNm()));
+        });
 
-    def(jvm, "instance-field-set",
-        "Sets's value of field on an instace. (performs implicit conversions) \n"
+    defnArity(jvm, "instance-field-set",
+              "Sets's value of field on an instace. (performs implicit conversions) \n"
         + "[obj fieldName value]; "
-        + "fieldName: unqualified symbol. ",
-        (c, a) -> arityRequire(SeqH.mapEval(a, c), "instance-field-set", (obj, tname, value) -> {
-          Symbol name = H.requireSymbol(tname);
+              + "fieldName: unqualified symbol. ",
+              FnH::id, H::requireSymbol, FnH::id,
+              (obj, name, value) -> {
           if (name.isQualified())
             throw new IllegalArgumentException("instance-field-set: method name cannot be qualified.");
           final Object content = obj.getContent();
           if (content == null)
             throw new IllegalArgumentException("instance-field-set: object cannot be nil");
 
-          c.getInterop().fieldSet(obj.getType(), content, name.getNm(), value);
-          return obj;
-        }));
-    def(jvm, "static-field-set",
-        "Sets's value of static field. (performs implicit conversions) \n"
+          return IO.make(c -> {
+            c.getInterop().fieldSet(obj.getType(), content, name.getNm(), value);
+            return obj;
+          });
+          
+        });
+    defnArity(jvm, "static-field-set",
+              "Sets's value of static field. (performs implicit conversions) \n"
         + "[type fieldName value]; "
         + "type: full class name (unqualified symbol). "
-        + "fieldName: unqualified symbol. ",
-        (c, a) -> arityRequire(SeqH.mapEval(a, c), "static-field-set", (ttype, tname, value) -> {
-          Symbol type = H.requireSymbol(ttype);
-          Symbol name = H.requireSymbol(tname);
+              + "fieldName: unqualified symbol. ",
+              H::requireSymbol, H::requireSymbol, FnH::id,
+              (type, name, value) -> {
           if (name.isQualified())
             throw new IllegalArgumentException("static-field-set: method name cannot be qualified.");
           if (type.isQualified())
             throw new IllegalArgumentException("static-field-set: type name cannot be qualified.");
 
-          Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
-          c.getInterop().fieldSet(typeCls, null, name.getNm(), value);
-          return H.NIL;
-        }));
+           return IO.make(c -> {
+             Class typeCls = typeRequire(type.getNm(), H.tuple(H.wrap("java.lang")));
+             c.getInterop().fieldSet(typeCls, null, name.getNm(), value);
+             return H.NIL;
+           });
+        });
   }
 
   private static Class typeRequire(String name, Iterable prefixes) {

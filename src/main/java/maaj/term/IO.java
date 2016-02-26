@@ -54,4 +54,8 @@ public interface IO extends Monad<IO>, Ground {
     return c -> cnt;
   }
 
+  public static IO make(IO io) {
+    return io;
+  }
+
 }
