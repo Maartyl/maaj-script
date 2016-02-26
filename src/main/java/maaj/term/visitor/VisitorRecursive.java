@@ -15,6 +15,10 @@ public interface VisitorRecursive<TR, TA> extends Visitor<TR, TA> {
 
   TR id(Term t, TA arg);
 
+  @Override
+  default TR run(Term t, TA arg) {
+    return t.visit(this, arg);
+  }
 
   @Override
   default TR ground(Ground t, TA arg) {
