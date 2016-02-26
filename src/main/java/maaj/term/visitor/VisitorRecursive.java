@@ -159,7 +159,7 @@ public interface VisitorRecursive<TR, TA> extends Visitor<TR, TA> {
 
   @Override
   default TR nil(Nil t, TA arg) {
-    return id(t, arg);
+    return ground(t, arg);
   }
 
   @Override
