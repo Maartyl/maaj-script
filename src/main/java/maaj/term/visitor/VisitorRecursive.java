@@ -6,6 +6,7 @@
 package maaj.term.visitor;
 
 import maaj.term.*;
+import maaj.util.H;
 
 /**
  *
@@ -17,7 +18,7 @@ public interface VisitorRecursive<TR, TA> extends Visitor<TR, TA> {
 
   @Override
   default TR run(Term t, TA arg) {
-    return t.visit(this, arg);
+    return H.ret1(t, t = null).unwrap().visit(this, arg);
   }
 
   @Override

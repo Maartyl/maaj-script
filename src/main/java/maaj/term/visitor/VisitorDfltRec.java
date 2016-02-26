@@ -17,16 +17,16 @@ import maaj.term.Term;
 public interface VisitorDfltRec<TR, TA> extends VisitorRecursive<TR, TA> {
 
   //default value returned from all
-  TR dflt();
+  TR dflt(Term t, TA arg);
 
   @Override
   public default TR id(Term t, TA arg) {
-    return dflt();
+    return dflt(t, arg);
   }
 
   @Override
   public default TR monad(Monad t, TA arg) {
-    return dflt();
+    return dflt(t, arg);
   }
 
 
