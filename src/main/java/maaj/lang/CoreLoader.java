@@ -583,14 +583,12 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     defnArity(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
                               + " producing new accumulator, appling on second ...; returns final accumulator",
-              (tfn, start, tt3) -> {
-      Invocable fn = H.requireInvocable(tfn);
-      Term t3 = tt3.unwrap();
-      if (t3 instanceof SeqLike) 
-        return SeqH.reduce((SeqLike) H.ret1(t3, t3 = null), H.ret1(start, start = null), fn);
+              H::requireInvocable, FnH::id, H::requireReducible, (fn, start, coll) -> {
+      if (coll instanceof SeqLike)
+        return SeqH.reduce((SeqLike) H.ret1(coll, coll = null), H.ret1(start, start = null), fn);
       //realization: it's impossible anyway: virtual methods (eval) prevent GC of their object...
       
-      Reducible coll = H.requireReducible(t3); //this retains entire coll in memory while reducing
+      //this retains entire coll in memory while reducing
       return coll.reduce(start, fn);
     });
 
@@ -966,16 +964,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
   }
 
   @FunctionalInterface
-  private interface TriFunction<T, U, S, R> {
-
-    /**
-     * Applies this function to the given arguments.
-     *
-     * @param t the first function argument
-     * @param u the second function argument
-     * @param s the third function argument
-     * @return the function result
-     */
+  private static interface TriFunction<T, U, S, R> {
     R apply(T t, U u, S s);
   }
 }
