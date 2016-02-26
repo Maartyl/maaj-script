@@ -303,26 +303,6 @@ public class H {
     return SeqH.sexp(t1, list(t2, t3, t4, t5));
   }
 
-  public static Class[] typesOfElems(Seq seq) {
-    Class[] clss = new Class[seq.count().asInteger()];
-    RangeSeeder rs = new RangeSeeder(); //lambda cannot bind mutable reference
-    seq.foreach((Invocable1) x -> {
-      clss[rs.next()] = x.getType();
-      return H.NIL;
-    });
-    return clss;
-  }
-
-  public static Object[] contentsOfElems(Seq seq) {
-    Object[] objs = new Object[seq.count().asInteger()];
-    RangeSeeder rs = new RangeSeeder(); //lambda cannot bind mutable reference
-    seq.foreach((Invocable1) x -> {
-      objs[rs.next()] = x.getContent();
-      return H.NIL;
-    });
-    return objs;
-  }
-
   public static Seq cons(Term head, Seq tail) {
     return SeqH.cons(head, tail);
   }
