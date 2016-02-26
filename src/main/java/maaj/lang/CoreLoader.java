@@ -682,7 +682,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
                                                    + "(throw-arity $args \"message\")", H::seqFrom, FnH::id, (args, msg) -> {
            throw new IllegalArgumentException("Wrong number of args: " + args.boundLength(50)
                                               + "; " + msg + " //args: " + SeqH.take(50, args));
-            });
+    });
 
     //lambda
     defmacro(core, "\u03BB", "creates function that binds args (same as fn)", a -> H.cons(Sym.fnSymCore, a));
