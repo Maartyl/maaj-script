@@ -560,6 +560,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defnArity(core, "retM", "monadic return (first arg is monad of desired type): (retM m a)", H::requireMonad, FnH::id, Monad::retM);
     defnArity(core, "retIO", "retM of type IO: (retIO a)", FnH::id, IO::retM1);
 
+    defnArity(core, "nil?", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
     defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
 
     defnArity(core, "cons", "prepends to list; O(1)", FnH::id, H::seqFrom, H::cons);
