@@ -5,7 +5,6 @@
  */
 package maaj.lang;
 
-import maaj.interop.ConverterCombiner;
 import maaj.interop.CvrtId;
 import maaj.interop.CvrtNil;
 import maaj.interop.ImplicitConversions;
