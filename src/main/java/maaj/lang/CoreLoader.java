@@ -679,20 +679,10 @@ public class CoreLoader extends NamespaceNormal.Loader {
     H.eval("(defn dissoc! ^\"removes 1 or more kv by ^2 key from a ^1 transient map\""
            + "([coll x] (dissoc!# coll x)) ([coll & r] (reduce dissoc!# coll r)))", cxt, rcxt);
 
-    
-
-//    defn(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
-//                                              + "(throw-arity $args \"message\")",
-//         a -> {
-//           int argC = H.seqFrom(arityRequire(2, a, Sym.throwAritySymCore.getNm()).first()).boundLength(50);
-//           throw new IllegalArgumentException("Wrong number of args: " + argC
-//                                              + "; " + a.rest().first() + " //args: " + SeqH.take(50, H.seqFrom(a.first())));
-//         });
-
     defnArity(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
-                                                   + "(throw-arity $args \"message\")", (args, msg) -> {
-           throw new IllegalArgumentException("Wrong number of args: " + H.seqFrom(args).boundLength(50)
-                                              + "; " + msg + " //args: " + SeqH.take(50, H.seqFrom(args)));
+                                                   + "(throw-arity $args \"message\")", H::seqFrom, FnH::id, (args, msg) -> {
+           throw new IllegalArgumentException("Wrong number of args: " + args.boundLength(50)
+                                              + "; " + msg + " //args: " + SeqH.take(50, args));
          });
   }
 
@@ -967,10 +957,25 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defnArity(ns, name, doc, (x, y) -> fn.apply(arg1.apply(H.ret1(x, x = null)), arg2.apply(H.ret1(y, y = null))));
   }
 
-//  private static <T1, T2, T3> void defnArity(Namespace ns, String name, String doc,
-//                                       Function<Term, T1> arg1, Function<Term, T2> arg2,Function<Term, T2> arg3,
-//                                       BiFunction<T1, T2, Term> fn) {
-//    defnArity(ns, name, doc, (x, y) -> fn.apply(arg1.apply(x), arg2.apply(y)));
-//  }
+  private static <T1, T2, T3> void defnArity(Namespace ns, String name, String doc,
+                                             Function<Term, T1> arg1, Function<Term, T2> arg2, Function<Term, T3> arg3,
+                                             TriFunction<T1, T2, T3, ? extends Term> fn) {
+    defnArity(ns, name, doc, (x, y, z) -> fn.apply(arg1.apply(H.ret1(x, x = null)),
+                                                   arg2.apply(H.ret1(y, y = null)),
+                                                   arg3.apply(H.ret1(z, z = null))));
+  }
 
+  @FunctionalInterface
+  private interface TriFunction<T, U, S, R> {
+
+    /**
+     * Applies this function to the given arguments.
+     *
+     * @param t the first function argument
+     * @param u the second function argument
+     * @param s the third function argument
+     * @return the function result
+     */
+    R apply(T t, U u, S s);
+  }
 }
