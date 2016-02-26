@@ -413,6 +413,10 @@ public class H {
     return TypeVisitors.reqVec.run(tt);
   }
 
+  public static Map requireMap(Term tt) {
+    return TypeVisitors.reqMap.run(tt);
+  }
+
   public static Invocable requireInvocable(Term tt) {
     return TypeVisitors.reqInvocable.run(tt);
   }
@@ -456,6 +460,10 @@ public class H {
 
   public static Term isVec(Term tt) {
     return TypeVisitors.isVec.run(tt);
+  }
+
+  public static Term isMap(Term tt) {
+    return TypeVisitors.isMap.run(tt);
   }
 
   public static Term isInvocable(Term tt) {
@@ -792,6 +800,19 @@ public class H {
     static final Visitor<Term, H> isVec = new VisitorIsBase() {
       @Override
       public Term vec(Vec t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Map, H> reqMap = new VisitorReqBase<Map>(Map.class) {
+      @Override
+      public Map map(Map t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isMap = new VisitorIsBase() {
+      @Override
+      public Term map(Map t, H arg) {
         return t;
       }
     };
