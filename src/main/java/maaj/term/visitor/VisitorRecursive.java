@@ -111,8 +111,13 @@ public interface VisitorRecursive<TR, TA> extends Visitor<TR, TA> {
 
   //---
   @Override
-  default TR symbol(Symbol t, TA arg) {
+  default TR symbolic(Symbolic t, TA arg) {
     return id(t, arg);
+  }
+
+  @Override
+  default TR symbol(Symbol t, TA arg) {
+    return symbolic(t, arg);
   }
 
   @Override
@@ -127,7 +132,7 @@ public interface VisitorRecursive<TR, TA> extends Visitor<TR, TA> {
 
   @Override
   default TR keyword(Keyword t, TA arg) {
-    return symbol(t, arg);
+    return symbolic(t, arg);
   }
 
   @Override

@@ -249,6 +249,10 @@ public class H {
     return Symbol.of(symbol);
   }
 
+  public static Symbolic symbolic(String symbol) {
+    return Symbolic.of(symbol);
+  }
+
   public static Symbol symbol(String ns, String name) {
     return Symbol.qualified(ns, name);
   }
@@ -487,7 +491,7 @@ public class H {
     if (t instanceof Deref)
       return (Deref) t;
 
-    throw new IllegalArgumentException("Requires Deref, got: " + t.getClass().getName());
+    throw illegalRequire(Deref.class, t);
   }
 
 
@@ -496,7 +500,7 @@ public class H {
     if (t instanceof Seqable)
       return (Seqable) t;
 
-    throw new IllegalArgumentException("Requires Seqable, got: " + t.getClass().getName());
+    throw illegalRequire(Seqable.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -505,7 +509,7 @@ public class H {
     if (t instanceof Growable)
       return (Growable<T>) t;
 
-    throw new IllegalArgumentException("Requires Growable, got: " + t.getClass().getName());
+    throw illegalRequire(Growable.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -514,7 +518,7 @@ public class H {
     if (t instanceof AssocUpdate)
       return (AssocUpdate<T>) t;
 
-    throw new IllegalArgumentException("Requires AssocUpdate, got: " + t.getClass().getName());
+    throw illegalRequire(AssocUpdate.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -523,7 +527,7 @@ public class H {
     if (t instanceof GrowableT)
       return (GrowableT<T>) t;
 
-    throw new IllegalArgumentException("Requires GrowableT, got: " + t.getClass().getName());
+    throw illegalRequire(GrowableT.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -532,7 +536,7 @@ public class H {
     if (t instanceof AssocUpdateT)
       return (AssocUpdateT<T>) t;
 
-    throw new IllegalArgumentException("Requires AssocUpdateT, got: " + t.getClass().getName());
+    throw illegalRequire(AssocUpdateT.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -541,7 +545,7 @@ public class H {
     if (t instanceof Dissoc)
       return (Dissoc<T>) t;
 
-    throw new IllegalArgumentException("Requires Dissoc, got: " + t.getClass().getName());
+    throw illegalRequire(Dissoc.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -550,7 +554,7 @@ public class H {
     if (t instanceof DissocT)
       return (DissocT<T>) t;
 
-    throw new IllegalArgumentException("Requires DissocT, got: " + t.getClass().getName());
+    throw illegalRequire(DissocT.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -559,7 +563,7 @@ public class H {
     if (t instanceof Peekable)
       return (T) t;
 
-    throw new IllegalArgumentException("Requires Peekable, got: " + t.getClass().getName());
+    throw illegalRequire(Peekable.class, t);
   }
 
   public static Numerable requireNumerable(Term tt) {
@@ -567,7 +571,7 @@ public class H {
     if (t instanceof Numerable)
       return (Numerable) t;
 
-    throw new IllegalArgumentException("Requires Numerable, got: " + t.getClass().getName());
+    throw illegalRequire(Numerable.class, t);
   }
 
   public static Reducible requireReducible(Term tt) {
@@ -577,7 +581,7 @@ public class H {
     if (t instanceof Seqable)
       return ((Seqable) t).seq();
 
-    throw new IllegalArgumentException("Requires Reducible, got: " + t.getClass().getName());
+    throw illegalRequire(Reducible.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -586,7 +590,7 @@ public class H {
     if (t instanceof Functor)
       return (Functor<T>) t;
 
-    throw new IllegalArgumentException("Requires Functor, got: " + t.getClass().getName());
+    throw illegalRequire(Functor.class, t);
   }
 
   @SuppressWarnings("unchecked")
@@ -596,7 +600,15 @@ public class H {
     if (t instanceof TraPer)
       return (TraPer) t;
 
-    throw new IllegalArgumentException("Requires TraPer, got: " + t.getClass().getName());
+    throw illegalRequire(TraPer.class, t);
+  }
+
+  private static RuntimeException illegalRequire(Class expected, Class got) {
+    return new IllegalArgumentException("Requires " + expected.getSimpleName() + ", got: " + got.getName());
+  }
+
+  private static RuntimeException illegalRequire(Class expected, Term got) {
+    return illegalRequire(expected, got.getType());
   }
 
   public static int inc(int i) {
@@ -638,7 +650,7 @@ public class H {
   public static Symbol uniqueSymbol(Symbol s) {
     if (s.isQualified()) {
       //this is not super efficient, but also not common
-      return uniqueSymbol(s.getNm()).prependNamespace(s.getNs());
+      return uniqueSymbol(s.getNm()).withSameNamespace(s);
     } else {
       return uniqueSymbol(s.getNm());
     }
@@ -713,7 +725,7 @@ public class H {
     private TypeVisitors() {
     }
 
-    static final Visitor<IO, H> reqIO = new VisitorReqBase<IO>("IO") {
+    static final Visitor<IO, H> reqIO = new VisitorReqBase<IO>(IO.class) {
       @Override
       public IO io(IO t, H arg) {
         return t;
@@ -726,7 +738,7 @@ public class H {
       }
     };
 
-    static final Visitor<Monad, H> reqMonad = new VisitorReqBase<Monad>("Monad") {
+    static final Visitor<Monad, H> reqMonad = new VisitorReqBase<Monad>(Monad.class) {
       @Override
       public Monad monad(Monad t, H arg) {
         return t;
@@ -739,7 +751,7 @@ public class H {
       }
     };
 
-    static final Visitor<Seq, H> reqSeq = new VisitorReqBase<Seq>("Seq") {
+    static final Visitor<Seq, H> reqSeq = new VisitorReqBase<Seq>(Seq.class) {
       @Override
       public Seq seq(Seq t, H arg) {
         return t;
@@ -752,7 +764,20 @@ public class H {
       }
     };
 
-    static final Visitor<Symbol, H> reqSymbol = new VisitorReqBase<Symbol>("Symbol") {
+    static final Visitor<Symbolic, H> reqSymbolic = new VisitorReqBase<Symbolic>(Symbolic.class) {
+      @Override
+      public Symbolic symbolic(Symbolic t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isSymbolic = new VisitorIsBase() {
+      @Override
+      public Term symbolic(Symbolic t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Symbol, H> reqSymbol = new VisitorReqBase<Symbol>(Symbol.class) {
       @Override
       public Symbol symbol(Symbol t, H arg) {
         return t;
@@ -765,7 +790,7 @@ public class H {
       }
     };
 
-    static final Visitor<Keyword, H> reqKeyword = new VisitorReqBase<Keyword>("Keyword") {
+    static final Visitor<Keyword, H> reqKeyword = new VisitorReqBase<Keyword>(Keyword.class) {
       @Override
       public Keyword keyword(Keyword t, H arg) {
         return t;
@@ -778,7 +803,7 @@ public class H {
       }
     };
 
-    static final Visitor<Vec, H> reqVec = new VisitorReqBase<Vec>("Vec") {
+    static final Visitor<Vec, H> reqVec = new VisitorReqBase<Vec>(Vec.class) {
       @Override
       public Vec vec(Vec t, H arg) {
         return t;
@@ -791,7 +816,7 @@ public class H {
       }
     };
 
-    static final Visitor<Num, H> reqNum = new VisitorReqBase<Num>("Num") {
+    static final Visitor<Num, H> reqNum = new VisitorReqBase<Num>(Num.class) {
       @Override
       public Num num(Num t, H arg) {
         return t;
@@ -804,7 +829,7 @@ public class H {
       }
     };
 
-    static final Visitor<Collection, H> reqColl = new VisitorReqBase<Collection>("Collection") {
+    static final Visitor<Collection, H> reqColl = new VisitorReqBase<Collection>(Collection.class) {
       @Override
       public Collection coll(Collection t, H arg) {
         return t;
@@ -817,7 +842,7 @@ public class H {
       }
     };
 
-    static final Visitor<Int, H> reqInt = new VisitorReqBase<Int>("Int") {
+    static final Visitor<Int, H> reqInt = new VisitorReqBase<Int>(Int.class) {
       @Override
       public Int integer(Int t, H arg) {
         return t;
@@ -830,7 +855,7 @@ public class H {
       }
     };
 
-    static final Visitor<Char, H> reqChar = new VisitorReqBase<Char>("Char") {
+    static final Visitor<Char, H> reqChar = new VisitorReqBase<Char>(Char.class) {
       @Override
       public Char character(Char t, H arg) {
         return t;
@@ -843,7 +868,7 @@ public class H {
       }
     };
 
-    static final Visitor<Invocable, H> reqInvocable = new VisitorReqBase<Invocable>("Invocable") {
+    static final Visitor<Invocable, H> reqInvocable = new VisitorReqBase<Invocable>(Invocable.class) {
       @Override
       public Invocable invocable(Invocable t, H arg) {
         return t;
@@ -858,15 +883,18 @@ public class H {
 
     private static class VisitorReqBase<T> implements VisitorDfltHierarchy<T, H> {
 
-      private final String reqClassName;
+      private final Class<T> reqClass;
 
-      public VisitorReqBase(String reqClassName) {
-        this.reqClassName = reqClassName;
+      public VisitorReqBase(Class<T> reqClass) {
+        this.reqClass = reqClass;
       }
 
       @Override
+      @SuppressWarnings("unchecked")
       public T dflt(Term t, H arg) {
-        throw new IllegalArgumentException("Requires " + reqClassName + ", got: " + t.getClass().getName());
+        if (reqClass.isAssignableFrom(t.getType()))
+          return (T) t.getContent();
+        throw illegalRequire(reqClass, t);
       }
     }
 

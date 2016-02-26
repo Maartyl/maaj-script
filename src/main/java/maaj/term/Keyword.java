@@ -7,18 +7,23 @@ package maaj.term;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
+import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
 import maaj.term.visitor.Visitor;
+import maaj.util.H;
+import maaj.util.SeqH;
 
 /**
  * Special symbols that evaluate to themselves and are mainly used as markers or as keys in maps.
  * <p>
  * @author maartyl
  */
-public class Keyword extends Symbol implements Ground {
+public class Keyword implements Symbolic<Keyword>, Ground {
+  protected final String name;
 
   protected Keyword(String name) {
-    super(name);
+    this.name = name;
   }
 
   @Override
@@ -32,7 +37,7 @@ public class Keyword extends Symbol implements Ground {
   }
 
   @Override
-  public Symbol prependNamespace(String ns) {
+  public Keyword prependNamespace(String ns) {
     return qualified(ns, name);
   }
 
@@ -66,14 +71,52 @@ public class Keyword extends Symbol implements Ground {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
+    if (getClass() != obj.getClass()) return false;
+    final Keyword other = (Keyword) obj;
+    if (!Objects.equals(this.name, other.name)) return false;
+    return true;
+  }
+
+  @Override
   public String toString() {
     return composeShow();
+  }
+
+  @Override
+  public String getNm() {
+    return name;
+  }
+
+  @Override
+  public Keyword withNamespace(String ns) {
+    return qualified(ns, name);
+  }
+
+  @Override
+  public Term apply(Context cxt, Seq args) {
+    //this is not function application: it only uses eval() and then calls apply on that fn.
+    args = SeqH.mapEval(args, cxt);
+    if (args.first().getContent() instanceof Symbolic) {
+      //infinite recursion
+      throw new InvalidOperationException("applying keyword to a symbolic");
+    }
+    return args.first().apply(cxt, H.cons(this, args.rest()));
+  }
+
+  @Override
+  public Monad unquoteTraverse(Context c) {
+    return H.tuple(this);
   }
 
   //-- STATIC
   public static Keyword of(String str) {
     if (str.charAt(0) == ':') str = str.substring(1);
-    int slash = findNsEnd(str);
+    int slash = Symbolic.findNsEnd(str);
     if (slash < 0) return simple(str);
     return qualifiedNonNull(str.substring(0, slash), str.substring(slash + 1));
   }

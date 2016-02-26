@@ -21,34 +21,24 @@ import maaj.util.Sym;
  * <p>
  * @author maartyl
  */
-public class Symbol implements Term {
+public class Symbol implements Symbolic<Symbol> {
   protected final String name;
 
   protected Symbol(String name) {
     this.name = name;
   }
 
-  public Str getName() {
-    return Str.of(name);
-  }
-
-  public Str getNamespace() {
-    return Str.EMPTY;
-  }
-
-  public String getNs() {
-    return null;
-  }
-
+  @Override
   public String getNm() {
     return name;
   }
 
-
+  @Override
   public boolean isQualified() {
     return false;
   }
 
+  @Override
   public boolean isKeyword() {
     return false;
   }
@@ -57,10 +47,12 @@ public class Symbol implements Term {
    * not a keyword or qualified
    * @return
    */
+  @Override
   public boolean isSimple() {
     return true;
   }
 
+  @Override
   public Symbol prependNamespace(String ns) {
     return qualified(ns, name);
   }
@@ -71,37 +63,13 @@ public class Symbol implements Term {
    * @param ns
    * @return
    */
+  @Override
   public Symbol withNamespace(String ns) {
     return qualified(ns, name);
   }
 
-  /**
-   * Uses ns.name for new namespace name
-   * @param ns
-   * @return
-   */
-  public Symbol withNamespace(Symbol ns) {
-    return qualified(ns.getNm(), name);
-  }
-  /**
-   * copies namespace from arg.
-   * @param ns
-   * @return
-   */
-  public Symbol withSameNamespace(Symbol ns) {
-    return qualified(ns.getNs(), name);
-  }
-
   public Symbol asSimple() {
     return this;
-  }
-
-  public boolean hasSameNs(Symbol other) {
-    return !(isQualified() || other.isQualified()) || Objects.equals(getNs(), other.getNs());
-  }
-
-  public boolean hasSameName(Symbol other) {
-    return Objects.equals(getNm(), other.getNm());
   }
 
   @Override
@@ -136,9 +104,9 @@ public class Symbol implements Term {
   public Term apply(Context cxt, Seq args) {
     //this is not function application: it only uses eval() and then calls apply on that fn.
     args = SeqH.mapEval(args, cxt);
-    if (args.first().getContent() instanceof Symbol) {
+    if (args.first().getContent() instanceof Symbolic) {
       //infinite recursion
-      throw new InvalidOperationException("applying symbol to a symbol");
+      throw new InvalidOperationException("applying symbol to a symbolic");
     }
     return args.first().apply(cxt, H.cons(this, args.rest()));
   }
@@ -150,12 +118,8 @@ public class Symbol implements Term {
     Var v = cxt.getVar(this);
     if (v != null && MapH.hasTag(v.getMeta(), Sym.macroSymK))
       return v.applyMacro(cxt, args);
-    return Term.super.applyMacro(cxt, args);
-  }
-
-  @Override
-  public void serialize(java.io.Writer w) throws IOException {
-    w.append(toString());
+    //return Symbolic.super.applyMacro(cxt, args);
+    return SeqH.cons(this, args.fmap((Invocable1) x -> x.evalMacros(cxt)));
   }
 
   @Override
@@ -193,8 +157,8 @@ public class Symbol implements Term {
 
   //-- STATIC
   public static Symbol of(String str) {
-    if ( str.charAt(0) == ':') return Keyword.of(str);
-    int slash = findNsEnd(str);
+    assert str.charAt(0) != ':' : "Symbol.of used for reading keyword: " + str;
+    int slash = Symbolic.findNsEnd(str);
     if (slash < 0) return simple(str);
     return qualified(str.substring(0, slash), str.substring(slash + 1));
   }
@@ -205,17 +169,5 @@ public class Symbol implements Term {
 
   public static Symbol qualified(String ns, String name) {
     return new SymbolNs(ns, name);
-  }
-
-  protected static int findNsEnd(String str) {
-    if ("/".equals(str)) return -1; //special case
-    int slash = str.lastIndexOf('/');
-    if (slash == -1) return -1;
-    if (slash == str.length() - 1) {
-      if (str.charAt(slash - 1) != '/')
-        throw new IllegalArgumentException("Symbol that contains only namespace.");
-      else return slash - 1;
-    }
-    return slash;
   }
 }

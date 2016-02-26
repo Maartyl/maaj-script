@@ -116,6 +116,11 @@ public interface VisitorDefault<TR, TA> extends Visitor<TR, TA> {
   }
 
   @Override
+  public default TR symbolic(Symbolic t, TA arg) {
+    return dflt();
+  }
+
+  @Override
   public default TR symbol(Symbol t, TA arg) {
     return dflt();
   }

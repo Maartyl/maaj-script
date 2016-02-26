@@ -19,6 +19,7 @@ import maaj.term.Num;
 import maaj.term.Seq;
 import maaj.term.Str;
 import maaj.term.Symbol;
+import maaj.term.Symbolic;
 import maaj.term.Term;
 import maaj.term.Unquote;
 import maaj.term.Vec;
@@ -166,7 +167,7 @@ public class MaajReader {
    * most of these variants are not decided on meaning yet
    * if symbol is qualified, prepends '#' to namespace of it and returns
    */
-  private Term readHashSymbol(Symbol s) {
+  private Term readHashSymbol(Symbolic s) {
     if (s.isQualified()) {
       //core functions with namespaces
       return H.symbol('#' + s.getNs(), s.getNm());
@@ -342,7 +343,7 @@ public class MaajReader {
     return fail("unrecognized escape sequence: \\" + (char) cur());
   }
   /**
-   * read 4 characters (0-f) and return them read into integer using radix 16
+   * read n characters (0-f) and return them read into integer using radix 16
    */
   private int readNNum16Int(int nChars) {
     StringBuilder sb = new StringBuilder(nChars);
@@ -369,13 +370,13 @@ public class MaajReader {
       return Int.of(Long.parseLong(sb.toString()));
   }
 
-  private Symbol readSymbol() {
+  private Symbolic readSymbol() {
     //precodition: isSymbolicStart(cur())
     StringBuilder sb = new StringBuilder();
     do sb.append((char) cur());
     while (isSymbolic(next()));
     unread(); //last read char is not part of symbol
-    return qualifyKeywordIfShould(H.symbol(sb.toString()));
+    return qualifyKeywordIfShould(H.symbolic(sb.toString()));
   }
 
   private Term readSymbolWithPosition() {
@@ -384,7 +385,7 @@ public class MaajReader {
     return readSymbol().addMeta(m);
   }
 
-  private Symbol qualifyKeywordIfShould(Symbol s) {
+  private Symbolic qualifyKeywordIfShould(Symbolic s) {
     //is not qualified and is keyword
     if (s.getType() == Keyword.class && s.getNm().startsWith(":"))
       return Keyword.qualified(context.getCurrentNamespaceName(), s.getNm().substring(1));

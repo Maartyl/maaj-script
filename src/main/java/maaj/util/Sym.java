@@ -7,6 +7,7 @@ package maaj.util;
 
 import maaj.term.Map;
 import maaj.term.Symbol;
+import maaj.term.Symbolic;
 import maaj.term.Term;
 
 /**
@@ -25,27 +26,31 @@ public class Sym {
    SymCCore: #core/...#
    aaaAaa : aaa-aaa
    */
+  
+  public static final Symbolic tagSymK = H.symbolic(":tag");
+  public static final Symbolic infoSymK = H.symbolic(":info");
+  public static final Symbolic numSymK = H.symbolic(":num");
+  public static final Symbolic elseSymK = H.symbolic(":else");
+  public static final Symbolic maxSymK = H.symbolic(":max");
+  public static final Symbolic srcSymK = H.symbolic(":src");
+  public static final Symbolic asSymK = H.symbolic(":as");
+  public static final Symbolic asteriskSymK = H.symbolic(":*");
+  public static final Symbolic fileRowSymK = H.symbolic(":file-row");
+  public static final Symbolic fileColSymK = H.symbolic(":file-col");
+  public static final Symbolic fileNameSymK = H.symbolic(":file-name");
+  public static final Symbolic typeSymK = H.symbolic(":type");
+  public static final Symbolic variadicSymK = H.symbolic(":variadic");
+  public static final Symbolic qnameSymK = H.symbolic(":qname");
+  public static final Symbolic aritySymK = H.symbolic(":arity");
+  public static final Symbolic bodySymK = H.symbolic(":body");
+  public static final Symbolic macroSymK = H.symbolic(":macro");
+  public static final Symbolic docSymK = H.symbolic(":doc");
+
   public static final Symbol derefSymCore = H.symbol("#core", "deref");
-  public static final Symbol tagSymK = H.symbol(":tag");
-  public static final Symbol infoSymK = H.symbol(":info");
-  public static final Symbol numSymK = H.symbol(":num");
-  public static final Symbol elseSymK = H.symbol(":else");
-  public static final Symbol maxSymK = H.symbol(":max");
-  public static final Symbol srcSymK = H.symbol(":src");
-  public static final Symbol asSymK = H.symbol(":as");
-  public static final Symbol asteriskSymK = H.symbol(":*");
-  public static final Symbol fileRowSymK = H.symbol(":file-row");
-  public static final Symbol fileColSymK = H.symbol(":file-col");
-  public static final Symbol fileNameSymK = H.symbol(":file-name");
-  public static final Symbol typeSymK = H.symbol(":type");
-  public static final Symbol variadicSymK = H.symbol(":variadic");
   public static final Symbol throwAritySymCore = H.symbol("#core", "throw-arity");
   public static final Symbol nameSym = H.symbol("name");
   public static final Symbol namespaceSym = H.symbol("namespace");
   public static final Symbol patternSym = H.symbol("pattern");
-  public static final Symbol qnameSymK = H.symbol(":qname");
-  public static final Symbol aritySymK = H.symbol(":arity");
-  public static final Symbol bodySymK = H.symbol(":body");
   public static final Symbol doSymC = H.symbol("#", "do");
   public static final Symbol ifSymC = H.symbol("#", "if");
   public static final Symbol varSymC = H.symbol("#", "var");
@@ -57,8 +62,6 @@ public class Sym {
   public static final Symbol listSymCore = H.symbol("#core", "list");
   public static final Symbol letSymC = H.symbol("#", "let");
   public static final Symbol defSymC = H.symbol("#", "def");
-  public static final Symbol docSymK = H.symbol(":doc");
-  public static final Symbol macroSymK = H.symbol(":macro");
   public static final Symbol ignoreSym = H.symbol("_");
   public static final Symbol ampSym = H.symbol("&");
   public static final Symbol dotSym = H.symbol(".");

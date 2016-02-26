@@ -58,6 +58,9 @@ public class KeywordNs extends Keyword {
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if (getClass() != obj.getClass()) return false;
     final KeywordNs other = (KeywordNs) obj;
     if (!Objects.equals(this.ns, other.ns)) return false;

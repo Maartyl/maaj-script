@@ -52,7 +52,7 @@ public class SymbolNs extends Symbol {
   }
   @Override
   public void show(Writer w) throws IOException {
-    w.append(ns + '/' + name);
+    w.append(ns).append('/').append(name);
   }
 
   @Override
@@ -71,6 +71,9 @@ public class SymbolNs extends Symbol {
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
+    if (obj instanceof Term)
+      obj = ((Term) obj).unwrap();
+    else return false;
     if (getClass() != obj.getClass()) return false;
     final SymbolNs other = (SymbolNs) obj;
     if (!Objects.equals(this.ns, other.ns)) return false;

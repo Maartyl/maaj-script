@@ -69,6 +69,8 @@ public interface Visitor<TR, TA> {
   TR sf(Sf t, TA arg);
 
   //---
+  TR symbolic(Symbolic t, TA arg);
+
   TR symbol(Symbol t, TA arg);
 
   TR symbolSimple(Symbol t, TA arg);
