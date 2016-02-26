@@ -36,6 +36,8 @@ import maaj.lang.Context;
 import maaj.reader.MaajReader;
 import maaj.reader.ReaderContext;
 import maaj.term.*;
+import maaj.term.visitor.Visitor;
+import maaj.term.visitor.VisitorDfltHierarchy;
 
 /**
  * General helpers
@@ -148,6 +150,9 @@ public class H {
     return t.getContent();
   }
 
+  public static boolean bool(Term t) {
+    return !t.isNil();
+  }
 
   public static Seq read(Reader r) {
     return read(r, staticReaderContext);
@@ -386,23 +391,98 @@ public class H {
   //--requires:
 
   public static Int requireInt(Term tt) {
-    //TODO: change all requires to default methods on Term
-    // - actually: another interfece extended by Term
-    Term t = tt.unwrap();
-    if (t instanceof Int)
-      return (Int) t;
-
-    throw new IllegalArgumentException("Requires Int, got: " + t.getClass().getName());
+    return TypeVisitors.reqInt.run(tt);
   }
   public static Char requireChar(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof Char)
-      return (Char) t;
-
-    throw new IllegalArgumentException("Requires Char, got: " + t.getClass().getName());
+    return TypeVisitors.reqChar.run(tt);
   }
 
+  public static Seq requireSeq(Term tt) {
+    return TypeVisitors.reqSeq.run(tt);
+  }
+
+  public static Num requireNum(Term tt) {
+    return TypeVisitors.reqNum.run(tt);
+  }
+
+  public static Symbol requireSymbol(Term tt) {
+    return TypeVisitors.reqSymbol.run(tt);
+  }
+
+  public static Keyword requireKeyword(Term tt) {
+    return TypeVisitors.reqKeyword.run(tt);
+  }
+
+  public static Monad requireMonad(Term tt) {
+    return TypeVisitors.reqMonad.run(tt);
+  }
+
+  public static IO requireIO(Term tt) {
+    return TypeVisitors.reqIO.run(tt);
+  }
+
+  public static Collection requireCollection(Term tt) {
+    return TypeVisitors.reqColl.run(tt);
+  }
+
+  public static Vec requireVec(Term tt) {
+    return TypeVisitors.reqVec.run(tt);
+  }
+
+  public static Invocable requireInvocable(Term tt) {
+    return TypeVisitors.reqInvocable.run(tt);
+  }
+
+  //tests
+  public static Term isInt(Term tt) {
+    return TypeVisitors.isInt.run(tt);
+  }
+
+  public static Term isChar(Term tt) {
+    return TypeVisitors.isChar.run(tt);
+  }
+
+  public static Term isSeq(Term tt) {
+    return TypeVisitors.isSeq.run(tt);
+  }
+
+  public static Term isNum(Term tt) {
+    return TypeVisitors.isNum.run(tt);
+  }
+
+  public static Term isSymbol(Term tt) {
+    return TypeVisitors.isSymbol.run(tt);
+  }
+
+  public static Term isKeyword(Term tt) {
+    return TypeVisitors.isKeyword.run(tt);
+  }
+
+  public static Term isMonad(Term tt) {
+    return TypeVisitors.isMonad.run(tt);
+  }
+
+  public static Term isIO(Term tt) {
+    return TypeVisitors.isIO.run(tt);
+  }
+
+  public static Term isCollection(Term tt) {
+    return TypeVisitors.isColl.run(tt);
+  }
+
+  public static Term isVec(Term tt) {
+    return TypeVisitors.isVec.run(tt);
+  }
+
+  public static Term isInvocable(Term tt) {
+    return TypeVisitors.isInvocable.run(tt);
+  }
+
+  //- non Term-implementing Interfaces
+
+
   public static Deref requireDeref(Term tt) {
+    //change to default methods on something extended by Term
     Term t = tt.unwrap();
     if (t instanceof Deref)
       return (Deref) t;
@@ -410,14 +490,6 @@ public class H {
     throw new IllegalArgumentException("Requires Deref, got: " + t.getClass().getName());
   }
 
-
-  public static Seq requireSeq(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof Seq)
-      return (Seq) t;
-
-    throw new IllegalArgumentException("Requires Seq, got: " + t.getClass().getName());
-  }
 
   public static Seqable requireSeqable(Term tt) {
     Term t = tt.unwrap();
@@ -490,31 +562,6 @@ public class H {
     throw new IllegalArgumentException("Requires Peekable, got: " + t.getClass().getName());
   }
 
-  public static Invocable requireInvocable(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof Invocable)
-      return (Invocable) t;
-
-    throw new IllegalArgumentException("Requires Invocable, got: " + t.getClass().getName());
-  }
-
-  public static Num requireNum(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof Num)
-      return (Num) t;
-
-    throw new IllegalArgumentException("Requires Num, got: " + t.getClass().getName());
-  }
-
-  public static Symbol requireSymbol(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof Symbol)
-      return (Symbol) t;
-
-    throw new IllegalArgumentException("Requires Symbol, got: " + t.getClass().getName());
-  }
-
-
   public static Numerable requireNumerable(Term tt) {
     Term t = tt.unwrap();
     if (t instanceof Numerable)
@@ -522,23 +569,6 @@ public class H {
 
     throw new IllegalArgumentException("Requires Numerable, got: " + t.getClass().getName());
   }
-
-  public static Collection requireCollection(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof Collection)
-      return (Collection) t;
-
-    throw new IllegalArgumentException("Requires Collection, got: " + t.getClass().getName());
-  }
-
-  public static Monad requireMonad(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof Monad)
-      return (Monad) t;
-
-    throw new IllegalArgumentException("Requires Monad, got: " + t.getClass().getName());
-  }
-
 
   public static Reducible requireReducible(Term tt) {
     Term t = tt.unwrap();
@@ -556,14 +586,6 @@ public class H {
       return (TraPer) t;
 
     throw new IllegalArgumentException("Requires TraPer, got: " + t.getClass().getName());
-  }
-
-  public static IO requireIO(Term tt) {
-    Term t = tt.unwrap();
-    if (t instanceof IO)
-      return (IO) t;
-
-    throw new IllegalArgumentException("Requires IO, got: " + t.getClass().getName());
   }
 
   public static int inc(int i) {
@@ -672,6 +694,176 @@ public class H {
 
     public int next() {
       return cur.getAndIncrement();
+    }
+  }
+
+  private static class TypeVisitors {
+
+    private TypeVisitors() {
+    }
+
+    static final Visitor<IO, H> reqIO = new VisitorReqBase<IO>("IO") {
+      @Override
+      public IO io(IO t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isIO = new VisitorIsBase() {
+      @Override
+      public Term io(IO t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Monad, H> reqMonad = new VisitorReqBase<Monad>("Monad") {
+      @Override
+      public Monad monad(Monad t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isMonad = new VisitorIsBase() {
+      @Override
+      public Term monad(Monad t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Seq, H> reqSeq = new VisitorReqBase<Seq>("Seq") {
+      @Override
+      public Seq seq(Seq t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isSeq = new VisitorIsBase() {
+      @Override
+      public Term seq(Seq t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Symbol, H> reqSymbol = new VisitorReqBase<Symbol>("Symbol") {
+      @Override
+      public Symbol symbol(Symbol t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isSymbol = new VisitorIsBase() {
+      @Override
+      public Term symbol(Symbol t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Keyword, H> reqKeyword = new VisitorReqBase<Keyword>("Keyword") {
+      @Override
+      public Keyword keyword(Keyword t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isKeyword = new VisitorIsBase() {
+      @Override
+      public Term keyword(Keyword t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Vec, H> reqVec = new VisitorReqBase<Vec>("Vec") {
+      @Override
+      public Vec vec(Vec t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isVec = new VisitorIsBase() {
+      @Override
+      public Term vec(Vec t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Num, H> reqNum = new VisitorReqBase<Num>("Num") {
+      @Override
+      public Num num(Num t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isNum = new VisitorIsBase() {
+      @Override
+      public Term num(Num t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Collection, H> reqColl = new VisitorReqBase<Collection>("Collection") {
+      @Override
+      public Collection coll(Collection t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isColl = new VisitorIsBase() {
+      @Override
+      public Term coll(Collection t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Int, H> reqInt = new VisitorReqBase<Int>("Int") {
+      @Override
+      public Int integer(Int t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isInt = new VisitorIsBase() {
+      @Override
+      public Term integer(Int t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Char, H> reqChar = new VisitorReqBase<Char>("Char") {
+      @Override
+      public Char character(Char t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isChar = new VisitorIsBase() {
+      @Override
+      public Term character(Char t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Invocable, H> reqInvocable = new VisitorReqBase<Invocable>("Invocable") {
+      @Override
+      public Invocable invocable(Invocable t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isInvocable = new VisitorIsBase() {
+      @Override
+      public Term invocable(Invocable t, H arg) {
+        return t;
+      }
+    };
+
+    private static class VisitorReqBase<T> implements VisitorDfltHierarchy<T, H> {
+
+      private final String reqClassName;
+
+      public VisitorReqBase(String reqClassName) {
+        this.reqClassName = reqClassName;
+      }
+
+      @Override
+      public T dflt(Term t, H arg) {
+        throw new IllegalArgumentException("Requires " + reqClassName + ", got: " + t.getClass().getName());
+      }
+    }
+
+    private static class VisitorIsBase implements VisitorDfltHierarchy<Term, H> {
+      @Override
+      public Term dflt(Term t, H arg) {
+        return H.NIL;
+      }
     }
   }
 
