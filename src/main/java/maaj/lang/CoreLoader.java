@@ -550,16 +550,14 @@ public class CoreLoader extends NamespaceNormal.Loader {
                               + "(count' 5 (100)) -> Int.MaxValue; "
                               + "(count' 200 (100)) -> 100; "
                               + "(count' 2 [7 8 9 7]) -> 4",
-              H::requireNum, FnH::id, (max, tcoll) -> {
-      Term coll = tcoll.unwrap();
+              H::requireNum, Term::unwrap, (max, coll) -> {
       if (coll instanceof Counted)
         return ((Counted) coll).getCount();
       return H.wrap(H.seqFrom(coll).boundLength(max.asInteger()));
             });
 
     defnArity(core, ">>=", "monadic bind: (>>= m #(... % ...))", H::requireMonad, H::requireInvocable, Monad::bindM);
-    defnArity(core, "retM", "monadic return (first arg is monad of desired type): (retM m a)", H::requireMonad, FnH::id,
-              Monad::retM);
+    defnArity(core, "retM", "monadic return (first arg is monad of desired type): (retM m a)", H::requireMonad, FnH::id, Monad::retM);
     defnArity(core, "retIO", "retM of type IO: (retIO a)", FnH::id, IO::retM1);
 
     defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
