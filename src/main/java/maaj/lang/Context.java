@@ -9,6 +9,7 @@ import maaj.coll.traits.Lookup;
 import maaj.exceptions.InvalidOperationException;
 import maaj.interop.Interop;
 import maaj.term.Map;
+import maaj.term.Seq;
 import maaj.term.Symbol;
 import maaj.term.Term;
 import maaj.term.Var;
@@ -137,6 +138,10 @@ public class Context implements Lookup {
 
   public Context addToScope(Term key, Term val) {
     return new Context(this, scope.assoc(key, val));
+  }
+
+  public Context scopeKeepOnly(Seq keys) {
+    return new Context(this, MapH.keepOnly(scope, keys));
   }
 
   public static Context buildStubWithoutNamespace(Glob g) {

@@ -8,6 +8,7 @@ package maaj.term;
 import java.io.IOException;
 import java.io.Writer;
 import maaj.lang.Context;
+import maaj.term.visitor.SimpleSymbolSeq;
 import maaj.util.H;
 import maaj.util.Sym;
 
@@ -37,7 +38,7 @@ public abstract class InvSeq implements InvocableSeq {
     if (!selfName.isNil())
       closure = closure.addToScope(selfName, this);
     //System.err.println(fn.firstOrNil().getMeta());
-    this.closure = closure;
+    this.closure = closure.scopeKeepOnly(SimpleSymbolSeq.singleton().run(fn)); //crude way to remove all that couldn't be referenced
   }
 
   @Override

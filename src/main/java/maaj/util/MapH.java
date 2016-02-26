@@ -75,6 +75,17 @@ public class MapH {
     }
   }
 
+  public static Map keepOnly(Map m, Seq keys) {
+    //TODO: faster algorith if large m and few removals
+    MapT mt = emptyTransient();
+    for (Term key : H.ret1(keys, keys = null)) {
+      Term v = m.valAt(key, H.notFoundNil);
+      if (v != H.notFoundNil)
+        mt = mt.doAssoc(key, v);
+    }
+    return mt.asPersistent();
+  }
+
   public static boolean hasTag(Map m, Term tag) {
     return !m.valAt(tag).isNil();
   }
