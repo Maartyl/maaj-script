@@ -175,7 +175,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
       throw new IllegalArgumentException("Cannot bind args withut binding form");
     if (!(a.first().unwrap() instanceof Seq)) //if simple body without overloads: make it 1 overload
       return argsBindMacro(H.list(a.addMeta(a.first().getMeta())), fnType);
-    Map fnMeta = a.first().getMeta();
+    Map fnMeta = a.first().getMeta().assoc(Sym.formSymSpecial, a);
     //passes meta to fnseq / metaseq (InvSeq)
     return H.list(fnType, argsBindMacroDispatch(a).addMeta(fnMeta));
   }
@@ -220,14 +220,14 @@ public class CoreLoader extends NamespaceNormal.Loader {
       //this means : simple function with 1 variadic overload
       assert aritys.containsKey(Sym.variadicSymK) : "expected 1 variadic overload but not present: " + a + ", " + aritys;
       Term body = aritys.valAt(Sym.variadicSymK);
-      return  argsBindArityDispatchVariadic(body, a);
+      return  argsBindArityDispatchVariadic(body);
     }
     //get only non-variadic overloads, in the order of declarations
     Seq posData = SeqH.filter(data, x -> H.wrap(((Num) ((SeqLike) x).first().unwrap()).asInteger() >= 0));
     //what to do if no overload matched actuall arity
     Seq notMatched = aritys.containsKey(Sym.variadicSymK) ? //try using variadic, or just throw
-             argsBindArityDispatchVariadic(aritys.valAt(Sym.variadicSymK), a) :
-                     H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, H.list(Sym.quoteSymC, a));
+             argsBindArityDispatchVariadic(aritys.valAt(Sym.variadicSymK)) :
+            H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, Sym.formSymSpecial);
     Seq els = H.list(Sym.ignoreSym, notMatched); //the pair : (_ (notMatched...))
     //each overload is list: (arity body) : almost what I want : just concat and add the else cause
     Seq allCases = SeqH.concatLazy(H.list(SeqH.concatLazy(posData), els));
@@ -249,7 +249,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
             + " and " + m.valAt(arity).getMeta(Sym.patternSym) + m.valAt(arity));
   }
 
-  private Seq argsBindArityDispatchVariadic(Term body, Term artiyErrMsg) {
+  private Seq argsBindArityDispatchVariadic(Term body) {
     //body is already expanded into let : doing it again only "deletes" it
     /*argsBindMacroLet : already done when computing meta*/
     Num minArity = (Num) body.getMeta().valAt(Sym.aritySymK);
@@ -259,7 +259,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
     return (SeqH.extend(H.list(Sym.ifSymC,
                                      H.list(Sym.LTSymCore,
                                       H.list(Sym.countPrimeSymCore, minArity, Sym.argsSymSpecial),                                            minArity),
-                               H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, H.list(Sym.quoteSymC, artiyErrMsg)),
+                               H.list(Sym.throwAritySymCore, Sym.argsSymSpecial, Sym.formSymSpecial),
                                H.seqFrom(body))));
   }
 
@@ -716,24 +716,24 @@ public class CoreLoader extends NamespaceNormal.Loader {
            + "))", cxt, rcxt);
 
     H.eval("(defmacro for  ^\"monadic composition block\"\n"
-            + "  ([binds body]\n"
-            + "   (unless (vec? binds)        (throw-arg \"for: binds has to be a vector\"))\n"
-            + "   (unless (< 2 (count binds)) (throw-arg \"for: too few binds: \" binds))\n"
-            + "   (let [[b m & br] binds]\n"
-            + "     (case b\n"
-            + "       :let `(let ~m (for ~br ~body)) ; in case it starts with let\n"
-            + "       _ (let [arg (gensym 'arg)] \n"
-            + "           `(for (macro [~arg] (retM ~m ~arg)) ~binds ~body))))) \n"
-            + "  ([ret binds body]\n"
-            + "    (case (count' 0 binds)\n"
-            + "      0 (list ret body)\n"
-            + "      1 (throw-arg \"odd binds: \" binds)\n"
-            + "      _ (let [[b m & rs] binds]\n"
-            + "          (case b\n"
-            + "            :let `(let ~m (for ~ret ~rs ~body))\n"
-            + "            _ (if (and (= 2 (count' 2 binds)) (= b body) (sym? b))\n"
-            + "                m\n"
-            + "                `(>>= ~m (fn [~b] (for ~ret ~rs ~body)))))))))\n", cxt, rcxt);
+           + "  ([binds body]\n"
+           + "   (unless (vec? binds)        (throw-arg \"for: binds has to be a vector\"))\n"
+           + "   (unless (< 2 (count binds)) (throw-arg \"for: too few binds: \" binds))\n"
+           + "   (let [[b m & br] binds]\n"
+           + "     (case b\n"
+           + "       :let `(let ~m (for ~br ~body)) ; in case it starts with let\n"
+           + "       _ (let [arg (gensym 'arg)] \n"
+           + "           `(for (macro [~arg] (retM ~m ~arg)) ~binds ~body))))) \n"
+           + "  ([ret binds body]\n"
+           + "    (case (count' 0 binds)\n"
+           + "      0 (list ret body)\n"
+           + "      1 (throw-arg \"odd binds: \" binds)\n"
+           + "      _ (let [[b m & rs] binds]\n"
+           + "          (case b\n"
+           + "            :let `(let ~m (for ~ret ~rs ~body))\n"
+           + "            _ (if (and (= 2 (count' 2 binds)) (= b body) (sym? b))\n"
+           + "                m\n"
+           + "                `(>>= ~m (fn [~b] (for ~ret ~rs ~body)))))))))\n", cxt, rcxt);
 
     defnArity(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                                    + "(throw-arity $args \"message\")", H::seqFrom, FnH::id, (args, msg) -> {

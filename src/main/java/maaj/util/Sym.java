@@ -71,15 +71,18 @@ public class Sym {
   public static final Symbol unquoteSymC = H.symbol("#macro", "unquote");
   public static final Symbol unquoteSplicingSymC = H.symbol("#macro", "unquote-splicing");
   public static final Symbol quoteQualifiedSymC = H.symbol("#macro", "quote-qualified");
-  public static final Symbol argsSymSpecial = H.symbol("$args");
   public static final Symbol macroseqSymC = H.symbol("#", "macroseq");
   public static final Symbol fnseqSymC = H.symbol("#", "fnseq");
   public static final Symbol requirePrimeSymC = H.symbol("#", "require'");
   public static final Symbol fnSymCore = H.symbol("#core", "fn");
   public static final Symbol macroSymCore = H.symbol("#core", "macro");
+
   public static final Symbol invokeStaticSymInterop = H.symbol("#jvm", "invoke-static");
   public static final Symbol invokeVirtualSymInterop = H.symbol("#jvm", "invoke-virtual");
   public static final Symbol ctorSymInterop = H.symbol("#jvm", "ctor");
+
+  public static final Symbol argsSymSpecial = H.symbol("&args");
+  public static final Symbol formSymSpecial = H.symbol("&form");
 
   public static final Map macroMapTag = H.map(macroSymK, macroSymK);
   public static final Term TRUE = H.symbol("t");

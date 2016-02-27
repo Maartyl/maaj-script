@@ -28,7 +28,7 @@ public abstract class InvSeq implements InvocableSeq {
     //.fmap((Invocable1) x -> x.evalMacros(closure)); //unnecessary
     if (fn.isNil()) {
       this.fn = H.list(Sym.doSymC);
-      this.closure = closure;
+      this.closure = closure.addToScope(Sym.formSymSpecial, fn); //always has to be something
       return;
     } 
     Term fst = fn.first();
@@ -37,6 +37,7 @@ public abstract class InvSeq implements InvocableSeq {
     Term selfName = meta.valAt(Sym.nameSym);
     if (!selfName.isNil())
       closure = closure.addToScope(selfName, this);
+    closure = closure.addToScope(Sym.formSymSpecial, meta.valAt(Sym.formSymSpecial, fn)); //add &form to scope
     //System.err.println(fn.firstOrNil().getMeta());
     this.closure = closure.scopeKeepOnly(SimpleSymbolSeq.singleton().run(fn)); //crude way to remove all that couldn't be referenced
   }
