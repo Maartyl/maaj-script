@@ -22,7 +22,7 @@ public interface Fn extends Invocable {
   public default Term apply(Context cxt, Seq args) {
     Term rslt = invokeSeq(SeqH.mapEval(H.ret1(args, args = null), cxt));
     while (rslt.isRecur())
-      rslt = invokeSeq(((Recur) rslt).getArgs());
+      rslt = invokeSeq(((Recur) H.ret1(rslt, rslt = null)).getArgs());
     return rslt;
   }
 
