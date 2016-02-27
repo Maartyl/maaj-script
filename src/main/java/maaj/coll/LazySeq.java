@@ -47,6 +47,16 @@ public final class LazySeq implements Seq {
   }
 
   @Override
+  public Term firstOrNil() {
+    return seq().firstOrNil();
+  }
+
+  @Override
+  public Seq restOrNil() {
+    return seq().restOrNil();
+  }
+
+  @Override
   public boolean isNil() {
     return seq().isNil();
   }

@@ -77,12 +77,14 @@ public interface SeqLike<S extends SeqLike<S>> extends Numerable, Seqable, Reduc
     }
   }
 
+  //Nil must override
   public default Term firstOrNil() {
-    return isNil() ? H.NIL : first();
+    return first();
   }
 
+  //Nil must override
   public default Seq restOrNil() {
-    return isNil() ? H.END : rest();
+    return rest();
   }
 
 }

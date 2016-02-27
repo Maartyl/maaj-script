@@ -52,6 +52,16 @@ public interface Nil extends Seq, Ground {
   }
 
   @Override
+  public default Term firstOrNil() {
+    return H.NIL;
+  }
+
+  @Override
+  public default Seq restOrNil() {
+    return H.END;
+  }
+
+  @Override
   public default Int count() {
     return Int.of(0);
   }

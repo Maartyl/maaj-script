@@ -69,10 +69,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
     def(core, "if", "evaluates first argument; if non-nil evaluates and returns second;"
                     + "if nil: if third argument is present: evaluates and returns it; otherwise nil", (c, a) -> {
       int len = a.boundLength(3);
-      if (len == 2)
-        return a.first().eval(c).isNil() ? H.NIL : a.rest().first().eval(c);
-      if (len == 3)
-        return !a.first().eval(c).isNil() ? a.rest().first().eval(c) : a.rest().rest().first().eval(c);
+      if (len == 2 || len == 3)
+        return (H.bool(a.first().eval(c)) ? a.rest() : a.rest().rest()).firstOrNil().eval(c);
       throw new InvalidOperationException("Wrong number of args passed to #/if: " + a.boundLength(30));
     });
     def(core, "def", "(def ^{meta here} name term); create global Var with name 'name and value 'term;"
