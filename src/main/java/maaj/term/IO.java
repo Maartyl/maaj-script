@@ -27,7 +27,7 @@ public interface IO extends Monad<IO>, Ground {
 
   @Override
   public default IO bindM(Invocable fn2Monad) {
-    return c -> H.requireIO(fn2Monad.invoke(run(c)));
+    return c -> H.requireIO(fn2Monad.invoke(run(c))).run(c);
   }
 
   @Override
