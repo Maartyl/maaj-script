@@ -487,6 +487,10 @@ public class H {
     return TypeVisitors.isInvocable.run(tt);
   }
 
+  public static Term isGround(Term tt) {
+    return wrap(tt.unwrap() instanceof Ground);
+  }
+
   //- non Term-implementing Interfaces
 
 

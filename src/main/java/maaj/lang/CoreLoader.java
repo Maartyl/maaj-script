@@ -161,6 +161,31 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     def(core, "io!", "runs given IO monad, returning it's final value",
         (c, a) -> arityRequire(a, "io!", arg -> H.requireIO(arg.eval(c)).run(c)));
+
+    //--- optimizers
+
+    core.get(Sym.ifSymC).addMeta(Sym.optimizerSymK, (InvocableSeq) s -> {
+      switch (s.boundLength(3)) {
+      case 2:
+      case 3:
+        Term test = s.first();
+        Term onTrue = s.rest().first();
+        Term onFalse = s.rest().rest().firstOrNil();
+        if (test.isNil()) //nil will surely evaluate to nil
+          return onFalse;
+        if (H.bool(H.isKeyword(test)))
+          return onTrue;
+        if (H.bool(H.isGround(test))) //ground will surely evaluate to itself
+          return onTrue;
+      }
+      return H.cons(Sym.ifSymC, s);
+    });
+
+    core.get(Sym.doSymC).addMeta(Sym.optimizerSymK, (InvocableSeq) s -> {
+      if (SeqH.isSingle(s))
+        return s.first();
+      return H.cons(Sym.doSymC, s);
+    });
   }
 
   /**
