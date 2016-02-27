@@ -49,7 +49,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
     switch (nsName.getNm()) {
     case "#": loadSf(ns);
       break;
-    case "#core": loadCore(c, ns, new ReaderContext(nsName, "<?>"));
+    case "#core": loadCore(c, ns, new ReaderContext(nsName, "<#core>"));
       break;
     case "#macro": loadMacro(ns);
       break;
