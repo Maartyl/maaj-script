@@ -119,6 +119,11 @@ public class Symbol implements Symbolic<Symbol> {
     if (v != null && MapH.hasTag(v.getMeta(), Sym.macroSymK))
       return v.applyMacro(cxt, args);
     //return Symbolic.super.applyMacro(cxt, args);
+
+    // !!!
+    //TODO: include optimizer: stored in meta of var; applied on macro expanded args
+    // - use instead of a macro application, if present (and isn't macro)
+    //essentially will replace this cons
     return SeqH.cons(this, args.fmap((Invocable1) x -> x.evalMacros(cxt)));
   }
 
