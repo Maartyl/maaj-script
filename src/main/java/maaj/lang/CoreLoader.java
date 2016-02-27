@@ -177,6 +177,15 @@ public class CoreLoader extends NamespaceNormal.Loader {
           return onTrue;
         if (H.bool(H.isGround(test))) //ground will surely evaluate to itself
           return onTrue;
+
+        //no branching (I don't want to test on full equality big subtrees, though)
+        //still, I have to evaluate test for sidefects anyway...
+        // - unless I change semantics, that: unnecessary stuff is not necessarily evaluated
+        if (onTrue.isNil() && onFalse.isNil()) {
+          if (H.bool(H.isSymbol(test))) //evaluating symbol does not have side-effects
+            return H.NIL;
+          return H.list(Sym.doSymC, test, H.NIL);
+        }
       }
       return H.cons(Sym.ifSymC, s);
     });
@@ -184,6 +193,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
     core.get(Sym.doSymC).addMeta(Sym.optimizerSymK, (InvocableSeq) s -> {
       if (SeqH.isSingle(s))
         return s.first();
+      if (s.isNil()) //empty 'do evaluates to ()
+        return H.NIL;
       return H.cons(Sym.doSymC, s);
     });
   }
