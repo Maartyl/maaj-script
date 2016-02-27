@@ -923,8 +923,12 @@ public class H {
       @Override
       @SuppressWarnings("unchecked")
       public T dflt(Term t, H arg) {
-        if (reqClass.isAssignableFrom(t.getType()))
-          return (T) t.getContent();
+        if (reqClass.isAssignableFrom(t.getType())) {
+          final Object content = t.getContent();
+          if (content == null)
+            return (T) H.NIL; // only Nil should return null
+          return (T) content;
+        }
         throw illegalRequire(reqClass, t);
       }
     }
