@@ -15,6 +15,7 @@ import maaj.util.SeqH;
  * <p>
  * @author maartyl
  */
+@FunctionalInterface
 public interface Fn extends Invocable {
 
   @Override

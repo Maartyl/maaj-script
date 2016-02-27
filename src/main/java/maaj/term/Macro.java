@@ -14,6 +14,7 @@ import maaj.term.visitor.Visitor;
  * <p>
  * @author maartyl
  */
+@FunctionalInterface
 public interface Macro extends Invocable {
 
   @Override

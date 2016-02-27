@@ -12,6 +12,7 @@ package maaj.term;
  * <p>
  * @author maartyl
  */
+@FunctionalInterface
 public interface Invocable5 extends Invocable {
 
   @Override

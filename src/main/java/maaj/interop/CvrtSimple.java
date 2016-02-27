@@ -10,6 +10,7 @@ package maaj.interop;
  * <p>
  * @author maartyl
  */
+@FunctionalInterface
 public interface CvrtSimple extends Conversion {
   @Override
   public default int cost() {

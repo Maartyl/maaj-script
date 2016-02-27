@@ -12,6 +12,7 @@ package maaj.interop;
  * <p>
  * @author maartyl
  */
+@FunctionalInterface
 public interface Converter {
 
   /**
