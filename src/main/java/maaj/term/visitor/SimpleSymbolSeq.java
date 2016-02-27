@@ -16,6 +16,8 @@ import maaj.term.Unquote;
 import maaj.util.H;
 
 /**
+ * seq of all simple symbols in given term
+ * [a 5 [b]] -> (a b)
  *
  * @author maartyl
  */
