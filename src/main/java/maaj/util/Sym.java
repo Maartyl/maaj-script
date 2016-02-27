@@ -45,6 +45,7 @@ public class Sym {
   public static final Symbolic bodySymK = H.symbolic(":body");
   public static final Symbolic macroSymK = H.symbolic(":macro");
   public static final Symbolic docSymK = H.symbolic(":doc");
+  public static final Symbolic optimizerSymK = H.symbolic(":optimizer");
 
   public static final Symbol derefSymCore = H.symbol("#core", "deref");
   public static final Symbol throwAritySymCore = H.symbol("#core", "throw-arity");

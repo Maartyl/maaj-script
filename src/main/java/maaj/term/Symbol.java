@@ -117,14 +117,20 @@ public class Symbol implements Symbolic<Symbol> {
     //I only want to get macros if in context of application of the macro
     Var v = cxt.getVar(this);
     if (v != null && MapH.hasTag(v.getMeta(), Sym.macroSymK))
-      return v.applyMacro(cxt, args);
-    //return Symbolic.super.applyMacro(cxt, args);
+      return v.applyMacro(cxt, H.ret1(args, args = null));
 
-    // !!!
-    //TODO: include optimizer: stored in meta of var; applied on macro expanded args
+    args = args.fmap((Invocable1) x -> x.evalMacros(cxt));
+
+    //include optimizer: stored in meta of var; applied on macro expanded args
     // - use instead of a macro application, if present (and isn't macro)
-    //essentially will replace this cons
-    return SeqH.cons(this, args.fmap((Invocable1) x -> x.evalMacros(cxt)));
+    //essentially will replaces cons
+    if (v != null) {
+      Term optimizer = v.getMeta().valAt(Sym.optimizerSymK);
+      if (H.bool(optimizer))
+        return H.requireInvocable(optimizer).invokeSeq(H.ret1(args, args = null));
+    }
+
+    return SeqH.cons(this, args);
   }
 
   @Override
