@@ -558,7 +558,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     defnArity(core, ">>=", "monadic bind: (>>= m #(... % ...))", H::requireMonad, H::requireInvocable, Monad::bindM);
     defnArity(core, "retM", "monadic return (first arg is monad of desired type): (retM m a)", H::requireMonad, FnH::id, Monad::retM);
-    defnArity(core, "retIO", "retM of type IO: (retIO a)", FnH::id, IO::retM1);
+    defnArity(core, "retIO", "retM of type IO: (retIO a)", IO::retM1);
 
     defnArity(core, "invocable?", "itself if invocable, nil otherwise", H::isInvocable);
     defnArity(core, "symbolic?", "itself if symbolic, nil otherwise", H::isSymbolic);
@@ -698,6 +698,22 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     H.eval("(defn dissoc! ^\"removes 1 or more kv by ^2 key from a ^1 transient map\""
            + "([coll x] (dissoc!# coll x)) ([coll & r] (reduce dissoc!# coll r)))", cxt, rcxt);
+
+    H.eval("(defmacro when ^\"if ^1, evaluates ^&2\""
+           + "[test & body] `(if ~test (do ~@body)) )", cxt, rcxt);
+
+    H.eval("(defmacro unless ^\"if not ^1, evaluates ^&2; when with negated test\""
+           + "[test & body] `(when (not ~test) ~@body) )", cxt, rcxt);
+
+    H.eval("(defmacro when-let ^\"like when, but binds resulting value if non-nil\""
+           + "[bind & body] "
+           + "(unless (vec? bind)         TODO:THROW)                  \n" //TODO: throw
+           + "(unless (== 2 (count bind)) TODO:THROW)                  \n"
+           + "(let [[b val] bind                                       \n"
+           + "      tmp (gensym 'test)]                                \n"
+           + "  `(let [~tmp ~val]                                      \n"
+           + "     (when ~tmp (let [~b ~tmp] ~@body)))                 \n"
+           + "))", cxt, rcxt);
 
     defnArity(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                                    + "(throw-arity $args \"message\")", H::seqFrom, FnH::id, (args, msg) -> {
