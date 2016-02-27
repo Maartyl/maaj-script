@@ -47,7 +47,7 @@ public interface VecBase<VB extends VecBase<VB>> extends CollectionBase<VB>, Vec
   @Override
   default public VB bindM(Invocable fn2Monad) {
     VecT v = VecH.emptyTransient();
-    foreach((Invocable1) x -> (Term) ((Functor<?>) x.transform(fn2Monad)).foreach((Invocable1) v::doConj));
+    foreach((Invocable1) x -> (Term) ((Functor<?>) x.transform(fn2Monad).unwrap()).foreach((Invocable1) v::doConj));
     return fromTransient(v);
   }
 

@@ -37,7 +37,7 @@ public interface Map extends Collection<Map>, MapBase<Map>, MapLike<Map, MapT> {
   public default Map bindM(Invocable fn2Monad) {
     MapT m = MapH.emptyTransient();
     for (KVPair p : this)
-      ((Functor<?>) p.transform(fn2Monad)).foreach((Invocable1) x -> m.doConj(x));
+      ((Functor<?>) p.transform(fn2Monad).unwrap()).foreach((Invocable1) x -> m.doConj(x));
     return m.asPersistent();
   }
 
