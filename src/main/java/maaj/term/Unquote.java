@@ -26,6 +26,10 @@ public abstract class Unquote implements Term {
     this.body = body;
   }
 
+  public Term getBody() {
+    return body;
+  }
+
   @Override
   public Term eval(Context c) {
     throw new InvalidOperationException("#macro/unquote outside quotation context");

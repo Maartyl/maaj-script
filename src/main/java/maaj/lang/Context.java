@@ -141,6 +141,8 @@ public class Context implements Lookup {
   }
 
   public Context scopeKeepOnly(Seq keys) {
+    System.out.println(keys);
+    System.out.println(MapH.keepOnly(scope, keys));
     return new Context(this, MapH.keepOnly(scope, keys));
   }
 

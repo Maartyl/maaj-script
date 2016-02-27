@@ -12,6 +12,7 @@ import maaj.term.Nil;
 import maaj.term.Seq;
 import maaj.term.Symbol;
 import maaj.term.Term;
+import maaj.term.Unquote;
 import maaj.util.H;
 
 /**
@@ -46,6 +47,11 @@ public class SimpleSymbolSeq implements VisitorRecursive<Seq, Nil> {
   @Override
   public Seq monad(Monad t, Nil arg) {
     return id(t, arg);
+  }
+
+  @Override
+  public Seq unquote(Unquote t, Nil arg) {
+    return t.getBody().unwrap().visit(this, arg);
   }
 
   private static final SimpleSymbolSeq SINGLETON = new SimpleSymbolSeq();
