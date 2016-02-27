@@ -381,6 +381,11 @@ public class H {
     return TypeVisitors.reqChar.run(tt);
   }
 
+  public static Dbl requireDbl(Term tt) {
+    return TypeVisitors.reqDbl.run(tt);
+  }
+
+
   public static Seq requireSeq(Term tt) {
     return TypeVisitors.reqSeq.run(tt);
   }
@@ -391,6 +396,10 @@ public class H {
 
   public static Symbol requireSymbol(Term tt) {
     return TypeVisitors.reqSymbol.run(tt);
+  }
+
+  public static Symbolic requireSymbolic(Term tt) {
+    return TypeVisitors.reqSymbolic.run(tt);
   }
 
   public static Keyword requireKeyword(Term tt) {
@@ -430,6 +439,10 @@ public class H {
     return TypeVisitors.isChar.run(tt);
   }
 
+  public static Term isDbl(Term tt) {
+    return TypeVisitors.isDbl.run(tt);
+  }
+
   public static Term isSeq(Term tt) {
     return TypeVisitors.isSeq.run(tt);
   }
@@ -440,6 +453,10 @@ public class H {
 
   public static Term isSymbol(Term tt) {
     return TypeVisitors.isSymbol.run(tt);
+  }
+
+  public static Term isSymbolic(Term tt) {
+    return TypeVisitors.isSymbolic.run(tt);
   }
 
   public static Term isKeyword(Term tt) {
@@ -852,6 +869,19 @@ public class H {
     static final Visitor<Term, H> isInt = new VisitorIsBase() {
       @Override
       public Term integer(Int t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Dbl, H> reqDbl = new VisitorReqBase<Dbl>(Dbl.class) {
+      @Override
+      public Dbl dbl(Dbl t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isDbl = new VisitorIsBase() {
+      @Override
+      public Term dbl(Dbl t, H arg) {
         return t;
       }
     };

@@ -560,6 +560,26 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defnArity(core, "retM", "monadic return (first arg is monad of desired type): (retM m a)", H::requireMonad, FnH::id, Monad::retM);
     defnArity(core, "retIO", "retM of type IO: (retIO a)", FnH::id, IO::retM1);
 
+    defnArity(core, "invocable?", "itself if invocable, nil otherwise", H::isInvocable);
+    defnArity(core, "symbolic?", "itself if symbolic, nil otherwise", H::isSymbolic);
+    defnArity(core, "keyword?", "itself if keyword, nil otherwise", H::isKeyword);
+    defnArity(core, "symbol?", "itself if symbol, nil otherwise", H::isSymbol);
+    defnArity(core, "sym?", "same as symbol?", H::isSymbol);
+    defnArity(core, "kw?", "same as keyword?", H::isKeyword);
+
+    defnArity(core, "num?", "itself if number, nil otherwise", H::isNum);
+    defnArity(core, "char?", "itself if char, nil otherwise", H::isChar);
+    defnArity(core, "int?", "itself if int, nil otherwise", H::isInt);
+    defnArity(core, "dbl?", "itself if dbl, nil otherwise", H::isDbl);
+
+    defnArity(core, "monad?", "itself if seq, nil otherwise", H::isMonad);
+    defnArity(core, "io?", "itself if IO, nil otherwise", H::isIO);
+
+    defnArity(core, "coll?", "itself if coll, nil otherwise", H::isCollection);
+    defnArity(core, "vec?", "itself if vec, nil otherwise", H::isVec);
+    defnArity(core, "map?", "itself if map, nil otherwise", H::isMap);
+    defnArity(core, "seq?", "itself if seq, nil otherwise; empty seq is also nil", H::isSeq);
+
     defnArity(core, "nil?", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
     defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
 
@@ -643,7 +663,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
     H.eval("(defn max ^\"selects maximal of arguments\""
            + "([x] x)     ([x & a] (reduce max# x a)))", cxt, rcxt);
 
-    H.eval("(defmacro and ^\"logical and\"([x] x)([]'t) ([x & y] (let [a (gensym)] " //implementation ~taken from clojure
+    H.eval("(defmacro and ^\"logical and\"([x] x)([]'t) ([x & y] (let [a (gensym)] " //implementation ~copied from clojure
            + "        `(let [~a ~x] (if ~a (~and ~@y) ~a))    )))", cxt, rcxt);
     H.eval("(defmacro or  ^\"logical and\"([x] x)([]()) ([x & y] (let [a (gensym)] "
            + "        `(let [~a ~x] (if ~a ~a (~or ~@y)))    )))", cxt, rcxt);
