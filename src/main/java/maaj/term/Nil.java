@@ -10,6 +10,7 @@ import java.io.Writer;
 import maaj.exceptions.InvalidOperationException;
 import maaj.lang.Context;
 import maaj.term.visitor.Visitor;
+import maaj.util.H;
 
 /**
  * Singleton representing null; null is not allowed in MaajScript and is always wrapped* in a Nil.
@@ -87,8 +88,8 @@ public interface Nil extends Seq, Ground {
   }
 
   @Override
-  public default Seq unquoteTraverse(Context c) {
-    return retM(this);
+  public default Monad unquoteTraverse(Context c) {
+    return H.tuple(this);
   }
 
   @Override
