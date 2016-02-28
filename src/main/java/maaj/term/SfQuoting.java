@@ -64,6 +64,7 @@ public abstract class SfQuoting implements Sf {
 
     @Override
     public Term apply(Context cxt, Seq args) {
+      cxt = cxt.withEmptyAutoGensym(); //new set of auto-gensym names //for something# symols
       return args.isNil() ? H.NIL : H.seqFrom(args.first().unquoteTraverse(cxt)).firstOrNil();
     }
 

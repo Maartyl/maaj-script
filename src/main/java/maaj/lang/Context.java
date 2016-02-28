@@ -5,6 +5,7 @@
  */
 package maaj.lang;
 
+import java.util.concurrent.ConcurrentHashMap;
 import maaj.coll.traits.Lookup;
 import maaj.exceptions.InvalidOperationException;
 import maaj.interop.Interop;
@@ -33,22 +34,29 @@ public class Context implements Lookup {
 
   private final Map scope;
 
-  private Context(Glob glob, Namespace curNs, Map scope) {
+  private final java.util.Map<Symbol, Symbol> autoGensyms;
+
+  private Context(Glob glob, Namespace curNs, java.util.Map<Symbol, Symbol> autoGensyms, Map scope) {
     this.glob = glob;
     this.curNs = curNs;
     this.scope = scope;
+    this.autoGensyms = autoGensyms;
   }
 
   private Context(Context c, Map scope) {
-    this(c.glob, c.curNs, scope);
+    this(c.glob, c.curNs, c.autoGensyms, scope);
   }
 
   private Context(Glob glob, Namespace curNs) {
-    this(glob, curNs, MapH.emptyPersistent());
+    this(glob, curNs, emptyUnquoteAutoGensyms(), MapH.emptyPersistent());
   }
 
   private Context(Context c, Namespace curNs) {
-    this(c.glob, curNs, c.scope);
+    this(c.glob, curNs, c.autoGensyms, c.scope);
+  }
+
+  private Context(Context c, java.util.Map<Symbol, Symbol> autoGensyms) {
+    this(c.glob, c.curNs, autoGensyms, c.scope);
   }
 
   public Namespace getCurNs() {
@@ -128,6 +136,18 @@ public class Context implements Lookup {
     return dflt;
   }
 
+  public Symbol resolveAutoGensym(Symbol sym) {
+    //used inside unqoteTravrse //qualified-quote: symbols that end with #
+    return autoGensyms.computeIfAbsent(sym, H::uniqueSymbol);
+  }
+
+  public Context withEmptyAutoGensym() {
+    //the correct one is shared with all in same quotation
+    //laziness doesn't matter: it will be computed when/if necessary but they share the same, correct map
+    //this is called from SfQuoting before each new quote
+    return new Context(this, emptyUnquoteAutoGensyms());
+  }
+
   public Context withNamespace(Namespace ns) {
     return new Context(this, ns);
   }
@@ -146,6 +166,10 @@ public class Context implements Lookup {
 
   public static Context buildStubWithoutNamespace(Glob g) {
     return new Starting(g);
+  }
+
+  private static java.util.Map<Symbol, Symbol> emptyUnquoteAutoGensyms() {
+    return new ConcurrentHashMap<>();
   }
 
   private static class Starting extends Context {

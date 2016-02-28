@@ -76,6 +76,9 @@ public class Symbol implements Symbolic<Symbol> {
   public Collection unquoteTraverse(Context c) {
     if (!isSimple())
       return H.tuple(this);
+    if (getNm().endsWith("#"))
+      return H.tuple(c.resolveAutoGensym(this));
+
     Var v = c.getVar(this); //qualify (use this ns or ns it refers to)
     if (v == null)
       return H.tuple(withNamespace(c.getCurNs().getName()));
