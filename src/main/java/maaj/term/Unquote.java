@@ -72,7 +72,9 @@ public abstract class Unquote implements Term {
 
     @Override
     public void show(Writer w) throws IOException {
-      H.list(Sym.unquoteSymC, body).show(w);
+      w.append('~');
+      body.show(w);
+      //H.list(Sym.unquoteSymC, body).show(w);
     }
 
     @Override
@@ -94,7 +96,9 @@ public abstract class Unquote implements Term {
 
     @Override
     public void show(Writer w) throws IOException {
-      H.list(Sym.unquoteSplicingSymC, body).show(w);
+      w.append("~@");
+      body.show(w);
+      //H.list(Sym.unquoteSplicingSymC, body).show(w);
     }
 
     @Override
