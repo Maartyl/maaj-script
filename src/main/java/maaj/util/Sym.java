@@ -57,7 +57,7 @@ public class Sym {
   public static final Symbol varSymC = H.symbol("#", "var");
   public static final Symbol condSymCore = H.symbol("#core", "cond");
   public static final Symbol caseSymCore = H.symbol("#core", "case");
-  public static final Symbol equalSymCCore = H.symbol("#core", "=#");
+  public static final Symbol equalSymCCore = H.symbol("#core", "=&");
   public static final Symbol LTSymCore = H.symbol("#core", "<");
   public static final Symbol countPrimeSymCore = H.symbol("#core", "count'");
   public static final Symbol listSymCore = H.symbol("#core", "list");

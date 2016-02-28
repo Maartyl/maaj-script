@@ -621,18 +621,18 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     defnArity(core, "peek", "retieves last conj-ed element", H::requirePeekable, Peekable::peek);
 
-    defnArity(core, "conj#", "adds to cellection; where depends on collection", H::requireGrowable, FnH::id, Growable::conj);
-    defnArity(core, "assoc#", "update collection at given key with given value",
+    defnArity(core, "conj&", "adds to cellection; where depends on collection", H::requireGrowable, FnH::id, Growable::conj);
+    defnArity(core, "assoc&", "update collection at given key with given value",
               H::requireAssocUpdate, FnH::id, FnH::id, AssocUpdate::assoc);
-    defnArity(core, "dissoc#", "remove from ^1 collection at given ^2 key", H::requireDissoc, FnH::id, Dissoc::dissoc);
+    defnArity(core, "dissoc&", "remove from ^1 collection at given ^2 key", H::requireDissoc, FnH::id, Dissoc::dissoc);
 
     defnArity(core, "transient", "transient version of ^1 collection", H::requireTraPer, TraPer::asTransient);
     defnArity(core, "persistent!", "freeze ^1 transient to behave like persistent", H::requireTraPer, TraPer::asPersistent);
 
-    defnArity(core, "conj!#", "adds to cellection; where depends on collection", H::requireGrowableT, FnH::id, GrowableT::doConj);
-    defnArity(core, "assoc!#", "update collection at given key with given value",
+    defnArity(core, "conj!&", "adds to cellection; where depends on collection", H::requireGrowableT, FnH::id, GrowableT::doConj);
+    defnArity(core, "assoc!&", "update collection at given key with given value",
               H::requireAssocUpdateT, FnH::id, FnH::id, AssocUpdateT::doAssoc);
-    defnArity(core, "dissoc!#", "remove from ^1 collection at given ^2 key", H::requireDissocT, FnH::id, DissocT::doDissoc);
+    defnArity(core, "dissoc!&", "remove from ^1 collection at given ^2 key", H::requireDissocT, FnH::id, DissocT::doDissoc);
 
 
     defnArity(core, "reduce", "applies ^1 fn on (^2 accumulator and first element in ^3 coll)"
@@ -669,12 +669,12 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     defnArity(core, "take", "takes first ^1 n elements of a ^2 seq", H::requireNum, H::seqFrom, SeqH::take);
 
-    defn(core, "+#", "adds 2 args", (Num.Num2Op) Num::add);
-    defn(core, "-#", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
-    defn(core, "*#", "multiplies 2 args", (Num.Num2Op) Num::mul);
-    defn(core, "div#", "divides arg1 by arg0", (Num.Num2Op) Num::div);
-    defn(core, "min#", "(if (< l r) l r)", (Num.Num2Op) Num::min);
-    defn(core, "max#", "(if (> l r) l r)", (Num.Num2Op) Num::max);
+    defn(core, "+&", "adds 2 args", (Num.Num2Op) Num::add);
+    defn(core, "-&", "subtracts arg1 from arg0", (Num.Num2Op) Num::sub);
+    defn(core, "*&", "multiplies 2 args", (Num.Num2Op) Num::mul);
+    defn(core, "div&", "divides arg1 by arg0", (Num.Num2Op) Num::div);
+    defn(core, "min&", "(if (< l r) l r)", (Num.Num2Op) Num::min);
+    defn(core, "max&", "(if (> l r) l r)", (Num.Num2Op) Num::max);
 
     defn(core, "inc", "(+ % 1)", (Num.NumOp) Num::inc);
     defn(core, "dec", "(- % 1)", (Num.NumOp) Num::dec);
@@ -686,23 +686,23 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defn(core, "<=", "Num; is first arg less then or equal to second?", (Num.NumPred) (Num::lteq));
     defn(core, ">=", "Num; is first arg greater then or equal to second?", (Num.NumPred) (Num::gteq));
 
-    H.eval("(defn + ^\"sums numeric arguments; (+) -> 0\"        a (reduce +# 0 a))", cxt, rcxt);
-    H.eval("(defn * ^\"product of numeric arguments; (*) -> 1\"  a (reduce *# 1 a))", cxt, rcxt);
+    H.eval("(defn + ^\"sums numeric arguments; (+) -> 0\"        a (reduce +& 0 a))", cxt, rcxt);
+    H.eval("(defn * ^\"product of numeric arguments; (*) -> 1\"  a (reduce *& 1 a))", cxt, rcxt);
     H.eval("(defn - ^\"negates only argument or substracts others from first\""
-           + "([x] (neg x))   ([x & a] (reduce -# x a)))", cxt, rcxt);
+           + "([x] (neg x))   ([x & a] (reduce -& x a)))", cxt, rcxt);
     H.eval("(defn / ^\"multiplicative inverse of only arg or divides first by all following\""
-           + "([x] (/ 1 x))   ([x & a] (reduce div# x a)))", cxt, rcxt);
+           + "([x] (/ 1 x))   ([x & a] (reduce div& x a)))", cxt, rcxt);
     H.eval("(defn min ^\"selects minimal of arguments\""
-           + "([x] x)     ([x & a] (reduce min# x a)))", cxt, rcxt);
+           + "([x] x)     ([x & a] (reduce min& x a)))", cxt, rcxt);
     H.eval("(defn max ^\"selects maximal of arguments\""
-           + "([x] x)     ([x & a] (reduce max# x a)))", cxt, rcxt);
+           + "([x] x)     ([x & a] (reduce max& x a)))", cxt, rcxt);
 
-    H.eval("(defmacro and ^\"logical and\"([x] x)([]'t) ([x & y] (let [a (gensym)] " //implementation ~copied from clojure
-           + "        `(let [~a ~x] (if ~a (~and ~@y) ~a))    )))", cxt, rcxt);
-    H.eval("(defmacro or  ^\"logical and\"([x] x)([]()) ([x & y] (let [a (gensym)] "
-           + "        `(let [~a ~x] (if ~a ~a (~or ~@y)))    )))", cxt, rcxt);
+    H.eval("(defmacro and ^\"logical and; returns last non-nil\"([x] x)([]'t) ([x & y]" //implementation ~copied from clojure
+           + "        `(let [a# ~x] (if a# (~and ~@y) a#))    ))", cxt, rcxt);
+    H.eval("(defmacro or  ^\"logical or; returns first non-nil\"([x] x)([]()) ([x & y]"
+           + "        `(let [a# ~x] (if a# a# (~or ~@y)))    ))", cxt, rcxt);
 
-    H.eval("(defmacro = ^\"true iff all arguments are equal\"([x y] `(=# ~x ~y)) ([_] ''t) "
+    H.eval("(defmacro = ^\"true iff all arguments are equal\"([x y] `(=& ~x ~y)) ([_] ''t) "
            + "      ([x y & a] `(and (= ~x ~y) (= ~y ~@a))))", cxt, rcxt);
 
     H.eval("(defn list ^\"returns list of evaluated arguments\""
@@ -716,22 +716,22 @@ public class CoreLoader extends NamespaceNormal.Loader {
            + "([x] `(lazy' (#/fnseq ~x))) ([h t] `(cons ~h (lazy ~t))))", cxt, rcxt);
 
     H.eval("(defn conj ^\"conjoins 1 or more ^2 terms to a ^1 collection\""
-           + "([coll x] (conj# coll x)) ([coll & r] (reduce conj# coll r)))", cxt, rcxt);
+           + "([coll x] (conj& coll x)) ([coll & r] (reduce conj& coll r)))", cxt, rcxt);
 
     H.eval("(defn assoc ^\"[associative key val] associate key with val in map; there can be multiple key val pairs\""
-           + "([c k v] (assoc# c k v)) ([c k v & r] (apply recur (assoc# c k v) r)))", cxt, rcxt);
+           + "([c k v] (assoc& c k v)) ([c k v & r] (apply recur (assoc& c k v) r)))", cxt, rcxt);
 
     H.eval("(defn dissoc ^\"removes 1 or more kv by ^2 key from a ^1 map\""
-           + "([coll x] (dissoc# coll x)) ([coll & r] (reduce dissoc# coll r)))", cxt, rcxt);
+           + "([coll x] (dissoc& coll x)) ([coll & r] (reduce dissoc& coll r)))", cxt, rcxt);
 
     H.eval("(defn conj! ^\"conjoins 1 or more ^2 terms to a transient ^1 collection\""
-           + "([coll x] (conj!# coll x)) ([coll & r] (reduce conj!# coll r)))", cxt, rcxt);
+           + "([coll x] (conj!& coll x)) ([coll & r] (reduce conj!& coll r)))", cxt, rcxt);
 
     H.eval("(defn assoc! ^\"[associative key val] associate key with val in transient map; there can be multiple key val pairs\""
-           + "([c k v] (assoc!# c k v)) ([c k v & r] (apply recur (assoc!# c k v) r)))", cxt, rcxt);
+           + "([c k v] (assoc!& c k v)) ([c k v & r] (apply recur (assoc!& c k v) r)))", cxt, rcxt);
 
     H.eval("(defn dissoc! ^\"removes 1 or more kv by ^2 key from a ^1 transient map\""
-           + "([coll x] (dissoc!# coll x)) ([coll & r] (reduce dissoc!# coll r)))", cxt, rcxt);
+           + "([coll x] (dissoc!& coll x)) ([coll & r] (reduce dissoc!& coll r)))", cxt, rcxt);
 
     H.eval("(defmacro when ^\"if ^1, evaluates ^&2\""
            + "[test & body] `(if ~test (do ~@body)) )", cxt, rcxt);
@@ -740,13 +740,12 @@ public class CoreLoader extends NamespaceNormal.Loader {
            + "[test & body] `(when (not ~test) ~@body) )", cxt, rcxt);
 
     H.eval("(defmacro when-let ^\"like when, but binds resulting value if non-nil\""
-           + "[bind & body] "
+           + "[bind & body]                                            \n"
            + "(unless (vec? bind)         TODO:THROW)                  \n" //TODO: throw
            + "(unless (== 2 (count bind)) TODO:THROW)                  \n"
-           + "(let [[b val] bind                                       \n"
-           + "      tmp (gensym 'test)]                                \n"
-           + "  `(let [~tmp ~val]                                      \n"
-           + "     (when ~tmp (let [~b ~tmp] ~@body)))                 \n"
+           + "(let [[b val] bind]                                      \n"
+           + "  `(let [tmp# ~val]                                      \n"
+           + "     (when tmp# (let [~b tmp#] ~@body)))                 \n"
            + "))", cxt, rcxt);
 
     H.eval("(defmacro for  ^\"monadic composition block\"\n"
@@ -756,8 +755,9 @@ public class CoreLoader extends NamespaceNormal.Loader {
            + "   (let [[b m & br] binds]\n"
            + "     (case b\n"
            + "       :let `(let ~m (for ~br ~body)) ; in case it starts with let\n"
-           + "       _ (let [arg (gensym 'arg)] \n"
-           + "           `(for (fn [~arg] (retM ~m ~arg)) ~binds ~body))))) \n"
+           + "       _    `(let [m# ~m  ; only evaluate m once\n"
+           + "                   ret# (macro [arg#] (retM m# arg#))]\n"
+           + "               (for ret# [~b m# ~@br] ~body))))) \n"
            + "  ([ret binds body]\n"
            + "    (case (count' 0 binds)\n"
            + "      0 (list ret body)\n"
