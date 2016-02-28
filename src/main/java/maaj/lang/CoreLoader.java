@@ -759,7 +759,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
            + "                   ret# (macro [arg#] (retM m# arg#))]\n"
            + "               (for ret# [~b m# ~@br] ~body))))) \n"
            + "  ([ret binds body]\n"
-           + "    (case (count' 0 binds)\n"
+           + "    (case (count' 1 binds)\n"
            + "      0 (list ret body)\n"
            + "      1 (throw-arg \"odd binds: \" binds)\n"
            + "      _ (let [[b m & rs] binds]\n"
