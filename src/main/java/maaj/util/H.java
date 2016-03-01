@@ -198,6 +198,12 @@ public class H {
     return eval(read1(term, rcxt), cxt);
   }
 
+  public static Seq evalAll(String term, Context cxt, ReaderContext rcxt) {
+    Seq s = SeqH.mapEval(read(term, rcxt), cxt);
+    s.foreach((Invocable1) FnH::id); //eagerly aval all
+    return s; //I could just do foreach, but then I wouldn't have results
+  }
+
   public static Map map(Term key, Term val) {
     return MapH.emptyPersistent().assoc(key, val);
   }

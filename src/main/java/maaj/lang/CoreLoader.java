@@ -686,88 +686,98 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defn(core, "<=", "Num; is first arg less then or equal to second?", (Num.NumPred) (Num::lteq));
     defn(core, ">=", "Num; is first arg greater then or equal to second?", (Num.NumPred) (Num::gteq));
 
-    H.eval("(defn + ^\"sums numeric arguments; (+) -> 0\"        a (reduce +& 0 a))", cxt, rcxt);
-    H.eval("(defn * ^\"product of numeric arguments; (*) -> 1\"  a (reduce *& 1 a))", cxt, rcxt);
-    H.eval("(defn - ^\"negates only argument or substracts others from first\""
-           + "([x] (neg x))   ([x & a] (reduce -& x a)))", cxt, rcxt);
-    H.eval("(defn / ^\"multiplicative inverse of only arg or divides first by all following\""
-           + "([x] (/ 1 x))   ([x & a] (reduce div& x a)))", cxt, rcxt);
-    H.eval("(defn min ^\"selects minimal of arguments\""
-           + "([x] x)     ([x & a] (reduce min& x a)))", cxt, rcxt);
-    H.eval("(defn max ^\"selects maximal of arguments\""
-           + "([x] x)     ([x & a] (reduce max& x a)))", cxt, rcxt);
-
-    H.eval("(defmacro and ^\"logical and; returns last non-nil\"([x] x)([]'t) ([x & y]" //implementation ~copied from clojure
-           + "        `(let [a# ~x] (if a# (~and ~@y) a#))    ))", cxt, rcxt);
-    H.eval("(defmacro or  ^\"logical or; returns first non-nil\"([x] x)([]()) ([x & y]"
-           + "        `(let [a# ~x] (if a# a# (~or ~@y)))    ))", cxt, rcxt);
-
-    H.eval("(defmacro = ^\"true iff all arguments are equal\"([x y] `(=& ~x ~y)) ([_] ''t) "
-           + "      ([x y & a] `(and (= ~x ~y) (= ~y ~@a))))", cxt, rcxt);
-
-    H.eval("(defn list ^\"returns list of evaluated arguments\""
-           + "as as)", cxt, rcxt);
-
-    H.eval("(defn id ^\"returns it's first argument\""
-           + "[x] x)", cxt, rcxt);
-
-    H.eval("(defmacro lazy ^\"postpones evaluation of argument and returns seq thunk; body must evaluate into seq; "
-           + "if 2 arguments given ~= (cons fst-arg (lazy snd-arg))\""
-           + "([x] `(lazy' (#/fnseq ~x))) ([h t] `(cons ~h (lazy ~t))))", cxt, rcxt);
-
-    H.eval("(defn conj ^\"conjoins 1 or more ^2 terms to a ^1 collection\""
-           + "([coll x] (conj& coll x)) ([coll & r] (reduce conj& coll r)))", cxt, rcxt);
-
-    H.eval("(defn assoc ^\"[associative key val] associate key with val in map; there can be multiple key val pairs\""
-           + "([c k v] (assoc& c k v)) ([c k v & r] (apply recur (assoc& c k v) r)))", cxt, rcxt);
-
-    H.eval("(defn dissoc ^\"removes 1 or more kv by ^2 key from a ^1 map\""
-           + "([coll x] (dissoc& coll x)) ([coll & r] (reduce dissoc& coll r)))", cxt, rcxt);
-
-    H.eval("(defn conj! ^\"conjoins 1 or more ^2 terms to a transient ^1 collection\""
-           + "([coll x] (conj!& coll x)) ([coll & r] (reduce conj!& coll r)))", cxt, rcxt);
-
-    H.eval("(defn assoc! ^\"[associative key val] associate key with val in transient map; there can be multiple key val pairs\""
-           + "([c k v] (assoc!& c k v)) ([c k v & r] (apply recur (assoc!& c k v) r)))", cxt, rcxt);
-
-    H.eval("(defn dissoc! ^\"removes 1 or more kv by ^2 key from a ^1 transient map\""
-           + "([coll x] (dissoc!& coll x)) ([coll & r] (reduce dissoc!& coll r)))", cxt, rcxt);
-
-    H.eval("(defmacro when ^\"if ^1, evaluates ^&2\""
-           + "[test & body] `(if ~test (do ~@body)) )", cxt, rcxt);
-
-    H.eval("(defmacro unless ^\"if not ^1, evaluates ^&2; when with negated test\""
-           + "[test & body] `(when (not ~test) ~@body) )", cxt, rcxt);
-
-    H.eval("(defmacro when-let ^\"like when, but binds resulting value if non-nil\""
-           + "[bind & body]                                            \n"
-           + "(unless (vec? bind)         TODO:THROW)                  \n" //TODO: throw
-           + "(unless (== 2 (count bind)) TODO:THROW)                  \n"
-           + "(let [[b val] bind]                                      \n"
-           + "  `(let [tmp# ~val]                                      \n"
-           + "     (when tmp# (let [~b tmp#] ~@body)))                 \n"
-           + "))", cxt, rcxt);
-
-    H.eval("(defmacro for  ^\"monadic composition block; like let, but instead of binding results composes monads.\"\n"
-           + "  ([binds body]\n"
-           + "   (unless (vec? binds)        (throw-arg \"for: binds has to be a vector\"))\n"
-           + "   (unless (<= 2 (count binds)) (throw-arg \"for: too few binds: \" binds))\n"
-           + "   (let [[b m & br] binds]\n"
-           + "     (case b\n"
-           + "       :let `(let ~m (for ~br ~body)) ; in case it starts with let\n"
-           + "       _    `(let [m# ~m  ; only evaluate m once\n"
-           + "                   ret# (macro [arg#] (list `retM m# arg#))]\n"
-           + "               (for ret# [~b m# ~@br] ~body))))) \n"
-           + "  ([ret binds body]\n"
-           + "    (case (count' 1 binds)\n"
-           + "      0 (list ret body)\n"
-           + "      1 (throw-arg \"odd binds: \" binds)\n"
-           + "      _ (let [[b m & rs] binds]\n"
-           + "          (case b\n"
-           + "            :let `(let ~m (for ~ret ~rs ~body))\n"
-           + "            _ (if (and (= 2 (count' 2 binds)) (= b body) (sym? b))\n"
-           + "                m\n"
-           + "                `(>>= ~m (fn [~b] (for ~ret ~rs ~body)))))))))\n", cxt, rcxt);
+    H.evalAll(
+            ""
+            + "(defn + ^\"sums numeric arguments; (+) -> 0\"        a (reduce +& 0 a))"
+            + "(defn * ^\"product of numeric arguments; (*) -> 1\"  a (reduce *& 1 a))"
+            + "(defn - ^\"negates only argument or substracts others from first\""
+            + "  ([x] (neg x))"
+            + "  ([x & a] (reduce -& x a)))"
+            + "(defn / ^\"multiplicative inverse of only arg or divides first by all following\""
+            + "  ([x] (/ 1 x))"
+            + "  ([x & a] (reduce div& x a)))"
+            + "(defn min ^\"selects minimal of arguments\""
+            + "  ([x] x)"
+            + "  ([x & a] (reduce min& x a)))"
+            + "(defn max ^\"selects maximal of arguments\""
+            + "  ([x] x)"
+            + "  ([x & a] (reduce max& x a)))"
+            + "\n"
+            + "(defmacro and ^\"logical and; returns last non-nil\""
+            + "  ([x] x)"
+            + "  ([]'t)"
+            + "  ([x & y]" //implementation ~copied from clojure
+            + "    `(let [a# ~x] (if a# (~and ~@y) a#))    ))"
+            + "(defmacro or  ^\"logical or; returns first non-nil\""
+            + "  ([x] x)"
+            + "  ([]())"
+            + "  ([x & y]"
+            + "    `(let [a# ~x] (if a# a# (~or ~@y)))    ))"
+            + "\n"
+            + "(defmacro = ^\"true iff all arguments are equal\""
+            + "  ([x y] `(=& ~x ~y)) "
+            + "  ([_] ''t) "
+            + "  ([x y & a] `(and (= ~x ~y) (= ~y ~@a))))"
+            + "\n"
+            + "(defn list ^\"returns list of evaluated arguments\""
+            + "  as as)"
+            + "(defn id ^\"returns it's first argument\""
+            + "  [x] x)"
+            + "\n"
+            + "\n"
+            + "(defmacro lazy ^\"postpones evaluation of argument and returns seq thunk; body must evaluate into seq; "
+            + "if 2 arguments given ~= (cons fst-arg (lazy snd-arg))\""
+            + "  ([x] `(lazy' (#/fnseq ~x)))"
+            + "  ([h t] `(cons ~h (lazy ~t))))"
+            + "\n"
+            + "(defn conj ^\"conjoins 1 or more ^2 terms to a ^1 collection\""
+            + "  ([coll x] (conj& coll x)) ([coll & r] (reduce conj& coll r)))"
+            + "(defn assoc ^\"[associative key val] associate key with val in map; there can be multiple key val pairs\""
+            + "  ([c k v] (assoc& c k v)) ([c k v & r] (apply recur (assoc& c k v) r)))"
+            + "(defn dissoc ^\"removes 1 or more kv by ^2 key from a ^1 map\""
+            + "  ([coll x] (dissoc& coll x)) ([coll & r] (reduce dissoc& coll r)))"
+            + "(defn conj! ^\"conjoins 1 or more ^2 terms to a transient ^1 collection\""
+            + "  ([coll x] (conj!& coll x)) ([coll & r] (reduce conj!& coll r)))"
+            + "(defn assoc! ^\"[associative key val] associate key with val in transient map; there can be multiple key val pairs\""
+            + "  ([c k v] (assoc!& c k v)) ([c k v & r] (apply recur (assoc!& c k v) r)))"
+            + "(defn dissoc! ^\"removes 1 or more kv by ^2 key from a ^1 transient map\""
+            + "  ([coll x] (dissoc!& coll x)) ([coll & r] (reduce dissoc!& coll r)))"
+            + "\n"
+            + "\n"
+            + "(defmacro when ^\"if ^1, evaluates ^&2\""
+            + "  [test & body] `(if ~test (do ~@body)))"
+            + "(defmacro unless ^\"if not ^1, evaluates ^&2; when with negated test\""
+            + "  [test & body] `(when (not ~test) ~@body))"
+            + "\n"
+            + "(defmacro when-let ^\"like when, but binds resulting value if non-nil\""
+            + "  [bind & body]                                            \n"
+            + "  (unless (vec? bind)         (throw-arg \"when-let: binds has to be a vector\"))\n"
+            + "  (unless (== 2 (count bind)) (throw-arg \"when-let: binds requires exactly 1 binding pair\"))\n"
+            + "  (let [[b val] bind]                                      \n"
+            + "    `(let [tmp# ~val]                                      \n"
+            + "       (when tmp# (let [~b tmp#] ~@body)))))               \n"
+            + "\n"
+            + "\n"
+            + "(defmacro for ^\"monadic composition block; like let, but instead of binding results composes monads.\"\n"
+            + "  ([binds body]\n"
+            + "   (unless (vec? binds)         (throw-arg \"for: binds has to be a vector\"))\n"
+            + "   (unless (<= 2 (count binds)) (throw-arg \"for: too few binds: \" binds))\n"
+            + "   (let [[b m & br] binds]\n"
+            + "     (case b\n"
+            + "       :let `(let ~m (for ~br ~body)) ; in case it starts with let\n"
+            + "       _    `(let [m# ~m  ; only evaluate m once\n"
+            + "                   ret# (macro [arg#] (list `retM m# arg#))]\n"
+            + "               (for ret# [~b m# ~@br] ~body))))) \n"
+            + "  ([ret binds body]\n"
+            + "   (case (count' 1 binds)\n"
+            + "     0 (list ret body)\n"
+            + "     1 (throw-arg \"odd binds: \" binds)\n"
+            + "     _ (let [[b m & rs] binds]\n"
+            + "         (case b\n"
+            + "           :let `(let ~m (for ~ret ~rs ~body))\n"
+            + "           _ (if (and (= 2 (count' 2 binds)) (= b body) (sym? b))\n"
+            + "               m\n"
+            + "               `(>>= ~m (fn [~b] (for ~ret ~rs ~body)))))))))\n", cxt, rcxt);
 
     defnArity(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                                    + "(throw-arity $args \"message\")", H::seqFrom, FnH::id, (args, msg) -> {
