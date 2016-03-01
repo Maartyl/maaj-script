@@ -748,7 +748,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
            + "     (when tmp# (let [~b tmp#] ~@body)))                 \n"
            + "))", cxt, rcxt);
 
-    H.eval("(defmacro for  ^\"monadic composition block\"\n"
+    H.eval("(defmacro for  ^\"monadic composition block; like let, but instead of binding results composes monads.\"\n"
            + "  ([binds body]\n"
            + "   (unless (vec? binds)        (throw-arg \"for: binds has to be a vector\"))\n"
            + "   (unless (<= 2 (count binds)) (throw-arg \"for: too few binds: \" binds))\n"
@@ -756,7 +756,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
            + "     (case b\n"
            + "       :let `(let ~m (for ~br ~body)) ; in case it starts with let\n"
            + "       _    `(let [m# ~m  ; only evaluate m once\n"
-           + "                   ret# (macro [arg#] (retM m# arg#))]\n"
+           + "                   ret# (macro [arg#] (list `retM m# arg#))]\n"
            + "               (for ret# [~b m# ~@br] ~body))))) \n"
            + "  ([ret binds body]\n"
            + "    (case (count' 1 binds)\n"
