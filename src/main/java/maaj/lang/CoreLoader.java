@@ -606,7 +606,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defnArity(core, "int?", "itself if int, nil otherwise", H::isInt);
     defnArity(core, "dbl?", "itself if dbl, nil otherwise", H::isDbl);
 
-    defnArity(core, "monad?", "itself if seq, nil otherwise", H::isMonad);
+    defnArity(core, "monad?", "itself if monad, nil otherwise", H::isMonad);
     defnArity(core, "io?", "itself if IO, nil otherwise", H::isIO);
 
     defnArity(core, "coll?", "itself if coll, nil otherwise", H::isCollection);
@@ -614,8 +614,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defnArity(core, "map?", "itself if map, nil otherwise", H::isMap);
     defnArity(core, "seq?", "itself if seq, nil otherwise; empty seq is also nil", H::isSeq);
 
-    defnArity(core, "nil?", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
-    defnArity(core, "not", "(if % () 't)", val -> val.isNil() ? Sym.TRUE : H.NIL);
+    defnArity(core, "nil?", "(if % () 't)", val -> H.wrap(val.isNil()));
+    defnArity(core, "not", "(if % () 't)", val -> H.wrap(val.isNil()));
 
     defnArity(core, "cons", "prepends to list; O(1)", FnH::id, H::seqFrom, H::cons);
 
