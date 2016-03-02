@@ -48,8 +48,10 @@ public class MaajReader {
   }
 
   public Seq readAll() {
-    if (nextSkipWhitespace() < 0)
+    if (nextSkipWhitespace() < 0) {
+      reader.close();
       return H.END;
+    }
     return H.lazy(read0Cur(), this::readAll);
   }
 
@@ -457,6 +459,6 @@ public class MaajReader {
    * @throws ReaderException + any call to rest() throws too
    */
   public static Seq read(Reader r, ReaderContext cxt) {
-    return H.lazy(() -> new MaajReader(new PosReader(r), cxt).readAll());
+    return H.lazy((new MaajReader(new PosReader(r), cxt))::readAll);
   }
 }
