@@ -95,7 +95,8 @@ public class InteropJvm implements Interop {
 
       StringBuilder b = new StringBuilder();
       int cost0 = matches.get(0).cost();
-      for (int i = 0; matches.get(i).cost() <= cost0; ++i) //all with same, lowest cost
+      int len = matches.size();
+      for (int i = 0; i < len && matches.get(i).cost() <= cost0; ++i) //all with same, lowest cost
         b.append(matches.get(i).getMethodString()).append('\n');
 
       //ambiguous call
