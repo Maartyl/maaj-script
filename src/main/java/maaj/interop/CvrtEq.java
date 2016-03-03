@@ -10,19 +10,19 @@ package maaj.interop;
  * <p>
  * @author maartyl
  */
-public final class CvrtId implements Conversion, Converter {
+public final class CvrtEq implements Conversion, Converter {
 
-  private CvrtId() {
+  private CvrtEq() {
   }
 
   @Override
   public Conversion lookup(Class<?> source, Class<?> target) {
-    return (target.isAssignableFrom(source)) ? this : null;
+    return (target == source) ? this : null;
   }
 
   @Override
   public int cost() {
-    return 1;
+    return 0;
   }
 
   @Override
@@ -30,9 +30,9 @@ public final class CvrtId implements Conversion, Converter {
     return obj;
   }
 
-  private static final CvrtId SINGLETON = new CvrtId();
+  private static final CvrtEq SINGLETON = new CvrtEq();
 
-  public static CvrtId singleton() {
+  public static CvrtEq singleton() {
     return SINGLETON;
   }
 

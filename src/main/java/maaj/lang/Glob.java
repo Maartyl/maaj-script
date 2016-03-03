@@ -5,6 +5,7 @@
  */
 package maaj.lang;
 
+import maaj.interop.CvrtEq;
 import maaj.interop.CvrtId;
 import maaj.interop.CvrtNil;
 import maaj.interop.ImplicitConversions;
@@ -75,6 +76,7 @@ public class Glob {
 
   private static Interop defaultInteropSimple() {
     return new InteropJvm(CvrtH.combine(
+            CvrtEq.singleton(),
             CvrtId.singleton(),
             ImplicitConversions.singleton(),
             CvrtNil.singleton()));

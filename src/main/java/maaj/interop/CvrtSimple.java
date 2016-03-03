@@ -14,6 +14,6 @@ package maaj.interop;
 public interface CvrtSimple extends Conversion {
   @Override
   public default int cost() {
-    return 1;
+    return 2;
   }
 }

@@ -25,7 +25,7 @@ public final class CvrtNil implements Conversion, Converter {
 
   @Override
   public int cost() {
-    return 0; //null is any ref type ...
+    return 1; //null is any ref type ...
   }
 
   @Override
