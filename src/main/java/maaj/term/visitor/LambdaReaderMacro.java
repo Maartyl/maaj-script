@@ -10,9 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import maaj.term.Nil;
 import maaj.term.Seq;
 import maaj.term.Symbol;
 import maaj.term.Term;
+import maaj.term.Unquote;
 import maaj.term.VecT;
 import maaj.util.H;
 import maaj.util.Sym;
@@ -32,6 +34,11 @@ public class LambdaReaderMacro implements VisitorTerm<Object> {
   public Term run(Term t) {
     Term body = VisitorTerm.super.run(t); //cannot inline: sidefects
     return H.list(Sym.fnSymCore, argsVec(), body);
+  }
+
+  @Override
+  public Term unquote(Unquote t, Object arg) {
+    return t.getBody().unwrap().visit(this, arg);
   }
 
   @Override
