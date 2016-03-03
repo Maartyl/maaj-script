@@ -56,8 +56,12 @@ public class Glob {
     v = current.get(s);
     if (v != null) return v;
     v = coreAcc.get(s);
-    // if (v != null) return v;
-    // no need to search in others: current has imported anything accessible
+    if (v != null) return v;
+
+    if (s.isSimple() && s.getNm().length() > 1 && s.getNm().charAt(0) == '.') { // >1 :: just . shouldn't be expanded
+      return getVar(H.symbol(".", s.getNm().substring(1)), current); // .lol -> ./lol
+      //maybe this should only work in seq.head position, but .... too complicated
+    }
     return v;
   }
 
