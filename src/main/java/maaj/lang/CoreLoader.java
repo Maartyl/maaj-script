@@ -601,6 +601,9 @@ public class CoreLoader extends NamespaceNormal.Loader {
     defnArity(core, "sym?", "same as symbol?", H::isSymbol);
     defnArity(core, "kw?", "same as keyword?", H::isKeyword);
 
+    defnArity(core, "string?", "itself if string, nil otherwise", H::isStr);
+    defnArity(core, "str?", "same as string?", H::isStr);
+
     defnArity(core, "num?", "itself if number, nil otherwise", H::isNum);
     defnArity(core, "char?", "itself if char, nil otherwise", H::isChar);
     defnArity(core, "int?", "itself if int, nil otherwise", H::isInt);
@@ -619,7 +622,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
     defnArity(core, "cons", "prepends to list; O(1)", FnH::id, H::seqFrom, H::cons);
 
-    defnArity(core, "peek", "retieves last conj-ed element", H::requirePeekable, Peekable::peek);
+    defnArity(core, "peek", "retrieves last conj-ed element", H::requirePeekable, Peekable::peek);
 
     defnArity(core, "conj&", "adds to cellection; where depends on collection", H::requireGrowable, FnH::id, Growable::conj);
     defnArity(core, "assoc&", "update collection at given key with given value",

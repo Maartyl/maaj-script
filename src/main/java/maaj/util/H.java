@@ -493,6 +493,10 @@ public class H {
     return TypeVisitors.isInvocable.run(tt);
   }
 
+  public static Term isStr(Term tt) {
+    return TypeVisitors.isStr.run(tt);
+  }
+
   public static Term isGround(Term tt) {
     return wrap(tt.unwrap() instanceof Ground);
   }
@@ -905,6 +909,19 @@ public class H {
     static final Visitor<Term, H> isChar = new VisitorIsBase() {
       @Override
       public Term character(Char t, H arg) {
+        return t;
+      }
+    };
+
+    static final Visitor<Str, H> reqStr = new VisitorReqBase<Str>(Str.class) {
+      @Override
+      public Str str(Str t, H arg) {
+        return t;
+      }
+    };
+    static final Visitor<Term, H> isStr = new VisitorIsBase() {
+      @Override
+      public Term str(Str t, H arg) {
         return t;
       }
     };
