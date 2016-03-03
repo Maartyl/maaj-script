@@ -35,6 +35,10 @@ public class SeqH {
     return s.fmap((Invocable1) x -> x.eval(c));
   }
 
+  public static Seq mapEvalMacros(Seq s, Context c) {
+    return s.fmap((Invocable1) x -> x.evalMacros(c));
+  }
+
   //--eager variants
 
   /**

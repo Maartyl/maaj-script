@@ -119,21 +119,18 @@ public class Symbol implements Symbolic<Symbol> {
     //this must be here, not in evalMacro : why?
     //I only want to get macros if in context of application of the macro
     Var v = cxt.getVar(this);
-    if (v != null && MapH.hasTag(v.getMeta(), Sym.macroSymK))
-      return v.applyMacro(cxt, H.ret1(args, args = null));
-
-    args = args.fmap((Invocable1) x -> x.evalMacros(cxt));
-
-    //include optimizer: stored in meta of var; applied on macro expanded args
-    // - use instead of a macro application, if present (and isn't macro)
-    //essentially will replaces cons
     if (v != null) {
-      Term optimizer = v.getMeta().valAt(Sym.optimizerSymK);
-      if (H.bool(optimizer))
-        return H.requireInvocable(optimizer).invokeSeq(H.ret1(args, args = null));
-    }
+      if (MapH.hasTag(v.getMeta(), Sym.macroSymK)) //on way 'down' in AST-DFS
+        return v.applyMacro(cxt, H.ret1(args, args = null));
 
-    return SeqH.cons(this, args);
+      //include optimizer: stored in meta of var; applied on macro expanded args
+      // - use instead of a macro application, if present (and isn't macro)
+      //essentially will replace simple cons
+      Term optimizer = v.getMeta().valAt(Sym.optimizerSymK); //on way 'up' in AST-DFS
+      if (H.bool(optimizer))
+        return H.requireInvocable(optimizer).invokeSeq(H.ret1(SeqH.mapEvalMacros(args, cxt), args = null));
+    }
+    return SeqH.cons(this, SeqH.mapEvalMacros(args, cxt));
   }
 
   @Override
@@ -166,8 +163,6 @@ public class Symbol implements Symbolic<Symbol> {
   public String toString() {
     return print();
   }
-
-
 
   //-- STATIC
   public static Symbol of(String str) {
