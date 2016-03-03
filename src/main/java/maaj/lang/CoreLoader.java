@@ -780,7 +780,20 @@ public class CoreLoader extends NamespaceNormal.Loader {
             + "           :let `(let ~m (for ~ret ~rs ~body))\n"
             + "           _ (if (and (= 2 (count' 2 binds)) (= b body) (sym? b))\n"
             + "               m\n"
-            + "               `(>>= ~m (fn [~b] (for ~ret ~rs ~body)))))))))\n", cxt, rcxt);
+            + "               `(>>= ~m (fn [~b] (for ~ret ~rs ~body)))))))))\n"
+            + ""
+            + "(defmacro -> ^\"insert first argument as first argument of second form;"
+            + " recursively on all; (-> a (+ 5) k) => (k (+ a 5))\"\n"
+            + "  ([x] x)\n"
+            + "  ([x form & rx] `(-> ~(if (seq? form)\n"
+            + "                         `(~(first form) ~x ~@(rest form))\n"
+            + "                         `(~form ~x)) ~@rx)))\n"
+            + "(defmacro ->> ^\"insert first argument as last argument of second form;"
+            + " recursively on all; (-> a (+ 5) k) => (k (+ 5 a))\"\n"
+            + "  ([x] x)\n"
+            + "  ([x form & rx] `(-> ~(if (seq? form)\n"
+            + "                         `(~(first form) ~@(rest form) ~x)\n"
+            + "                         `(~form ~x)) ~@rx)))", cxt, rcxt);
 
     defnArity(core, Sym.throwAritySymCore.getNm(), "throws exception about unmatched arirty; counts first arg; second is data;"
                                                    + "(throw-arity $args \"message\")", H::seqFrom, FnH::id, (args, msg) -> {
