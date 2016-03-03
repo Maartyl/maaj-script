@@ -34,9 +34,9 @@ public final class NsDot implements Namespace.ReadOnly {
    (./xx? obj) -> (./isXx obj)
    (./xx! obj val) -> (./setXx obj val)
 
-   (./xx- obj) -> field getter
-   (./xx- obj val) -> field setter
-   (./xx- 'Type) -> access static field //set if adds second arg
+   (./-xx obj) -> field getter
+   (./-xx! obj val) -> field setter
+   (./-xx 'Type) -> access static field //set if adds second arg
 
 
    (./!! ex) -> throw ex
@@ -73,6 +73,7 @@ public final class NsDot implements Namespace.ReadOnly {
     //name is nonempty
     switch (name.charAt(0)) { //on first char
     case ':': return ctor(name.substring(1));
+    case '-': return field(name.substring(1));
     default: //continue
     }
 
@@ -83,7 +84,7 @@ public final class NsDot implements Namespace.ReadOnly {
       case ':': return getter(name.substring(0, lastIndex));
       case '?': return getterBool(name.substring(0, lastIndex));
       case '!': return setter(name.substring(0, lastIndex));
-      case '-': return field(name.substring(0, lastIndex));
+      
       default: //continue
       }
     
@@ -117,8 +118,48 @@ public final class NsDot implements Namespace.ReadOnly {
     };
   }
 
-  private Macro field(String substring) {
-    throw new UnsupportedOperationException("Not supported yet."); //TODO: implement
+  private Macro field(String name) {
+    if ("".equals(name) || "!".equals(name))
+      throw new IllegalArgumentException("empty field name");
+    int lastIndex = name.length() - 1;
+
+    if (name.charAt(lastIndex) == '!')
+      return fieldSet(name.substring(0, lastIndex));
+    return fieldGet(name);
+  }
+
+  private Macro fieldSet(String name) {
+    String nm = checkAndEscape(name);
+
+    return args -> {
+      if (args.isNil())
+        throw (new IllegalArgumentException("Cannot access field '" + nm + " without target argument."));
+      if (args.rest().isNil())
+        throw (new IllegalArgumentException("Cannot set field '" + nm + " : no value provided."));
+      if (!args.rest().rest().isNil())
+        throw (new IllegalArgumentException("Too many arguments to field '" + nm + " setter."));
+
+      Term target = args.first();
+      Term value = args.rest().first();
+      return H.list(isQuotedSymbol(target) ? Sym.staticFieldSetSymInterop : Sym.instanceFieldSetSymInterop,                                 target,
+                    H.list(Sym.quoteSymC, H.symbol(nm)),
+                    value);
+    };
+  }
+
+  private Macro fieldGet(String name) {
+    String nm = checkAndEscape(name);
+
+    return args -> {
+      if (args.isNil())
+        throw (new IllegalArgumentException("Cannot access field '" + nm + " without target argument."));
+
+      Term target = args.first();
+      Term field_access = H.list(isQuotedSymbol(target) ? Sym.staticFieldGetSymInterop : Sym.instanceFieldGetSymInterop,
+                                 target,
+                                 H.list(Sym.quoteSymC, H.symbol(nm)));
+      return H.cons(Sym.orSymCore, field_access, args.rest()); //if more args present: use as default value
+    };
   }
 
   private Macro escapeAndInvoke(String name) {
@@ -137,7 +178,7 @@ public final class NsDot implements Namespace.ReadOnly {
   }
 
   private static String checkAndEscape(String name) {
-    //. ; [ / < > : --- these chars need escaping to be JVM identifier //TODO
+    //. ; [ / < > : --- these chars are not valid JVM identifier //TODO
     int len = name.length();
     int last = len - 1;
     int pos;

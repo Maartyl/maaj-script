@@ -864,7 +864,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
           return IO.make(c -> c.getInterop().ctor(typeRequire(type.getNm(), H.tuple(H.wrap("java.lang"))), args.seq()));
         });
 
-    defnArity(jvm, "instance-field-get",
+    defnArity(jvm, Sym.instanceFieldGetSymInterop.getNm(),
               "Get's value of field on an instace.\n"
         + "[obj fieldName]; "
               + "fieldName: unqualified symbol. ",
@@ -879,7 +879,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
 
           return IO.make(c -> c.getInterop().fieldGet(obj.getType(), content, name.getNm()));
         });
-    defnArity(jvm, "static-field-get",
+    defnArity(jvm, Sym.staticFieldGetSymInterop.getNm(),
               "Get's value of static field.\n"
         + "[type fieldName]; "
         + "type: full class name (unqualified symbol). "
@@ -895,7 +895,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
                                                             null, name.getNm()));
         });
 
-    defnArity(jvm, "instance-field-set",
+    defnArity(jvm, Sym.instanceFieldSetSymInterop.getNm(),
               "Sets's value of field on an instace. (performs implicit conversions) \n"
         + "[obj fieldName value]; "
               + "fieldName: unqualified symbol. ",
@@ -913,7 +913,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
           });
           
         });
-    defnArity(jvm, "static-field-set",
+    defnArity(jvm, Sym.staticFieldSetSymInterop.getNm(),
               "Sets's value of static field. (performs implicit conversions) \n"
         + "[type fieldName value]; "
         + "type: full class name (unqualified symbol). "

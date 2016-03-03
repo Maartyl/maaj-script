@@ -77,10 +77,15 @@ public class Sym {
   public static final Symbol requirePrimeSymC = H.symbol("#", "require'");
   public static final Symbol fnSymCore = H.symbol("#core", "fn");
   public static final Symbol macroSymCore = H.symbol("#core", "macro");
+  public static final Symbol orSymCore = H.symbol("#core", "or");
 
   public static final Symbol invokeStaticSymInterop = H.symbol("#jvm", "invoke-static");
   public static final Symbol invokeVirtualSymInterop = H.symbol("#jvm", "invoke-virtual");
   public static final Symbol ctorSymInterop = H.symbol("#jvm", "ctor");
+  public static final Symbol instanceFieldGetSymInterop = H.symbol("#jvm", "instance-field-get");
+  public static final Symbol instanceFieldSetSymInterop = H.symbol("#jvm", "instance-field-set");
+  public static final Symbol staticFieldGetSymInterop = H.symbol("#jvm", "static-field-get");
+  public static final Symbol staticFieldSetSymInterop = H.symbol("#jvm", "static-field-set");
 
   public static final Symbol argsSymSpecial = H.symbol("&args");
   public static final Symbol formSymSpecial = H.symbol("&form");
