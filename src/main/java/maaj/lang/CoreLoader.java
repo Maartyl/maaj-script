@@ -799,7 +799,15 @@ public class CoreLoader extends NamespaceNormal.Loader {
                                                    + "(throw-arity $args \"message\")", H::seqFrom, FnH::id, (args, msg) -> {
            throw new IllegalArgumentException("Wrong number of args: " + args.boundLength(50)
                                               + "; " + msg + " //args: " + SeqH.take(50, args));
-    });
+            });
+
+    defn(core, "throw-arg", "throws exception about unmatched arirty; counts first arg; second is data;"
+                            + "(throw-arity $args \"message\")", a -> {
+              StringBuilder sb = new StringBuilder();
+              for (Term arg : a)
+                sb.append(arg);
+              throw new IllegalArgumentException(sb.toString());
+            });
 
     //lambda
     defmacro(core, "\u03BB", "creates function that binds args (same as fn)", a -> H.cons(Sym.fnSymCore, a));
