@@ -370,7 +370,7 @@ public class CoreLoader extends NamespaceNormal.Loader {
   private Term condMacro(Seq a) {
     switch (a.boundLength(2)) {
     case 0: return H.END; //also nil; but can be seq
-    case 1: throw new IllegalArgumentException("cond: odd number of terms //: " + a.first().print());
+    case 1: throw new IllegalArgumentException("cond: odd number of terms //last: " + a.first().print());
     default:
       Term test = a.first();
       Term body = a.rest().first();
