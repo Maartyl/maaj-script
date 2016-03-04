@@ -171,19 +171,19 @@ public class CoreLoader extends NamespaceNormal.Loader {
         Term onFalse = s.rest().rest().firstOrNil();
         if (test.isNil()) //nil will surely evaluate to nil
           return onFalse;
-        if (H.bool(H.isKeyword(test)))
-          return onTrue;
+        //if (H.bool(H.isKeyword(test))) //is Ground too
+        //  return onTrue;
         if (H.bool(H.isGround(test))) //ground will surely evaluate to itself
           return onTrue;
 
         //no branching (I don't want to test on full equality big subtrees, though)
-        //still, I have to evaluate test for sidefects anyway...
-        // - unless I change semantics, that: unnecessary stuff is not necessarily evaluated
-        if (onTrue.isNil() && onFalse.isNil()) {
-          if (H.bool(H.isSymbol(test))) //evaluating symbol does not have side-effects
-            return H.NIL;
-          return H.list(Sym.doSymC, test, H.NIL);
-        }
+        // unnecessary stuff is not necessarily evaluated (unless it's IO)
+//        if (onTrue.isNil() && onFalse.isNil()) {
+//          if (H.bool(H.isSymbol(test))) //evaluating symbol does not have side-effects
+//            return H.NIL;
+//          // return H.list(Sym.doSymC, test, H.NIL);
+//          return H.list(Sym.doSymC, test, H.NIL);
+//        } //IT happens so rarely, it's probably pointless to test: costs more than possible gain
       }
       return H.cons(Sym.ifSymC, s);
     });
