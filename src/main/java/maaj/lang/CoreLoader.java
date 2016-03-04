@@ -349,7 +349,8 @@ public class CoreLoader extends NamespaceNormal.Loader {
       // : empty body : just return nil
       return (H.END);
     //create pattern binder with meta of original pattern + add the pattern in case it would be needed
-    Term pb = patternBinder(ptrn).addMeta(ptrn.getMeta()).addMeta(Sym.patternSym, ptrn);
+    //Term pb = patternBinder(ptrn).addMeta(ptrn.getMeta()).addMeta(Sym.patternSym, ptrn);
+    Term pb = ptrn;
     return (H.cons(Sym.letSymC, H.cons(H.tuple(pb, Sym.argsSymSpecial), body)));//(let [~pb $args] ~@body)
   }
 
@@ -394,10 +395,14 @@ public class CoreLoader extends NamespaceNormal.Loader {
     //(cond exp match body) -> (if (=# match exp) body) // no need for let
     case 3: return H.list(Sym.ifSymC, H.list(Sym.equalSymCCore, a.rest().first(), a.first()), a.rest().rest().first());
     default:
-      Symbol gensym = H.uniqueSymbol("exp");
       Term exp = a.first();
+      boolean noLet = H.bool(H.isSymbolic(exp)) || H.bool(H.isGround(exp));
+      Term gensym = noLet ? exp : H.uniqueSymbol("exp");
+      
       Seq matchList = SeqH.mapAlternate(a.rest(), x -> Sym.ignoreSym.equals(x) ? Sym.elseSymK :
-                                                       H.list(Sym.equalSymCCore, x, gensym), FnH::id);
+                                        H.list(Sym.equalSymCCore, x, gensym), FnH::id);
+      if (noLet)
+        return H.cons(Sym.condSymCore, matchList);
       return H.list(Sym.letSymC, H.tuple(gensym, exp), H.cons(Sym.condSymCore, matchList));
     }
   }
